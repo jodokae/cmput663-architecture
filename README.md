@@ -44,7 +44,8 @@ Can get architecture and metrics out of source code
 
 Next Steps (23.10.17):
 
-0. Extract out of Husact (takes too long, or aborts)
+0. Extract out of Husact (takes too long, or OutOfMemException)
+    Extend Husact to Headless version which extracts into another format (see 4)
 1. Check Extracted Data
 2. Transform Result
 3. Decide how to define architecture
