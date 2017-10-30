@@ -21,10 +21,8 @@ public class Extraction {
 	@Test
 	public void headlessTest() {
 		
-		
 		List<String> path = Arrays.asList(FILES.split(";"));
 		test(path);
-		
 		
 	}
 	
@@ -59,7 +57,7 @@ public class Extraction {
 	        String simpleName = cElement.getContent().get(0).getValue();
 	        String pkg = cElement.getContent().get(4).getValue();
 	        
-	        //System.out.println(simpleName + " in: " + pkg);
+	        System.out.println(simpleName + " in: " + pkg);
 	    }
 	    
 	    for (Content c : dependencies) {
@@ -68,7 +66,7 @@ public class Extraction {
 	        String toType = cElement.getContent().get(1).getValue();
 	        String dependencyType = cElement.getContent().get(2).getValue();
 	        
-	        //System.out.println(fromType + " -> " + toType + ". Type: " + dependencyType);
+	        System.out.println(fromType + " -> " + toType + ". Type: " + dependencyType);
 	      }
 	    
 	    
