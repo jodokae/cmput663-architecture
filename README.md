@@ -40,13 +40,15 @@ https://github.com/HUSACCT/HUSACCT
 Can get architecture and metrics out of source code
 
 
+Own HUSACCT Project for Java direct use: https://github.com/jodokae/HUSACCT
+Build HUSACCT via ant and then copy it to local-mvn-repo (already done)
+
+Java Project can then extract Java Classes / Packages / Dependencies
+
+
 # TODO
 
-Next Steps (23.10.17):
+Next Steps (30.10.17):
 
-0. Extract out of Husact (takes too long, or OutOfMemException)
-    Extend Husact to Headless version which extracts into another format (see 4)
-1. Check Extracted Data
-2. Transform Result
-3. Decide how to define architecture
-4. Change Husact so that it can be used automatically
+1. Transform Result
+2. Decide how to define architecture
