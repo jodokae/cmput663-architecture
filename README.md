@@ -27,7 +27,10 @@ select gh_lang, gh_project_name, count(gh_project_name) as commits, tr_log_analy
 => Analyze SonarQube as Test object. Largest
 
 Relevant info:
-select tr_log_analyzer, gh_project_name, git_trigger_commit, tr_build_number, tr_status from travistorrent_8_2_2017 where gh_project_name = "SonarSource/sonarqube" order by tr_build_number ;
+select tr_log_analyzer, gh_project_name, git_trigger_commit, tr_build_number, tr_status from travistorrent_8_2_2017 where gh_project_name = "SonarSource/sonarqube" && tr_log_analyzer = "java-maven" order by tr_build_number ;
+
+
+Only Maven because maven architecture is used to analyse (src/main) for extraction
 
 Get Commit: github.com/{gh_project_name}/archive/{tr_trigger_commit}.zip
 

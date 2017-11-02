@@ -1,5 +1,0 @@
-package Test;
-
-class Test {
-
-}
