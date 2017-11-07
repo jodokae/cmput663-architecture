@@ -46,7 +46,8 @@ public class Extraction {
 		
 		for(Entry<String, Element> entry : graphs.entrySet()) {
 			System.out.println(entry.getKey() + ": ");
-			printBasicInfo(entry.getValue());
+			//printBasicInfo(entry.getValue());
+			printBasicGraph(entry.getValue());
 		}
 		
 	}
