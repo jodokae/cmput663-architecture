@@ -3,6 +3,12 @@
   <groupId>org.jodokae</groupId>
   <artifactId>architecture</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  
   <dependencies>
   	<dependency>
   		<groupId>org.jdom</groupId>
@@ -26,6 +32,14 @@
 	    <scope>system</scope>
 	    <systemPath>${project.basedir}/local-mvn-repo/HUSACCT.jar</systemPath>
 	</dependency>
+	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>6.0.6</version>
+</dependency>
+
+	
   </dependencies>
  
   

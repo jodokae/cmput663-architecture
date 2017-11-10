@@ -20,9 +20,9 @@ public class Main {
 	}
 	
 	public void init() {
-		database = Factory.getDatabase();
-		extractor = Factory.getExtractor();	
-		simComp = Factory.getSimilarityComputer();
+		database = Factory.createDatabase();
+		extractor = Factory.createExtractor();	
+		simComp = Factory.createSimilarityComputer();
 		
 	}
 	
@@ -31,6 +31,9 @@ public class Main {
 		
 		String pathOne = database.getCommit(builds.get(0));
 		String pathTwo = database.getCommit(builds.get(1));
+		
+		System.out.println(pathOne);
+		System.out.println(pathTwo);
 		
 		Graph<Module> architectureOne = extractor.computeArchitecture(pathOne);
 		Graph<Module> architectureTwo = extractor.computeArchitecture(pathTwo);
