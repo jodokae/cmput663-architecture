@@ -1,10 +1,8 @@
 package architecture.extraction.reconstruction;
 
-import architecture.commons.ClassElement;
-import architecture.commons.Graph;
-import architecture.commons.Module;
+import java.io.File;
 
 public abstract class AbstractArchitectureReconstructor {
 	
-	public abstract Graph<Module> reconstruct(Graph<ClassElement> graph);
+	public abstract void reconstruct(File graph, File output);
 }

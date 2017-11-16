@@ -1,10 +1,9 @@
 package architecture.similarity;
 
-import architecture.commons.Graph;
-import architecture.commons.Module;
+import java.io.File;
 
 public abstract class AbstractArchitectureSimilarityComputer {
 	
-	public abstract double computeSimilarity(Graph<Module> arcOne, Graph<Module> arcTwo);
+	public abstract double computeSimilarity(File arcOne, File arcTwo);
 	
 }

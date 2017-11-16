@@ -1,9 +1,9 @@
 package architecture.extraction.classes;
 
-import architecture.commons.ClassElement;
-import architecture.commons.Graph;
+import java.io.File;
+import java.io.IOException;
 
 public abstract class AbstractClassGraphExtractor {
 	
-	public abstract Graph<ClassElement> extract(String path);
+	public abstract void extract(File projectFolder, File output) throws IOException;
 }
