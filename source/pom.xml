@@ -32,12 +32,51 @@
 	    <scope>system</scope>
 	    <systemPath>${project.basedir}/local-mvn-repo/HUSACCT.jar</systemPath>
 	</dependency>
+	<dependency>
+		<groupId>edu.usc.softarch</groupId>
+	    <artifactId>arcade</artifactId>
+	    <version>0.1.0</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/local-mvn-repo/arcade.jar</systemPath>
+	</dependency>
 	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
     <version>6.0.6</version>
 </dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.7</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.rauschig/jarchivelib -->
+<dependency>
+    <groupId>org.rauschig</groupId>
+    <artifactId>jarchivelib</artifactId>
+    <version>0.7.1</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.specs2/classycle -->
+<dependency>
+    <groupId>org.specs2</groupId>
+    <artifactId>classycle</artifactId>
+    <version>1.4.3</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>23.4-jre</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+<dependency>
+    <groupId>commons-cli</groupId>
+    <artifactId>commons-cli</artifactId>
+    <version>1.4</version>
+</dependency>
+
+
 
 	
   </dependencies>
