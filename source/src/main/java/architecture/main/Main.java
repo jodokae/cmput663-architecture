@@ -18,8 +18,8 @@ public class Main {
 	
 	private final static String PROJECT = "SonarSource/sonarqube";
 	
-	private final static String PROJECT_FOLDER = "projects/";
-	private final static String ARC_FOLDER = "architecture";
+	private final static String PROJECT_FOLDER = "extracted/projects/";
+	private final static String ARC_FOLDER = "extracted/architectures/";
 	
 	static Logger log = Logger.getLogger(Main.class);
 	

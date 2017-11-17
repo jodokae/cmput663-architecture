@@ -5,6 +5,4 @@ target/
 .classpath
 .project
 
-architecture/
-autoDownloadProjects/
-projects/
+extracted/
