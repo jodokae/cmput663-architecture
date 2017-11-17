@@ -6,4 +6,6 @@ public abstract class AbstractArchitectureSimilarityComputer {
 	
 	public abstract double computeSimilarity(File arcOne, File arcTwo);
 	
+	public abstract double getNormalizedDifference(double simValue);
+	
 }

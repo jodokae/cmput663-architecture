@@ -9,6 +9,7 @@ import architecture.extraction.classes.HusacctGraphExtractor;
 import architecture.extraction.reconstruction.ACDCReconstructor;
 import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
+import architecture.similarity.direct.A2aSimiliarityComputer;
 
 public class Factory {
 	
@@ -23,6 +24,6 @@ public class Factory {
 	}
 	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
-		return null;
+		return new A2aSimiliarityComputer();
 	}
 }
