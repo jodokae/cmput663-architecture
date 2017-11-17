@@ -8,4 +8,8 @@ public abstract class AbstractArchitectureSimilarityComputer {
 	
 	public abstract double getNormalizedDifference(double simValue);
 	
+	public double computeDifference(File arcOne, File arcTwo) {
+		return getNormalizedDifference(computeSimilarity(arcOne, arcTwo));
+	}
+	
 }

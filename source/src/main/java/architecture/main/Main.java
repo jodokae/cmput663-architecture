@@ -4,21 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import architecture.commons.files.FileHandler;
 import architecture.database.AbstractDatabase;
-import architecture.extraction.AbstractArchitectureExtractor;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
 
 public class Main {
-	private AbstractArchitectureExtractor extractor;
 	private AbstractDatabase database;
 	private AbstractArchitectureSimilarityComputer simComp;
 	
-	private String project = "SonarSource/sonarqube";
+	private CommitToArchitecture comToArc;
+	
+	private final static String PROJECT = "SonarSource/sonarqube";
+	
+	private final static String PROJECT_FOLDER = "projects/";
+	private final static String ARC_FOLDER = "architecture";
 	
 	static Logger log = Logger.getLogger(Main.class);
 	
@@ -36,40 +37,31 @@ public class Main {
 		}
 	}
 	
-	public void init() {
-		database = Factory.createDatabase(project);
-		extractor = Factory.createExtractor();	
+	public void init() {		
+		database = Factory.createDatabase(PROJECT);	
 		simComp = Factory.createSimilarityComputer();
+		
+		comToArc = new CommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
 		
 	}
 	
 	public void run() throws IOException {
+		System.out.println("Starting");
+		
 		List<Integer> builds = database.getBuildList();
 		
 		String commitOne = database.getCommit(builds.get(0));
 		String commitTwo = database.getCommit(builds.get(1));
 			
-		String projectFolder = "autoDownloadProjects/";
+		System.out.println("Recover Arc 1");
+		File architectureOne = comToArc.downloadAndReconstruct(commitOne);
+		System.out.println("Recover Arc 2");
+		File architectureTwo = comToArc.downloadAndReconstruct(commitTwo);
 		
-		File archive = FileHandler.downloadCommit(project, commitOne, projectFolder);
-		File versionOne = FileHandler.extract(archive, projectFolder);
-		
-		File archive2 = FileHandler.downloadCommit(project, commitTwo, projectFolder);
-		File versionTwo = FileHandler.extract(archive2, projectFolder);
-		
-		String architectureFolder = FilenameUtils.normalize("architecture/" + project + "/" + commitOne);
-		String architectureFolderTwo = FilenameUtils.normalize("architecture/" + project + "/" + commitTwo);
-		
-		
-		File architectureOne = extractor.computeArchitecture(versionOne, architectureFolder);
-		File architectureTwo = extractor.computeArchitecture(versionTwo, architectureFolderTwo);
-			
-		double sim = simComp.computeSimilarity(architectureOne, architectureTwo);
-		double diff = simComp.getNormalizedDifference(sim);
+		System.out.println("Compute Diff");
+		double diff = simComp.computeDifference(architectureOne, architectureTwo);
 		
 		System.out.println("Diff between " + commitOne + " and " + commitTwo + ": " + diff);
-		//System.out.println(database.getOutcome(builds.get(0)));
-		//System.out.println(database.getOutcome(builds.get(1)));
 		
 		System.out.println("Finished");
 		
