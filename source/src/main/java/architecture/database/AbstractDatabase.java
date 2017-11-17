@@ -21,9 +21,11 @@ public abstract class AbstractDatabase {
 		
 		return res;
 	}
+	
 	public String getCommit(int build) {
 		return commits.get(build);
 	}
+	
 	public String getOutcome(int build) {
 		return statuses.get(build);
 	}
