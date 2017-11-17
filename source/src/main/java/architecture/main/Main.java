@@ -2,29 +2,27 @@ package architecture.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import architecture.database.AbstractDatabase;
-import architecture.similarity.AbstractArchitectureSimilarityComputer;
 
 public class Main {
 	private AbstractDatabase database;
-	private AbstractArchitectureSimilarityComputer simComp;
 	
 	private CommitToArchitecture comToArc;
+	private CompareAndSave compSave;
 	
 	private final static String PROJECT = "SonarSource/sonarqube";
 	
 	private final static String PROJECT_FOLDER = "extracted/projects/";
 	private final static String ARC_FOLDER = "extracted/architectures/";
+	private final static String DIFF_JSON = "extracted/versionDiff.json";
 	
 	static Logger log = Logger.getLogger(Main.class);
 	
@@ -37,49 +35,28 @@ public class Main {
 		
 		main.extractAndCompare(5);
 		
-		/*try {
-			main.run();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		main.finish();
 	}
 	
 	public void init() {		
 		database = Factory.createDatabase(PROJECT);	
-		simComp = Factory.createSimilarityComputer();
 		
-		comToArc = new CommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
+		comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
+		compSave = Factory.createCompareAndSave(DIFF_JSON);
 		
 	}
 	
-	public void run() throws IOException {
-		System.out.println("Starting");
-		
-		List<Integer> builds = database.getBuildList();
-		
-		String commitOne = database.getCommit(builds.get(0));
-		String commitTwo = database.getCommit(builds.get(1));
-			
-		System.out.println("Recover Arc 1");
-		File architectureOne = comToArc.downloadAndReconstruct(commitOne);
-		System.out.println("Recover Arc 2");
-		File architectureTwo = comToArc.downloadAndReconstruct(commitTwo);
-		
-		System.out.println("Compute Diff");
-		double diff = simComp.computeDifference(architectureOne, architectureTwo);
-		
-		System.out.println("Diff between " + commitOne + " and " + commitTwo + ": " + diff);
-		
-		System.out.println("Finished");
-		
-		
+	public void finish() {
+		try {
+			compSave.storeJSON();
+		} catch (IOException e) {
+			log.warn("Couldn't write Diff JSON");
+		}
 	}
 	
 	private void extractAndCompare(int numberVersions) {
 		List<Integer> builds = database.getBuildList();	
 		Map<String, File> architectures = new HashMap<String, File>();
-		Map<Integer, Double> diffValues = new HashMap<Integer, Double>();
 		
 		if(builds.size() < numberVersions) {
 			System.out.println("Not enough Versions in Database");
@@ -106,9 +83,13 @@ public class Main {
 			String firstCommit = database.getCommit(first);
 			String secondCommit = database.getCommit(second);
 			
-			double diff = simComp.computeDifference(architectures.get(firstCommit), architectures.get(secondCommit));
+			ImmutablePair<Integer, File> arcOne = 
+					new ImmutablePair<Integer, File>(first, architectures.get(firstCommit));
+			ImmutablePair<Integer, File> arcTwo = 
+					new ImmutablePair<Integer, File>(second, architectures.get(secondCommit));
+						
 			
-			diffValues.put(second, diff);
+			double diff = compSave.compare(arcOne, arcTwo);
 			
 			System.out.println("Diff: " + first + " -> " + second + ": " + diff);
 			

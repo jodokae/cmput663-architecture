@@ -26,4 +26,13 @@ public class Factory {
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
 		return new A2aSimiliarityComputer();
 	}
+	
+	public static CommitToArchitecture createCommitToArchitecture(
+			String downloadFolder, String arcFolder, String project) {
+		return new CommitToArchitecture(downloadFolder, arcFolder, project);
+	}
+	
+	public static CompareAndSave createCompareAndSave(String path) {
+		return new CompareAndSave(path);
+	}
 }

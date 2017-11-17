@@ -1,0 +1,22 @@
+[
+  {
+    "fromVersion": 522,
+    "toVersion": 2856,
+    "diffValue": 0.38529585217220363
+  },
+  {
+    "fromVersion": 2856,
+    "toVersion": 2900,
+    "diffValue": 0.008169440242057346
+  },
+  {
+    "fromVersion": 2900,
+    "toVersion": 2918,
+    "diffValue": 0.002849002849002691
+  },
+  {
+    "fromVersion": 2918,
+    "toVersion": 2944,
+    "diffValue": 0.020697882493289632
+  }
+]
