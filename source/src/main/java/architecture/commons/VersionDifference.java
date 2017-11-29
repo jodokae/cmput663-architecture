@@ -1,14 +1,16 @@
 package architecture.commons;
 
+import java.util.Map;
+
 public class VersionDifference {
 	private int fromVersion;
 	private int toVersion;
-	private double diffValue;
+	private Map<String, Double> diffValues;
 	
-	public VersionDifference(int from, int to, double diff) {
+	public VersionDifference(int from, int to, Map<String, Double> diffValues) {
 		this.fromVersion = from;
 		this.toVersion = to;
-		this.diffValue = diff;
+		this.diffValues = diffValues;
 	}
 	
 	public int getFromVersion() {
@@ -27,12 +29,12 @@ public class VersionDifference {
 		this.toVersion = toVersion;
 	}
 	
-	public double getDiffValue() {
-		return diffValue;
+	public Map<String, Double> getDiffValue() {
+		return diffValues;
 	}
 	
-	public void setDiffValue(double diffValue) {
-		this.diffValue = diffValue;
+	public void setDiffValue(Map<String, Double> diffValues) {
+		this.diffValues = diffValues;
 	}
 	
 }

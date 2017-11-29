@@ -11,13 +11,14 @@ import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
 import architecture.extraction.reconstruction.pkg.PackageReconstructor;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
 import architecture.similarity.direct.A2aSimiliarityComputer;
+import architecture.similarity.direct.CvgSimiliarityComputer;
 
 public class Factory {
 	
 	public static AbstractArchitectureExtractor createExtractor() {
 		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor(false);
-		AbstractArchitectureReconstructor reconstructor = new PackageReconstructor("packageArc");
-		return new SplittedArchitectureExtractor(extractor, reconstructor, "complexClasses");
+		AbstractArchitectureReconstructor reconstructor = new ACDCReconstructor("acdc");
+		return new SplittedArchitectureExtractor(extractor, reconstructor, "husacct");
 	}
 	
 	public static AbstractDatabase createDatabase(String projectName) {
@@ -25,7 +26,7 @@ public class Factory {
 	}
 	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
-		return new A2aSimiliarityComputer();
+		return new CvgSimiliarityComputer();
 	}
 	
 	public static CommitToArchitecture createCommitToArchitecture(

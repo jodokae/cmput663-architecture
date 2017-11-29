@@ -4,6 +4,6 @@ import java.util.Map;
 
 public abstract class AbstractComparator {
 
-	public abstract double compare(Map<String, Double> m1, Map<String, Double> m2);
+	public abstract Map<String, Double> compare(Map<String, Double> m1, Map<String, Double> m2);
 	
 }

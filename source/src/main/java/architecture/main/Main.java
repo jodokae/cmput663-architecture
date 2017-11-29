@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -12,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import architecture.database.AbstractDatabase;
-import architecture.similarity.direct.CvgSimiliarityComputer;
 
 public class Main {
 	private AbstractDatabase database;
@@ -37,7 +37,7 @@ public class Main {
 		
 		
 		//System.out.println(main.database.getBuildList().size()); //3043
-		main.extractAndCompare(1);
+		main.extractAndCompare(3);
 		
 		main.finish();
 	}
@@ -67,8 +67,8 @@ public class Main {
 		}
 		
 		// TODO ConcurrentModificationException
-		IntStream.range(0, numberVersions).parallel().forEach(i-> {
-		//for(int i = 0; i < numberVersions; i++) {
+		//IntStream.range(0, numberVersions).parallel().forEach(i-> {
+		for(int i = 0; i < numberVersions; i++) {
 			String commit = database.getCommit(builds.get(i));
 			try {
 				architectures.put(commit, comToArc.downloadAndReconstruct(commit, true));
@@ -76,8 +76,8 @@ public class Main {
 				System.err.println("Could't extract Version " + commit);
 				e.printStackTrace();
 			}
-		//}
-		});
+		}
+		//});
 		
 		if(architectures.size() < numberVersions) {
 			System.out.println("At least one version was not downloaded. Aborting comparison");
@@ -96,9 +96,13 @@ public class Main {
 					new ImmutablePair<Integer, File>(second, architectures.get(secondCommit));
 						
 			
-			double diff = compSave.compare(arcOne, arcTwo);
+			Map<String, Double> diff = compSave.compare(arcOne, arcTwo);
 			
-			System.out.println("Diff: " + first + " -> " + second + ": " + diff);
+			for(Entry<String, Double> diffEntry: diff.entrySet()) {
+				System.out.println("Diff: " + first + " -> " + second + ": " 
+						+ diffEntry.getKey() + " " + diffEntry.getValue());
+			}
+			
 			
 		}
 		

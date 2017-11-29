@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,14 +45,14 @@ public class CompareAndSave {
 		handler.writeJson(path, list);
 	}
 	
-	public double compare(Pair<Integer, File> arcOne, Pair<Integer, File> arcTwo) {
+	public Map<String, Double> compare(Pair<Integer, File> arcOne, Pair<Integer, File> arcTwo) {
 		Optional<VersionDifference> vd = listContains(arcOne.getLeft(), arcTwo.getLeft());
 		if(vd.isPresent()) {
 			log.info("Diff between " + arcOne.getLeft() + " and " + arcTwo.getLeft() + " already computed");
 			return vd.get().getDiffValue();
 		}
 		
-		double diff = simComp.computeDifference(arcOne.getRight(), arcTwo.getRight());
+		Map<String, Double> diff = simComp.computeDifference(arcOne.getRight(), arcTwo.getRight());
 		list.add(new VersionDifference(arcOne.getLeft(), arcTwo.getLeft(), diff));
 		return diff;
 		
