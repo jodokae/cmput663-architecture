@@ -6,6 +6,10 @@ import acdc.ACDC;
 
 public class ACDCReconstructor extends AbstractArchitectureReconstructor {
 
+	public ACDCReconstructor(String name) {
+		super(name);
+	}
+
 	@Override
 	public void reconstruct(File graph, File outputFile) {
 		

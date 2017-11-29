@@ -5,18 +5,19 @@ import architecture.database.MySQLDatabase;
 import architecture.extraction.AbstractArchitectureExtractor;
 import architecture.extraction.SplittedArchitectureExtractor;
 import architecture.extraction.classes.AbstractClassGraphExtractor;
-import architecture.extraction.classes.HusacctGraphExtractor;
+import architecture.extraction.classes.husacct.HusacctGraphExtractor;
 import architecture.extraction.reconstruction.ACDCReconstructor;
 import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
+import architecture.extraction.reconstruction.pkg.PackageReconstructor;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
 import architecture.similarity.direct.A2aSimiliarityComputer;
 
 public class Factory {
 	
 	public static AbstractArchitectureExtractor createExtractor() {
-		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor();
-		AbstractArchitectureReconstructor reconstructor = new ACDCReconstructor();
-		return new SplittedArchitectureExtractor(extractor, reconstructor);
+		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor(false);
+		AbstractArchitectureReconstructor reconstructor = new PackageReconstructor("packageArc");
+		return new SplittedArchitectureExtractor(extractor, reconstructor, "complexClasses");
 	}
 	
 	public static AbstractDatabase createDatabase(String projectName) {

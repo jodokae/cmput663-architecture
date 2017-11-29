@@ -23,12 +23,28 @@ public class CommitToArchitecture {
 		this.project = project;
 	}
 	
-	public File downloadAndReconstruct(String commitID) throws IOException {
+	public File downloadAndReconstruct(String commitID, boolean removeArchive) throws IOException {
 		String architectureFolder = FilenameUtils.normalize(arcFolder + "/" + project + "/" + commitID);
 		
+		if(extractor.isComputed(architectureFolder).isPresent()) {
+			System.out.println("Architecture already calculated");
+			return extractor.isComputed(architectureFolder).get();
+		}
+		
+		if(new File(architectureFolder).exists() && new File(architectureFolder).list().length != 0) {
+			
+		}
+		
 		File archive = FileHandler.downloadCommit(project, commitID, downloadFolder);
-		File source = FileHandler.extract(archive, downloadFolder);		
-		return extractor.computeArchitecture(source, architectureFolder);
+		File source = FileHandler.extract(archive, downloadFolder);
+		File archictecture = extractor.computeArchitecture(source, architectureFolder);
+		
+		if(removeArchive) {
+			FileHandler.remove(archive);
+			FileHandler.remove(source);
+		}
+		
+		return archictecture;
 		
 	}
 	

@@ -2,6 +2,7 @@ package architecture.extraction;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -10,27 +11,35 @@ import architecture.extraction.classes.AbstractClassGraphExtractor;
 import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
 
 public class SplittedArchitectureExtractor extends AbstractArchitectureExtractor {
-	private AbstractClassGraphExtractor extractor;
-	private AbstractArchitectureReconstructor reconstructor;
+	protected AbstractClassGraphExtractor extractor;
+	protected AbstractArchitectureReconstructor reconstructor;
+	
+	private String intermediateFileName;
 	
 	static Logger log = Logger.getLogger(SplittedArchitectureExtractor.class);
 	
 	public SplittedArchitectureExtractor(
-			AbstractClassGraphExtractor extractor, AbstractArchitectureReconstructor reconstructor) {
+			AbstractClassGraphExtractor extractor, 
+			AbstractArchitectureReconstructor reconstructor,
+			String intermediateFileName) {
 		
 		this.extractor = extractor;
 		this.reconstructor = reconstructor;
+		
+		this.intermediateFileName = intermediateFileName;
 	}
 
 	@Override
 	public File computeArchitecture(File projectFolder, String outputDir) throws IOException {
 		new File(outputDir).mkdirs();
 		
-		String classStructureName = outputDir + "/classes.rsf";
+		File classStructure = computeClasses(projectFolder, outputDir);	
+		return computeArc(projectFolder, outputDir, classStructure);
+	}
+		
+	protected File computeClasses(File projectFolder, String outputDir) throws IOException {
+		String classStructureName = outputDir + "/" + intermediateFileName + ".rsf";
 		File classStructure = new File(FilenameUtils.normalize(classStructureName));
-				
-		String outputName = outputDir + "/architecture.rsf";
-		File output = new File(FilenameUtils.normalize(outputName));
 		
 		if(!classStructure.exists()) {
 			extractor.extract(projectFolder, classStructure);
@@ -38,12 +47,40 @@ public class SplittedArchitectureExtractor extends AbstractArchitectureExtractor
 			log.info("Class Structure " + projectFolder.getName() + " already extracted");
 		}
 		
+		return classStructure;
+		
+	}
+	
+	protected File computeArc(File projectFolder, String outputDir, File classStructure,
+			AbstractArchitectureReconstructor recon) {
+		String outputName = outputDir + "/" + recon.getName() + ".rsf";
+		File output = new File(FilenameUtils.normalize(outputName));
+				
 		if(!output.exists()) {
-			reconstructor.reconstruct(classStructure, output);	
+			recon.reconstruct(classStructure, output);	
 		} else {
 			log.info("Architecture Structure " + projectFolder.getName() + " already extracted");
 		}
 		
 		return output;
+	}
+	
+	protected File computeArc(File projectFolder, String outputDir, File classStructure) {
+		return computeArc(projectFolder, outputDir, classStructure, this.reconstructor);
+	}
+
+	@Override
+	public Optional<File> isComputed(String outputDir) {
+		String classStructureName = outputDir + "/" + intermediateFileName + ".rsf";
+		File classStructure = new File(FilenameUtils.normalize(classStructureName));
+				
+		String outputName = outputDir + "/" + this.reconstructor.getName() + ".rsf";
+		File output = new File(FilenameUtils.normalize(outputName));
+		
+		if( output.exists() && classStructure.exists()) {
+			return Optional.of(output);
+		} else {
+			return Optional.empty();
+		}
 	}
 }

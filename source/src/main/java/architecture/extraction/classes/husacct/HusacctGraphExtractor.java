@@ -1,4 +1,4 @@
-package architecture.extraction.classes;
+package architecture.extraction.classes.husacct;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.jdom2.Element;
 
-import architecture.commons.files.HusaactGraphFileWriter;
+import architecture.extraction.classes.AbstractClassGraphExtractor;
 import husacct.analyse.AnalyseServiceImpl;
 import husacct.analyse.IAnalyseService;
 import husacct.common.dto.ProjectDTO;
@@ -16,11 +16,17 @@ public class HusacctGraphExtractor extends AbstractClassGraphExtractor {
 
 	public static final String[] SOURCE_DIR = {"src", "main"};
 	
+	private boolean simpleWriter;
+		
+	public HusacctGraphExtractor(boolean simpleWriter) {
+		this.simpleWriter = simpleWriter;
+	}
+	
 	@Override
 	public void extract(File projectFolder, File output) throws IOException {		
 		Element res = extractGraph(projectFolder);
 		
-		HusaactGraphFileWriter writer = new HusaactGraphFileWriter(output);
+		HusaactGraphFileWriter writer = new HusaactGraphFileWriter(output, simpleWriter);
 		writer.write(res);
 	}
 	

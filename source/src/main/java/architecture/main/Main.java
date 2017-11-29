@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.log4j.Logger;
@@ -33,7 +34,9 @@ public class Main {
 		Main main = new Main();
 		main.init();
 		
-		main.extractAndCompare(5);
+		
+		//System.out.println(main.database.getBuildList().size()); //3043
+		main.extractAndCompare(1);
 		
 		main.finish();
 	}
@@ -61,24 +64,27 @@ public class Main {
 		if(builds.size() < numberVersions) {
 			System.out.println("Not enough Versions in Database");
 		}
-				
-		for(int i = 0; i < numberVersions; i++) {
-			String commit = database.getCommit(builds.get(i*10));
+		
+		// TODO ConcurrentModificationException
+		IntStream.range(0, numberVersions).parallel().forEach(i-> {
+		//for(int i = 0; i < numberVersions; i++) {
+			String commit = database.getCommit(builds.get(i));
 			try {
-				architectures.put(commit, comToArc.downloadAndReconstruct(commit));
+				architectures.put(commit, comToArc.downloadAndReconstruct(commit, true));
 			} catch (IOException e) {
 				System.err.println("Could't extract Version " + commit);
 				e.printStackTrace();
 			}
-		}
+		//}
+		});
 		
 		if(architectures.size() < numberVersions) {
 			System.out.println("At least one version was not downloaded. Aborting comparison");
 		}
 		
 		for(int i = 1; i < numberVersions; i++) {
-			int first = builds.get((i-1)*10);
-			int second = builds.get(i*10);
+			int first = builds.get((i-1));
+			int second = builds.get(i);
 			
 			String firstCommit = database.getCommit(first);
 			String secondCommit = database.getCommit(second);

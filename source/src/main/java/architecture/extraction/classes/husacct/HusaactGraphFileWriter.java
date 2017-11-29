@@ -1,25 +1,29 @@
-package architecture.commons.files;
+package architecture.extraction.classes.husacct;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.List;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
 
-public class HusaactGraphFileWriter {
+import architecture.commons.files.GraphFileWriter;
 
-	PrintStream out;
-	PrintWriter writer;
+public class HusaactGraphFileWriter extends GraphFileWriter<Element> {
 
-	public HusaactGraphFileWriter(File output) throws FileNotFoundException {
-		out = new PrintStream(output);
-		writer = new PrintWriter(out);
+	public static final String SUB_PKG = "subPkg";
+	public static final String CONTAINS = "contains";
+	public static final String REFERENCES = "references";
+	
+	private boolean simple;
+
+	public HusaactGraphFileWriter(File output, boolean simple) throws FileNotFoundException {
+		super(output);
+		
+		this.simple = simple;
 	}
 
-	public File write(Element input) {
+	public void write(Element input) {
 
 		List<Content> packages = ((Element) input.getContent(1)).getContent();
 		List<Content> classes = ((Element) input.getContent(2)).getContent();
@@ -30,15 +34,23 @@ public class HusaactGraphFileWriter {
 		handleDependencies(dependencies);
 
 		writer.close();
-
-		return null;
-
 	}
 
-	private void appendLine(String from, String to) {
+	@Override
+	protected void appendLine(String from, String to, String type) {
+		if(simple) {
+			type = "depends";
+		}
+		if(!from.contains("xLibraries") && !to.contains("xLibraries")) {
+			super.appendLine(from, to, type);
+		}
+		
 		if(!from.isEmpty() && !to.isEmpty() &&
 				!from.contains("xLibraries") && !to.contains("xLibraries")) {
-			writer.println("depends " + from + " " + to);
+			if(simple) {
+				type = "depends";
+			}
+			writer.println(type + " " + from + " " + to);
 		}
 
 	}
@@ -49,7 +61,7 @@ public class HusaactGraphFileWriter {
 			String fullPkgName = cElement.getContent().get(1).getValue();
 			String parentFullName = cElement.getContent().get(4).getValue();
 			
-			appendLine(fullPkgName, parentFullName);
+			appendLine(parentFullName, fullPkgName, SUB_PKG);
 		}
 	}
 
@@ -61,7 +73,7 @@ public class HusaactGraphFileWriter {
 
 			String fullName = pkg + "." + simpleName;
 
-			appendLine(fullName, pkg);
+			appendLine(pkg, fullName, CONTAINS);
 		}
 	}
 
@@ -71,7 +83,7 @@ public class HusaactGraphFileWriter {
 			String fromType = cElement.getContent().get(0).getValue();
 			String toType = cElement.getContent().get(1).getValue();
 			
-			appendLine(fromType, toType);
+			appendLine(fromType, toType, REFERENCES);
 		}
 	}
 

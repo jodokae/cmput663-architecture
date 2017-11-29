@@ -62,4 +62,8 @@ public class FileHandler {
 		}		
 		return dest;
 	}
+	
+	public static void remove(File file) throws IOException {
+		FileUtils.deleteQuietly(file);
+	}
 }
