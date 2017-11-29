@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import architecture.database.AbstractDatabase;
+import architecture.similarity.direct.CvgSimiliarityComputer;
 
 public class Main {
 	private AbstractDatabase database;
