@@ -8,19 +8,6 @@ import java.util.Set;
 import architecture.similarity.pairwise.AbstractComparator;
 
 public class GraphMetricComparator extends AbstractComparator {
-
-//	public static final String NUMBER_NODES = "numNodes";
-//	public static final String NUMBER_EDGES = "numEdges";
-//	public static final String AVG_NODE_DEG = "avgNodeDeg";
-//	public static final String AVG_ABS_INST = "avgAbsInst";
-//	public static final String AVG_REL_INST = "avgRelInst";
-	
-//	public static final String DELIMITER = "_";
-//	public static final String AFFERENT = "aff";
-//	public static final String EFFERENT = "eff";
-//	public static final String ABS_INST = "absInst";
-//	public static final String REL_INST = "relInst";
-//	public static final String DEG = "degree";
 	
 	private Map<String, Double> res;
 	
