@@ -62,10 +62,6 @@ public class GraphMetricComparator extends AbstractComparator {
 		if(v1 == -1 || v2 == -1) {
 			return 0.0;
 		}
-		System.out.println("\n");
-		System.out.println(metric);
-		System.out.println(v1);
-		System.out.println(v2);
 		
 		if(abs) {
 			return computeSimAbsoluteValues(v1, v2);
@@ -81,13 +77,11 @@ public class GraphMetricComparator extends AbstractComparator {
 		if(v1 == 0 && v2 == 0) {
 			return 1.0;
 		}
-		System.out.println((double) Math.min(v1, v2) / Math.max(v1, v2));
 		
 		return (double) Math.min(v1, v2) / Math.max(v1, v2);
 	}
 	
 	private double computeSimRelativeValues(double v1, double v2) {
-		System.out.println((double) 1- (Math.max(v1, v2) - Math.min(v1, v2)));
 		return (double) 1- (Math.max(v1, v2) - Math.min(v1, v2));
 	}
 

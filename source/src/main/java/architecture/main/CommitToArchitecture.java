@@ -42,6 +42,7 @@ public class CommitToArchitecture {
 		if(removeArchive) {
 			FileHandler.remove(archive);
 			FileHandler.remove(source);
+			FileHandler.remove(source.getParentFile());
 		}
 		
 		return archictecture;
