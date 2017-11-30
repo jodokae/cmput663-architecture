@@ -37,7 +37,7 @@ public class Main {
 		
 		
 		//System.out.println(main.database.getBuildList().size()); //3043
-		main.extractAndCompare(3);
+		main.extractAndCompare(2);
 		
 		main.finish();
 	}

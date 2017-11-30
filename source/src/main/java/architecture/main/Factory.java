@@ -12,12 +12,13 @@ import architecture.extraction.reconstruction.pkg.PackageReconstructor;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
 import architecture.similarity.direct.A2aSimiliarityComputer;
 import architecture.similarity.direct.CvgSimiliarityComputer;
+import architecture.similarity.pairwise.graph.GraphSimiliarityComputer;
 
 public class Factory {
 	
 	public static AbstractArchitectureExtractor createExtractor() {
 		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor(false);
-		AbstractArchitectureReconstructor reconstructor = new ACDCReconstructor("acdc");
+		AbstractArchitectureReconstructor reconstructor = new PackageReconstructor("package");
 		return new SplittedArchitectureExtractor(extractor, reconstructor, "husacct");
 	}
 	
@@ -26,7 +27,7 @@ public class Factory {
 	}
 	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
-		return new CvgSimiliarityComputer();
+		return new GraphSimiliarityComputer();
 	}
 	
 	public static CommitToArchitecture createCommitToArchitecture(

@@ -33,7 +33,6 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 
 	@Override
 	public void reconstruct(File graph, File output) {
-		
 		try (Stream<String> stream = Files.lines(Paths.get(graph.toURI()))) {
 
 			stream.forEach(line -> buildGraph(line));
@@ -43,7 +42,9 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 			return;
 		} 
 		
+		System.out.println("Calc Clusters");
 		getClusters();		
+		System.out.println("Calc Dependencies");
 		addDependencies();
 		
 		try {
@@ -53,11 +54,6 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 			System.err.println("Could not print Package Architecture");
 			e.printStackTrace();
 		}
-		
-		//System.out.println(this.graph);
-				
-		//System.out.println(graph.getAbsolutePath());
-		//System.out.println(output.getAbsolutePath());
 		
 	}
 	
@@ -75,7 +71,7 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		Set<String> nodes = inputGraph.nodes();		
 		
 		Set<String> clusters = new HashSet<String>();
-		
+				
 		for(String node : nodes) {
 			if(inputGraph.predecessors(node).isEmpty()) {
 				clusters.add(node);
@@ -105,7 +101,10 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 			clusters = tempClusters;
 		}
 		
+		
+		// TODO verhindere Endlosschleifen
 		while(clusters.size() < 10) {
+			//System.out.println(clusters.size());
 			Set<String> tempClusters = new HashSet<String>(clusters);
 			for(String node : clusters) {
 				if(containsClasses(node)) {

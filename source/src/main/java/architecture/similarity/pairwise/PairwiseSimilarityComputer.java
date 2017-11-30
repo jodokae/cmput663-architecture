@@ -7,13 +7,22 @@ import architecture.similarity.AbstractArchitectureSimilarityComputer;
 
 public abstract class PairwiseSimilarityComputer extends AbstractArchitectureSimilarityComputer {
 	
-	private AbstractMetricExtractor metricExtractor;
-	private AbstractComparator comparator;
+	protected AbstractMetricExtractor metricExtractor;
+	protected AbstractComparator comparator;
+	
+	public PairwiseSimilarityComputer(
+			AbstractMetricExtractor metricExtractor, AbstractComparator comparator) {
+		this.metricExtractor = metricExtractor;
+		this.comparator = comparator;
+	}
 	
 	@Override
 	public Map<String, Double> computeSimilarity(File arcOne, File arcTwo) {
 		Map<String, Double> m1 = metricExtractor.getMetrics(arcOne);
 		Map<String, Double> m2 = metricExtractor.getMetrics(arcTwo);
+		
+		System.out.println(m1);
+		System.out.println(m2);
 				
 		return comparator.compare(m1, m2);
 	}
