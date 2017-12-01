@@ -2,9 +2,14 @@ package architecture.extraction;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
+
+import com.kenai.jffi.Array;
 
 import architecture.extraction.classes.AbstractClassGraphExtractor;
 import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
@@ -27,7 +32,7 @@ public class MultiSplittedArchitectureExtractor extends SplittedArchitectureExtr
 	}
 	
 	@Override
-	public File computeArchitecture(File projectFolder, String outputDir) throws IOException {
+	public File[] computeArchitecture(File projectFolder, String outputDir) throws IOException {
 		new File(outputDir).mkdirs();
 				
 		File classStructure = computeClasses(projectFolder, outputDir);
@@ -38,24 +43,26 @@ public class MultiSplittedArchitectureExtractor extends SplittedArchitectureExtr
 			res[i] = computeArc(projectFolder, outputDir, classStructure, reconstructors[i]);
 		}
 		
-		return res[0].getParentFile();
+		return res;
 	}
 	
 	@Override
-	public Optional<File> isComputed(String outputDir) {
-		Optional<File> res = super.isComputed(outputDir);
-		if(res.isPresent()) {
+	public Optional<File[]> isComputed(String outputDir) {
+		Optional<File[]> superRes = super.isComputed(outputDir);
+		if(superRes.isPresent()) {
+			List<File> res = new ArrayList<File>();
 			for(AbstractArchitectureReconstructor recon : reconstructors) {
 				String outputName = outputDir + "/" + recon.getName() + ".rsf";
 				File output = new File(FilenameUtils.normalize(outputName));
+				res.add(output);
 				
 				if(!output.exists()) {
 					return Optional.empty();
 				}
 			}
-			return Optional.of(res.get().getParentFile());
+			return Optional.of(res.toArray(new File[res.size()]));
 		}
-		return res;
+		return superRes;
 		
 	}
 	

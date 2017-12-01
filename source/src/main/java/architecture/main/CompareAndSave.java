@@ -3,21 +3,27 @@ package architecture.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import architecture.commons.VersionDifference;
 import architecture.commons.files.DifferenceFileHandler;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
+import architecture.similarity.pairwise.graph.GraphSimiliarityComputer;
 
 public class CompareAndSave {
 	
 	private DifferenceFileHandler handler;
-	private AbstractArchitectureSimilarityComputer simComp;
+	private AbstractArchitectureSimilarityComputer a2aComp;
+	private AbstractArchitectureSimilarityComputer cvgComp;
+	private AbstractArchitectureSimilarityComputer pkgComp;
 	
 	private String path;
 	private List<VersionDifference> list;
@@ -26,7 +32,9 @@ public class CompareAndSave {
 		
 	public CompareAndSave(String path) {
 		handler = new DifferenceFileHandler();
-		simComp = Factory.createSimilarityComputer();
+		a2aComp = Factory.createA2aComputer();
+		cvgComp = Factory.createCvgComputer();
+		pkgComp = Factory.createPkgComputer();
 		
 		this.path = path;
 		try {
@@ -45,16 +53,50 @@ public class CompareAndSave {
 		handler.writeJson(path, list);
 	}
 	
-	public Map<String, Double> compare(Pair<Integer, File> arcOne, Pair<Integer, File> arcTwo) {
+	public Map<String, Map<String, Double>> compare(Pair<Integer, File[]> arcOne, Pair<Integer, File[]> arcTwo) {
 		Optional<VersionDifference> vd = listContains(arcOne.getLeft(), arcTwo.getLeft());
 		if(vd.isPresent()) {
 			log.info("Diff between " + arcOne.getLeft() + " and " + arcTwo.getLeft() + " already computed");
-			return vd.get().getDiffValue();
+			return vd.get().getMetrics();
 		}
 		
-		Map<String, Double> diff = simComp.computeDifference(arcOne.getRight(), arcTwo.getRight());
-		list.add(new VersionDifference(arcOne.getLeft(), arcTwo.getLeft(), diff));
-		return diff;
+		Map<String, Map<String, Double>> metrics = new HashMap<String, Map<String, Double>>();
+		
+		for(int i = 0; i < arcOne.getRight().length; i++) {
+			switch (FilenameUtils.getBaseName(arcOne.getRight()[i].getAbsolutePath())) {
+			case Factory.ACDC_FILE_BASE: 
+				Map<String, Double> a2aMetrics = 
+						a2aComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
+				Map<String, Double> cvgMetrics = 
+						cvgComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
+				Map<String, Double> combined = new HashMap<String, Double>();
+				combined.putAll(a2aMetrics);
+				combined.putAll(cvgMetrics);
+				metrics.put("arcade", combined);
+				break;
+			case Factory.PKG_FILE_BASE:
+				Map<String, Double> pkgMetrics =
+						pkgComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
+				
+				Map<String, Double> globalMetrics = new HashMap<String, Double>();
+				Map<String, Double> classMetrics = new HashMap<String, Double>(pkgMetrics);
+				for(Entry<String, Double> metric: pkgMetrics.entrySet()) {
+					if(metric.getKey() == GraphSimiliarityComputer.NUMBER_NODES ||
+							metric.getKey() == GraphSimiliarityComputer.NUMBER_EDGES ||
+							metric.getKey() == GraphSimiliarityComputer.AVG_NODE_DEG ||
+							metric.getKey() == GraphSimiliarityComputer.AVG_ABS_INST ||
+							metric.getKey() == GraphSimiliarityComputer.AVG_REL_INST) {
+							globalMetrics.put(metric.getKey(), metric.getValue());
+							classMetrics.remove(metric.getKey());
+					}
+				}
+				
+				metrics.put("global", globalMetrics);
+				metrics.put("class", classMetrics);
+			}
+		}
+		list.add(new VersionDifference(arcOne.getLeft(), arcTwo.getLeft(), metrics));
+		return metrics;
 		
 		
 	}

@@ -13,13 +13,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import architecture.database.AbstractDatabase;
+import architecture.similarity.AbstractArchitectureSimilarityComputer;
 
 public class Main {
 	private AbstractDatabase database;
 	
 	private CommitToArchitecture comToArc;
 	private CompareAndSave compSave;
-	
+		
 	private final static String PROJECT = "SonarSource/sonarqube";
 	
 	private final static String PROJECT_FOLDER = "extracted/projects/";
@@ -42,7 +43,7 @@ public class Main {
 		main.finish();
 	}
 	
-	public void init() {		
+	private void init() {		
 		database = Factory.createDatabase(PROJECT);	
 		
 		comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
@@ -50,7 +51,7 @@ public class Main {
 		
 	}
 	
-	public void finish() {
+	private void finish() {
 		try {
 			compSave.storeJSON();
 		} catch (IOException e) {
@@ -60,7 +61,7 @@ public class Main {
 	
 	private void extractAndCompare(int numberVersions) {
 		List<Integer> builds = database.getBuildList();	
-		Map<String, File> architectures = new HashMap<String, File>();
+		Map<String, File[]> architectures = new HashMap<String, File[]>();
 		
 		if(builds.size() < numberVersions) {
 			System.out.println("Not enough Versions in Database");
@@ -82,7 +83,7 @@ public class Main {
 		if(architectures.size() < numberVersions) {
 			System.out.println("At least one version was not downloaded. Aborting comparison");
 		}
-		
+				
 		for(int i = 1; i < numberVersions; i++) {
 			int first = builds.get((i-1));
 			int second = builds.get(i);
@@ -90,20 +91,22 @@ public class Main {
 			String firstCommit = database.getCommit(first);
 			String secondCommit = database.getCommit(second);
 			
-			ImmutablePair<Integer, File> arcOne = 
-					new ImmutablePair<Integer, File>(first, architectures.get(firstCommit));
-			ImmutablePair<Integer, File> arcTwo = 
-					new ImmutablePair<Integer, File>(second, architectures.get(secondCommit));
+			ImmutablePair<Integer, File[]> arcOne = 
+					new ImmutablePair<Integer, File[]>(first, architectures.get(firstCommit));
+			ImmutablePair<Integer, File[]> arcTwo = 
+					new ImmutablePair<Integer, File[]>(second, architectures.get(secondCommit));
 						
 			
-			Map<String, Double> diff = compSave.compare(arcOne, arcTwo);
+			Map<String, Map<String, Double>> metrics = compSave.compare(arcOne, arcTwo);
 			
-			for(Entry<String, Double> diffEntry: diff.entrySet()) {
-				System.out.println("Diff: " + first + " -> " + second + ": " 
-						+ diffEntry.getKey() + " " + diffEntry.getValue());
+			for(Entry<String, Map<String, Double>> metricEntry: metrics.entrySet()) {
+				System.out.println(metricEntry.getKey());
+				for(Entry<String, Double> diffEntry : metricEntry.getValue().entrySet()) {
+					System.out.println("Diff: " + first + " -> " + second + ": " 
+							+ diffEntry.getKey() + " " + diffEntry.getValue());				
+				
+				}
 			}
-			
-			
 		}
 		
 	}

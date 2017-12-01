@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public abstract class AbstractArchitectureExtractor {
 
-	public abstract File computeArchitecture(File projectFolder, String outputDir) throws IOException;
+	public abstract File[] computeArchitecture(File projectFolder, String outputDir) throws IOException;
 	
-	public abstract Optional<File> isComputed(String outputDir);
+	public abstract Optional<File[]> isComputed(String outputDir);
 
 }

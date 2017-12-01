@@ -30,11 +30,11 @@ public class SplittedArchitectureExtractor extends AbstractArchitectureExtractor
 	}
 
 	@Override
-	public File computeArchitecture(File projectFolder, String outputDir) throws IOException {
+	public File[] computeArchitecture(File projectFolder, String outputDir) throws IOException {
 		new File(outputDir).mkdirs();
 		
 		File classStructure = computeClasses(projectFolder, outputDir);	
-		return computeArc(projectFolder, outputDir, classStructure);
+		return new File[]{computeArc(projectFolder, outputDir, classStructure)};
 	}
 		
 	protected File computeClasses(File projectFolder, String outputDir) throws IOException {
@@ -70,7 +70,7 @@ public class SplittedArchitectureExtractor extends AbstractArchitectureExtractor
 	}
 
 	@Override
-	public Optional<File> isComputed(String outputDir) {
+	public Optional<File[]> isComputed(String outputDir) {
 		String classStructureName = outputDir + "/" + intermediateFileName + ".rsf";
 		File classStructure = new File(FilenameUtils.normalize(classStructureName));
 				
@@ -78,7 +78,7 @@ public class SplittedArchitectureExtractor extends AbstractArchitectureExtractor
 		File output = new File(FilenameUtils.normalize(outputName));
 		
 		if( output.exists() && classStructure.exists()) {
-			return Optional.of(output);
+			return Optional.of(new File[]{output});
 		} else {
 			return Optional.empty();
 		}

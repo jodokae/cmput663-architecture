@@ -23,7 +23,7 @@ public class CommitToArchitecture {
 		this.project = project;
 	}
 	
-	public File downloadAndReconstruct(String commitID, boolean removeArchive) throws IOException {
+	public File[] downloadAndReconstruct(String commitID, boolean removeArchive) throws IOException {
 		String architectureFolder = FilenameUtils.normalize(arcFolder + "/" + project + "/" + commitID);
 		
 		if(extractor.isComputed(architectureFolder).isPresent()) {
@@ -37,7 +37,7 @@ public class CommitToArchitecture {
 		
 		File archive = FileHandler.downloadCommit(project, commitID, downloadFolder);
 		File source = FileHandler.extract(archive, downloadFolder);
-		File archictecture = extractor.computeArchitecture(source, architectureFolder);
+		File[] archictecture = extractor.computeArchitecture(source, architectureFolder);
 		
 		if(removeArchive) {
 			FileHandler.remove(archive);

@@ -3,6 +3,7 @@ package architecture.main;
 import architecture.database.AbstractDatabase;
 import architecture.database.MySQLDatabase;
 import architecture.extraction.AbstractArchitectureExtractor;
+import architecture.extraction.MultiSplittedArchitectureExtractor;
 import architecture.extraction.SplittedArchitectureExtractor;
 import architecture.extraction.classes.AbstractClassGraphExtractor;
 import architecture.extraction.classes.husacct.HusacctGraphExtractor;
@@ -16,10 +17,17 @@ import architecture.similarity.pairwise.graph.GraphSimiliarityComputer;
 
 public class Factory {
 	
+	public final static String ACDC_FILE_BASE = "acdcArc";
+	public final static String PKG_FILE_BASE = "pkgArc";
+	
 	public static AbstractArchitectureExtractor createExtractor() {
 		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor(false);
-		AbstractArchitectureReconstructor reconstructor = new PackageReconstructor("package");
-		return new SplittedArchitectureExtractor(extractor, reconstructor, "husacct");
+		AbstractArchitectureReconstructor reconstructorAcdc = new ACDCReconstructor(ACDC_FILE_BASE);
+		AbstractArchitectureReconstructor reconstructorPkg = new PackageReconstructor(PKG_FILE_BASE);
+		//return new SplittedArchitectureExtractor(extractor, reconstructor, "husacct_simple");
+		return new MultiSplittedArchitectureExtractor(extractor, 
+				new AbstractArchitectureReconstructor[]{reconstructorAcdc, reconstructorPkg}, 
+				"husacct");
 	}
 	
 	public static AbstractDatabase createDatabase(String projectName) {
@@ -27,6 +35,18 @@ public class Factory {
 	}
 	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
+		return new CvgSimiliarityComputer();
+	}
+	
+	public static AbstractArchitectureSimilarityComputer createA2aComputer() {
+		return new A2aSimiliarityComputer();
+	}
+	
+	public static AbstractArchitectureSimilarityComputer createCvgComputer() {
+		return new CvgSimiliarityComputer();
+	}
+	
+	public static AbstractArchitectureSimilarityComputer createPkgComputer() {
 		return new GraphSimiliarityComputer();
 	}
 	

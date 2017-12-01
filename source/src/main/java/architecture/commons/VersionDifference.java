@@ -5,14 +5,22 @@ import java.util.Map;
 public class VersionDifference {
 	private int fromVersion;
 	private int toVersion;
-	private Map<String, Double> diffValues;
+	private Map<String, Map<String, Double>> metrics;
 	
-	public VersionDifference(int from, int to, Map<String, Double> diffValues) {
+	public VersionDifference(int from, int to, Map<String, Map<String, Double>> metrics) {
 		this.fromVersion = from;
 		this.toVersion = to;
-		this.diffValues = diffValues;
+		this.metrics = metrics;
 	}
 	
+	public Map<String, Map<String, Double>> getMetrics() {
+		return metrics;
+	}
+
+	public void setMetrics(Map<String, Map<String, Double>> metrics) {
+		this.metrics = metrics;
+	}
+
 	public int getFromVersion() {
 		return fromVersion;
 	}
@@ -28,13 +36,6 @@ public class VersionDifference {
 	public void setToVersion(int toVersion) {
 		this.toVersion = toVersion;
 	}
-	
-	public Map<String, Double> getDiffValue() {
-		return diffValues;
-	}
-	
-	public void setDiffValue(Map<String, Double> diffValues) {
-		this.diffValues = diffValues;
-	}
+
 	
 }
