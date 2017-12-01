@@ -21,11 +21,13 @@ public class Main {
 	//private CommitToArchitecture comToArc;
 	private CompareAndSave compSave;
 		
-	private final static String PROJECT = "SonarSource/sonarqube";
+	private final static String BASE_FOLDER = "extracted/";
 	
-	private final static String PROJECT_FOLDER = "extracted/projects/";
-	private final static String ARC_FOLDER = "extracted/architectures/";
-	private final static String DIFF_JSON = "extracted/versionDiff.json";
+	private static String project = "SonarSource/sonarqube";
+	
+	private final static String PROJECT_FOLDER = BASE_FOLDER + project + "/projects/";
+	private final static String ARC_FOLDER = BASE_FOLDER + project + "/architectures/";
+	private final static String DIFF_JSON = BASE_FOLDER + project + "/versionDiff.json";
 	
 	static Logger log = Logger.getLogger(Main.class);
 	
@@ -33,19 +35,27 @@ public class Main {
 		File log4jfile = new File("cfg/log4j.properties");
 	    PropertyConfigurator.configure(log4jfile.getAbsolutePath());
 		
+		if(args.length != 1) {
+			log.error("No project given as parameter");
+			System.out.println("Usage: Project as first param");
+			return;
+		} else {
+			project = args[0];
+		}
+		
 	    log.info("Start Computation");
 		Main main = new Main();
 		main.init();
 		
 		
 		//System.out.println(main.database.getBuildList().size()); //3043
-		main.extractAndCompare(10);
+		main.extractAndCompare(2);
 		
 		main.finish();
 	}
 	
 	private void init() {		
-		database = Factory.createDatabase(PROJECT);	
+		database = Factory.createDatabase(project);	
 		
 		//comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
 		compSave = Factory.createCompareAndSave(DIFF_JSON);
@@ -85,7 +95,7 @@ public class Main {
 			}
 			
 			try {
-				CommitToArchitecture comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, PROJECT);
+				CommitToArchitecture comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, project);
 				architectures.put(commit, Optional.of(comToArc.downloadAndReconstruct(commit, true)));
 			} catch (IOException e) {
 				System.err.println("Could't extract Version " + commit);
@@ -120,20 +130,7 @@ public class Main {
 				
 				//Map<String, Map<String, Double>> metrics = compSave.compare(arcOne, arcTwo);
 				compSave.compare(arcOne, arcTwo);
-				
-				if(((i == 0 && compSave.nextCalclulated(first)) || 
-						compSave.metricsCalculated(first) || 
-						(i == numberVersions-1 && compSave.prevCalclulated(first)))) {	
-					try {
-						FileHandler.remove(arcOne.getRight()[0].getParentFile());
-					} catch (IOException e) {
-						log.warn("Could not remove Architecture Files for "+ firstCommit);
-						e.printStackTrace();
-					} catch (NullPointerException e) {
-						// Intended behaviour
-					}
-				}
-				
+								
 				/*
 				for(Entry<String, Map<String, Double>> metricEntry: metrics.entrySet()) {
 					System.out.println(metricEntry.getKey());
@@ -146,6 +143,26 @@ public class Main {
 			}
 		//}
 		});
+		
+		log.info("Delete Files");
+		for(int i = 0; i < numberVersions; i++) {
+			int build = builds.get(i);
+			Optional<File[]> files = architectures.get(database.getCommit(build));
+			if(files.isPresent()) {
+				if(((i == 0 && compSave.nextCalclulated(build)) || 
+						compSave.metricsCalculated(build) || 
+						(i == numberVersions-1 && compSave.prevCalclulated(build)))) {	
+					try {
+						FileHandler.remove(files.get()[0].getParentFile());
+					} catch (IOException e) {
+						log.warn("Could not remove Architecture Files for "+ database.getCommit(build));
+						e.printStackTrace();
+					} catch (NullPointerException e) {
+						// Intended behaviour
+					}
+				}
+			}
+		}
 		
 		log.info("Done");
 		
