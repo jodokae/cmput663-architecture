@@ -20,10 +20,7 @@ public abstract class PairwiseSimilarityComputer extends AbstractArchitectureSim
 	public Map<String, Double> computeSimilarity(File arcOne, File arcTwo) {
 		Map<String, Double> m1 = metricExtractor.getMetrics(arcOne);
 		Map<String, Double> m2 = metricExtractor.getMetrics(arcTwo);
-		
-		System.out.println(m1);
-		System.out.println(m2);
-				
+						
 		return comparator.compare(m1, m2);
 	}
 	

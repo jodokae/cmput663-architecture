@@ -68,7 +68,7 @@ public class HusacctGraphExtractor extends AbstractClassGraphExtractor {
     }
 	
 	
-	private Element extract(List<String> path) {
+	private static synchronized Element extract(List<String> path) {
 		IAnalyseService analyseService = new AnalyseServiceImpl();
 	    
 	    ProjectDTO project = new ProjectDTO("TestName", new ArrayList<String>(path), "Java", "1.0", "",

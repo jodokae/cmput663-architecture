@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -18,11 +20,12 @@ import architecture.extraction.classes.husacct.HusaactGraphFileWriter;
 import architecture.extraction.reconstruction.AbstractArchitectureReconstructor;
 
 
-
 public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		
 	private MutableValueGraph<String, String> inputGraph;
 	private MutableValueGraph<String, Integer> outputGraph;
+	
+	static Logger log = Logger.getLogger(PackageReconstructor.class);
 	
 	public PackageReconstructor(String name) {
 		super(name);
@@ -42,9 +45,9 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 			return;
 		} 
 		
-		System.out.println("Calc Clusters");
+		log.info("Calculate Clusters");
 		getClusters();		
-		System.out.println("Calc Dependencies");
+		log.info("Calculate Dependencies");
 		addDependencies();
 		
 		try {

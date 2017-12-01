@@ -35,18 +35,22 @@ public class HusaactGraphFileWriter extends GraphFileWriter<Element> {
 
 		writer.close();
 	}
+	
+	private boolean containsInvalid(String element) {
+		return element.contains("xLibraries") || element.contains("No_Package");
+	}
 
 	@Override
 	protected void appendLine(String from, String to, String type) {
 		if(simple) {
 			type = "depends";
 		}
-		if(!from.contains("xLibraries") && !to.contains("xLibraries")) {
+		if(!containsInvalid(from) && !containsInvalid(to)) {
 			super.appendLine(from, to, type);
 		}
 		
 		if(!from.isEmpty() && !to.isEmpty() &&
-				!from.contains("xLibraries") && !to.contains("xLibraries")) {
+				!containsInvalid(from) && !containsInvalid(to)) {
 			if(simple) {
 				type = "depends";
 			}

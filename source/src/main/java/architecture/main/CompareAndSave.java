@@ -3,6 +3,7 @@ package architecture.main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +42,51 @@ public class CompareAndSave {
 			loadJSON();
 		} catch (IOException e) {
 			log.warn("Version Diff JSON could not be loaded");
-			list = new ArrayList<VersionDifference>();
+			list = Collections.synchronizedList(new ArrayList<VersionDifference>());
 		}
 	}
 	
 	public void loadJSON() throws IOException {
-		list = handler.readJson(path);
+		list = Collections.synchronizedList(handler.readJson(path));
 	}
 	
 	public void storeJSON() throws IOException {
 		handler.writeJson(path, list);
+	}
+	
+	public boolean prevCalclulated(int buildNum) {
+		for(VersionDifference vd : list) {
+			if(vd.getToVersion() == buildNum) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean nextCalclulated(int buildNum) {
+		for(VersionDifference vd : list) {
+			if(vd.getFromVersion() == buildNum) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean metricsCalculated(int buildNum) {
+		boolean prev = false;
+		boolean next = false;
+		for(VersionDifference vd : list) {
+			if(vd.getFromVersion() == buildNum) {
+				next = true;
+			}
+			if(vd.getToVersion() == buildNum) {
+				prev = true;
+			}
+			if(next && prev) {
+				return true;
+			}
+		}
+		return next && prev;	
 	}
 	
 	public Map<String, Map<String, Double>> compare(Pair<Integer, File[]> arcOne, Pair<Integer, File[]> arcTwo) {
@@ -65,6 +101,7 @@ public class CompareAndSave {
 		for(int i = 0; i < arcOne.getRight().length; i++) {
 			switch (FilenameUtils.getBaseName(arcOne.getRight()[i].getAbsolutePath())) {
 			case Factory.ACDC_FILE_BASE: 
+				log.info("Computing Arcade Metrics");
 				Map<String, Double> a2aMetrics = 
 						a2aComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
 				Map<String, Double> cvgMetrics = 
@@ -75,6 +112,7 @@ public class CompareAndSave {
 				metrics.put("arcade", combined);
 				break;
 			case Factory.PKG_FILE_BASE:
+				log.info("Computing Package Metrics");
 				Map<String, Double> pkgMetrics =
 						pkgComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
 				

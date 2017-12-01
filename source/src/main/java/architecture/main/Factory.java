@@ -4,7 +4,6 @@ import architecture.database.AbstractDatabase;
 import architecture.database.MySQLDatabase;
 import architecture.extraction.AbstractArchitectureExtractor;
 import architecture.extraction.MultiSplittedArchitectureExtractor;
-import architecture.extraction.SplittedArchitectureExtractor;
 import architecture.extraction.classes.AbstractClassGraphExtractor;
 import architecture.extraction.classes.husacct.HusacctGraphExtractor;
 import architecture.extraction.reconstruction.ACDCReconstructor;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 
 import architecture.commons.files.FileHandler;
 import architecture.extraction.AbstractArchitectureExtractor;
@@ -14,6 +15,8 @@ public class CommitToArchitecture {
 	private String project;
 	private String downloadFolder;
 	private String arcFolder;
+	
+	static Logger log = Logger.getLogger(CommitToArchitecture.class);
 	
 	public CommitToArchitecture(String downloadFolder, String arcFolder, String project) {
 		extractor = Factory.createExtractor();
@@ -27,7 +30,7 @@ public class CommitToArchitecture {
 		String architectureFolder = FilenameUtils.normalize(arcFolder + "/" + project + "/" + commitID);
 		
 		if(extractor.isComputed(architectureFolder).isPresent()) {
-			System.out.println("Architecture already calculated");
+			log.info("Architecture already calculated");
 			return extractor.isComputed(architectureFolder).get();
 		}
 		
