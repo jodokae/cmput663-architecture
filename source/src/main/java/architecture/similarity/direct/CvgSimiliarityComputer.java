@@ -11,7 +11,7 @@ public class CvgSimiliarityComputer extends DirectSimiliarityComputer {
 	@Override
 	public Map<String, Double> computeSimilarity(File arcOne, File arcTwo) {
 		PythonInterpreter interpreter = new PythonInterpreter();
-		interpreter.exec("import sys\nsys.path.append('target/classes/arcadepy')\nimport simevolanalyzer");
+		interpreter.exec("import sys\nsys.path.append('arcadepy')\nimport simevolanalyzer");
 		
 		interpreter.set("src", arcOne.getAbsolutePath());
 		interpreter.set("target", arcTwo.getAbsolutePath());

@@ -55,3 +55,10 @@ Next Steps (30.10.17):
 
 1. Transform Result
 2. Decide how to define architecture
+
+
+# Attention
+
+Import jars from local-mvn-repo to local maven repository using mvn install:install-file .... (full code please)
+
+Folder arcadepy from resources and cfg are needed beside the jar

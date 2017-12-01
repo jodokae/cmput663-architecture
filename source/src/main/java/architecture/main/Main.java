@@ -20,10 +20,10 @@ public class Main {
 	
 	//private CommitToArchitecture comToArc;
 	private CompareAndSave compSave;
+	
+	private static String project;
 		
 	private final static String BASE_FOLDER = "extracted/";
-	
-	private static String project = "SonarSource/sonarqube";
 	
 	private final static String PROJECT_FOLDER = BASE_FOLDER + project + "/projects/";
 	private final static String ARC_FOLDER = BASE_FOLDER + project + "/architectures/";
@@ -35,21 +35,25 @@ public class Main {
 		File log4jfile = new File("cfg/log4j.properties");
 	    PropertyConfigurator.configure(log4jfile.getAbsolutePath());
 		
-		if(args.length != 1) {
-			log.error("No project given as parameter");
-			System.out.println("Usage: Project as first param");
+	    int numbuilds;
+		if(args.length != 2) {
+			log.error("Wrong parameters. Use [Project] [NumBuilds] - Use [NumBuilds]=0 for all");
 			return;
 		} else {
 			project = args[0];
+			numbuilds = Integer.parseInt(args[1]);
+			
 		}
 		
-	    log.info("Start Computation");
 		Main main = new Main();
 		main.init();
 		
+		if(numbuilds == 0) {
+			numbuilds = main.database.getBuildList().size();
+		}
 		
-		//System.out.println(main.database.getBuildList().size()); //3043
-		main.extractAndCompare(2);
+		log.info("Start Computation on " + numbuilds + " commits");
+		main.extractAndCompare(numbuilds);
 		
 		main.finish();
 	}
