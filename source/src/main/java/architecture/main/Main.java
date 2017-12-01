@@ -51,7 +51,7 @@ public class Main {
 		if(numbuilds == 0) {
 			numbuilds = main.database.getBuildList().size();
 		}
-		
+				
 		log.info("Start Computation on " + numbuilds + " commits");
 		main.extractAndCompare(numbuilds);
 		

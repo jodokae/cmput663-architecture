@@ -11,7 +11,7 @@ public abstract class AbstractDatabase {
 	
 	protected Map<Integer, String> commits;
 	protected Map<Integer, String> statuses;
-	
+		
 	public List<Integer> getBuildList() {
 		Set<Integer> commitSet = commits.keySet();
 		

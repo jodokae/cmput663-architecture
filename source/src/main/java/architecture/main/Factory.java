@@ -1,6 +1,7 @@
 package architecture.main;
 
 import architecture.database.AbstractDatabase;
+import architecture.database.MockDatabaseFromJSON;
 import architecture.database.MySQLDatabase;
 import architecture.extraction.AbstractArchitectureExtractor;
 import architecture.extraction.MultiSplittedArchitectureExtractor;
@@ -30,7 +31,7 @@ public class Factory {
 	}
 	
 	public static AbstractDatabase createDatabase(String projectName) {
-		return new MySQLDatabase(projectName);
+		return new MockDatabaseFromJSON(projectName);
 	}
 	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {

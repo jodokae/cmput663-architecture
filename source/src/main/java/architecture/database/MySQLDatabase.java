@@ -1,11 +1,24 @@
 package architecture.database;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.io.FilenameUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import architecture.commons.VersionDifference;
 
 
 public class MySQLDatabase extends AbstractDatabase {
@@ -30,6 +43,14 @@ public class MySQLDatabase extends AbstractDatabase {
 		
 		
 		getData();
+		
+		try {
+			writeJson(FilenameUtils.getBaseName(project) + ".json");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private void getData() {
@@ -53,5 +74,15 @@ public class MySQLDatabase extends AbstractDatabase {
 		}
 	}
 	
+	public void writeJson(String path) throws IOException {
+		PrintStream out = new PrintStream(path);;
+		PrintWriter writer = new PrintWriter(out);
+		
+	    Gson gson = new GsonBuilder().setPrettyPrinting().create();	    
+	    Type type = new TypeToken<AbstractDatabase>(){}.getType();
+
+		writer.println(gson.toJson(this, type));
+		writer.close();
+	}
 
 }
