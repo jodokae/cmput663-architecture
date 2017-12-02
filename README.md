@@ -62,3 +62,6 @@ Next Steps (30.10.17):
 Import jars from local-mvn-repo to local maven repository using mvn install:install-file .... (full code please)
 
 Folder arcadepy from resources and cfg are needed beside the jar
+
+mvn install:install-file -Dfile=local-mvn-repo/arcade.jar -DgroupId=edu.usc.softarch -DartifactId=arcade -Dversion=0.1.0 -Dpackaging=jar
+
