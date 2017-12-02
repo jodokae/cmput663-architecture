@@ -165,7 +165,7 @@ public class Main {
 		//}
 		});
 		
-		/*log.info("Delete Files");
+		log.info("Delete Files");
 		for(int i = 0; i < numberVersions; i++) {
 			int build = builds.get(i);
 			Optional<File[]> files = architectures.get(database.getCommit(build));
@@ -183,7 +183,7 @@ public class Main {
 					}
 				}
 			}
-		}*/
+		}
 		
 		log.info("Done");
 		
