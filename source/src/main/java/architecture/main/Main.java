@@ -125,15 +125,21 @@ public class Main {
 			Optional<File[]> secondFiles = architectures.get(secondCommit);
 			
 			if(firstFiles.isPresent() && secondFiles.isPresent()) {
-			
-				ImmutablePair<Integer, File[]> arcOne = 
-						new ImmutablePair<Integer, File[]>(first, architectures.get(firstCommit).get());
-				ImmutablePair<Integer, File[]> arcTwo = 
-						new ImmutablePair<Integer, File[]>(second, architectures.get(secondCommit).get());
-							
 				
-				//Map<String, Map<String, Double>> metrics = compSave.compare(arcOne, arcTwo);
-				compSave.compare(arcOne, arcTwo);
+				if(i % 2 == 0) {
+					synchronized(firstFiles.get()) {
+						synchronized(secondFiles.get()) {
+							compare(first, firstFiles.get(), second, secondFiles.get());
+						}
+					}
+				} else {
+					synchronized(secondFiles.get()) {
+						synchronized(firstFiles.get()) {
+							compare(first, firstFiles.get(), second, secondFiles.get());
+						}
+					}
+				}
+
 								
 				/*
 				for(Entry<String, Map<String, Double>> metricEntry: metrics.entrySet()) {
@@ -170,6 +176,16 @@ public class Main {
 		
 		log.info("Done");
 		
+	}
+	
+	
+	private void compare(int first, File[] firstFiles, int second, File[] secondFiles) {
+		ImmutablePair<Integer, File[]> arcOne = 
+				new ImmutablePair<Integer, File[]>(first, firstFiles);
+		ImmutablePair<Integer, File[]> arcTwo = 
+				new ImmutablePair<Integer, File[]>(second, secondFiles);
+					
+		compSave.compare(arcOne, arcTwo);
 	}
 	
 	

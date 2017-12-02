@@ -22,9 +22,9 @@ import architecture.similarity.pairwise.graph.GraphSimiliarityComputer;
 public class CompareAndSave {
 	
 	private DifferenceFileHandler handler;
-	private AbstractArchitectureSimilarityComputer a2aComp;
-	private AbstractArchitectureSimilarityComputer cvgComp;
-	private AbstractArchitectureSimilarityComputer pkgComp;
+	//private AbstractArchitectureSimilarityComputer a2aComp;
+	//private AbstractArchitectureSimilarityComputer cvgComp;
+	//private AbstractArchitectureSimilarityComputer pkgComp;
 	
 	private String path;
 	private List<VersionDifference> list;
@@ -33,9 +33,9 @@ public class CompareAndSave {
 		
 	public CompareAndSave(String path) {
 		handler = new DifferenceFileHandler();
-		a2aComp = Factory.createA2aComputer();
-		cvgComp = Factory.createCvgComputer();
-		pkgComp = Factory.createPkgComputer();
+//		a2aComp = Factory.createA2aComputer();
+//		cvgComp = Factory.createCvgComputer();
+//		pkgComp = Factory.createPkgComputer();
 		
 		this.path = path;
 		try {
@@ -96,14 +96,19 @@ public class CompareAndSave {
 			return vd.get().getMetrics();
 		}
 		
+		AbstractArchitectureSimilarityComputer a2aComp = Factory.createA2aComputer();
+		AbstractArchitectureSimilarityComputer cvgComp = Factory.createCvgComputer();
+		AbstractArchitectureSimilarityComputer pkgComp = Factory.createPkgComputer();
+		
 		Map<String, Map<String, Double>> metrics = new HashMap<String, Map<String, Double>>();
 		
 		for(int i = 0; i < arcOne.getRight().length; i++) {
-			switch (FilenameUtils.getBaseName(arcOne.getRight()[i].getAbsolutePath())) {
+			switch (FilenameUtils.getBaseName(arcOne.getRight()[i].getAbsolutePath())) {			
 			case Factory.ACDC_FILE_BASE: 
-				log.info("Computing Arcade Metrics");
+				log.info("Computing a2a");
 				Map<String, Double> a2aMetrics = 
 						a2aComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
+				log.info("Compute cvg");
 				Map<String, Double> cvgMetrics = 
 						cvgComp.computeDifference(arcOne.getRight()[i], arcTwo.getRight()[i]);
 				Map<String, Double> combined = new HashMap<String, Double>();

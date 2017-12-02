@@ -64,6 +64,10 @@ public class MySQLDatabase extends AbstractDatabase {
 				int number = rs.getInt("tr_build_number");
 				String status = rs.getString("tr_status");
 				
+				if(commits.containsValue(commit)) {
+					continue;
+				}
+				
 				commits.put(number, commit);
 				statuses.put(number, status);
 				

@@ -10,6 +10,16 @@ public class CvgSimiliarityComputer extends DirectSimiliarityComputer {
 
 	@Override
 	public Map<String, Double> computeSimilarity(File arcOne, File arcTwo) {
+		double[] cov = callPythonCalc(arcOne, arcTwo);
+		
+		metrics.put("cvgSource", cov[0]);
+		metrics.put("cvgTarget", cov[1]);
+		
+		
+		return metrics;
+	}
+	
+	private static synchronized double[] callPythonCalc(File arcOne, File arcTwo) {
 		PythonInterpreter interpreter = new PythonInterpreter();
 		interpreter.exec("import sys\nsys.path.append('arcadepy')\nimport simevolanalyzer");
 		
@@ -21,12 +31,9 @@ public class CvgSimiliarityComputer extends DirectSimiliarityComputer {
 		PyObject sourceCoverage = interpreter.get("a");
 		PyObject targetCoverage = interpreter.get("b");
 		
-		metrics.put("cvgSource", sourceCoverage.asDouble());
-		metrics.put("cvgTarget", targetCoverage.asDouble());
-		
 		interpreter.close();
 		
-		return metrics;
+		return new double[]{sourceCoverage.asDouble(), targetCoverage.asDouble()};
 	}
 
 	@Override

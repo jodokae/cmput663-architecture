@@ -87,12 +87,11 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 			
 			Set<String> tempClusters = new HashSet<String>(clusters);
 			for(String node : clusters) {
-				Set<String> successors = inputGraph.successors(node);
-				String firstSucc = successors.iterator().next();
-							
+				Set<String> successors = inputGraph.successors(node);							
 				if(!isPackage(node)) {
 					tempClusters.remove(node);
 				} else {
+					String firstSucc = successors.iterator().next();
 					// If only one element, take successor package
 					if(successors.size() == 1 && !containsClasses(node)) {
 						tempClusters.remove(node);
@@ -105,14 +104,17 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		}
 		
 		
+		change = true;
 		// TODO verhindere Endlosschleifen
-		while(clusters.size() < 10) {
+		while(clusters.size() < 10 &&change) {
+			change = false;
 			//System.out.println(clusters.size());
 			Set<String> tempClusters = new HashSet<String>(clusters);
 			for(String node : clusters) {
 				if(containsClasses(node)) {
 					continue;
 				}
+				change = true;
 				tempClusters.remove(node);
 				tempClusters.addAll(inputGraph.successors(node));				
 			}
@@ -170,9 +172,12 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 	
 	private boolean isPackage(String node) {
 		Set<String> successors = inputGraph.successors(node);
+		if(!successors.iterator().hasNext()) {
+			return false;
+		}
 		String firstSucc = successors.iterator().next();
 		
-		return firstSucc != null && firstSucc.contains(node);
+		return firstSucc.contains(node);
 	}
 	
 	private String findParent(String node) {
