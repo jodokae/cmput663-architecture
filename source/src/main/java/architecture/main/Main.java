@@ -37,12 +37,17 @@ public class Main {
 		
 	    int numbuilds;
 		if(args.length != 2) {
-			log.error("Wrong parameters. Use [Project] [NumBuilds] - Use [NumBuilds]=0 for all");
+			log.error("Wrong parameters. Use [Project] [NumBuilds] - Use [NumBuilds]=0 for all -1 for creatingFile");
 			return;
 		} else {
 			project = args[0];
 			numbuilds = Integer.parseInt(args[1]);
 			
+		}
+		
+		if(numbuilds == -1) {
+			Factory.createDatabaseFile(project);
+			return;
 		}
 		
 		Main main = new Main();

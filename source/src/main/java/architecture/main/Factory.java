@@ -35,6 +35,10 @@ public class Factory {
 		//return new MySQLDatabase(projectName);
 	}
 	
+	public static AbstractDatabase createDatabaseFile(String projectName) {
+		return new MySQLDatabase(projectName);
+	}
+	
 	public static AbstractArchitectureSimilarityComputer createSimilarityComputer() {
 		return new CvgSimiliarityComputer();
 	}
