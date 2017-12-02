@@ -184,26 +184,37 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 	}
 	
 	private boolean isPackage(String node) {
+		boolean isNotEmpty;
 		Set<String> successors = inputGraph.successors(node);
 		if(!successors.iterator().hasNext()) {
-			return false;
+			isNotEmpty = false;
+		} else {
+			String firstSucc = successors.iterator().next();
+			isNotEmpty = firstSucc.contains(node);
 		}
-		String firstSucc = successors.iterator().next();
 		
-		return firstSucc.contains(node);
+		boolean hasPkgTypeRelations = false;
+		Set<String> predecessors = inputGraph.predecessors(node);
+		if(!predecessors.iterator().hasNext()) {
+			hasPkgTypeRelations = true;
+		} else {
+			for(String pred : predecessors) {
+				if(inputGraph.edgeValueOrDefault(pred, node, "").equals(HusaactGraphFileWriter.SUB_PKG)) {
+					hasPkgTypeRelations = true;
+				}
+			}
+		}
+		return isNotEmpty && hasPkgTypeRelations;
+		
 	}
 	
 	private String findParent(String node) {
 		Set<String> predecessors = inputGraph.predecessors(node);
 		Optional<String> pkg = Optional.empty();
 		for(String pred: predecessors) {
-			//if(node.contains("IndexDatetime")) {
-				//System.out.println(predecessors);
-			//}
 			if(inputGraph.edgeValueOrDefault(pred, node, null).equals(HusaactGraphFileWriter.CONTAINS) || 
 					inputGraph.edgeValueOrDefault(pred, node, null).equals(HusaactGraphFileWriter.SUB_PKG)) {
 				pkg = Optional.of(pred);
-				//System.out.println(pred);
 				break;
 			}
 		}

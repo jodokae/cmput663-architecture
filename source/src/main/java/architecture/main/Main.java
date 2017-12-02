@@ -25,11 +25,17 @@ public class Main {
 		
 	private final static String BASE_FOLDER = "extracted/";
 	
-	private final static String PROJECT_FOLDER = BASE_FOLDER + project + "/projects/";
-	private final static String ARC_FOLDER = BASE_FOLDER + project + "/architectures/";
-	private final static String DIFF_JSON = BASE_FOLDER + project + "/versionDiff.json";
+	private final String PROJECT_FOLDER;
+	private final String ARC_FOLDER;
+	private final String DIFF_JSON;
 	
 	static Logger log = Logger.getLogger(Main.class);
+	
+	public Main() {
+		PROJECT_FOLDER = BASE_FOLDER + project + "/projects/";
+		ARC_FOLDER = BASE_FOLDER + project + "/architectures/";
+		DIFF_JSON = BASE_FOLDER + project + "/versionDiff.json";
+	}
 	
 	public static void main(String[] args) {
 		File log4jfile = new File("cfg/log4j.properties");
@@ -159,7 +165,7 @@ public class Main {
 		//}
 		});
 		
-		log.info("Delete Files");
+		/*log.info("Delete Files");
 		for(int i = 0; i < numberVersions; i++) {
 			int build = builds.get(i);
 			Optional<File[]> files = architectures.get(database.getCommit(build));
@@ -177,7 +183,7 @@ public class Main {
 					}
 				}
 			}
-		}
+		}*/
 		
 		log.info("Done");
 		
