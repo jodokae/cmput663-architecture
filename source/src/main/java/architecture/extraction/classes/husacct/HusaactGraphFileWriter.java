@@ -47,6 +47,7 @@ public class HusaactGraphFileWriter extends GraphFileWriter<Element> {
 		}
 		if(!containsInvalid(from) && !containsInvalid(to)) {
 			super.appendLine(from, to, type);
+			return;
 		}
 		
 		if(!from.isEmpty() && !to.isEmpty() &&

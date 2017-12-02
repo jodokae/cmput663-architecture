@@ -105,20 +105,23 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		
 		
 		change = true;
-		// TODO verhindere Endlosschleifen
-		while(clusters.size() < 10 &&change) {
+		while(clusters.size() < 10 && change) {
 			change = false;
 			//System.out.println(clusters.size());
 			Set<String> tempClusters = new HashSet<String>(clusters);
 			for(String node : clusters) {
-				if(containsClasses(node)) {
+				if(!containsSubPkg(node)) {
 					continue;
 				}
 				change = true;
 				tempClusters.remove(node);
-				tempClusters.addAll(inputGraph.successors(node));				
+				for(String succ: inputGraph.successors(node)) {
+					if(isPackage(succ)) {
+						tempClusters.add(succ);
+					}
+				}			
 			}
-			clusters = tempClusters;			
+			clusters = tempClusters;
 		}
 		
 		
@@ -164,6 +167,16 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		Set<String> successors = inputGraph.successors(node);
 		for(String succ : successors) {
 			if(!isPackage(succ)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean containsSubPkg(String pkg) {
+		Set<String> successors = inputGraph.successors(pkg);
+		for(String succ : successors) {
+			if(isPackage(succ)) {
 				return true;
 			}
 		}

@@ -26,7 +26,6 @@ public class CvgSimiliarityComputer extends DirectSimiliarityComputer {
 		interpreter.set("src", arcOne.getAbsolutePath());
 		interpreter.set("target", arcTwo.getAbsolutePath());
 		
-		
 		interpreter.exec("(a,b) = simevolanalyzer.compareTwoVersions(src, target)");
 		PyObject sourceCoverage = interpreter.get("a");
 		PyObject targetCoverage = interpreter.get("b");
