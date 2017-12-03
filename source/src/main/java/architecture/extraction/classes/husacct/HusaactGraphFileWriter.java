@@ -32,7 +32,7 @@ public class HusaactGraphFileWriter extends GraphFileWriter<Element> {
 		handlePackages(packages);
 		handleClasses(classes);
 		handleDependencies(dependencies);
-
+		
 		writer.close();
 	}
 	

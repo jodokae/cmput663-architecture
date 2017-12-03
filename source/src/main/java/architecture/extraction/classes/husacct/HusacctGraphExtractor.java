@@ -1,10 +1,15 @@
 package architecture.extraction.classes.husacct;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jdom2.Element;
 
 import architecture.extraction.classes.AbstractClassGraphExtractor;
@@ -50,22 +55,43 @@ public class HusacctGraphExtractor extends AbstractClassGraphExtractor {
 		return withoutTest;
 	}
 	
-	private List<String> getSourceFolders(File root) {
+	private List<String> getSourceFolders(File root) {				
+		MavenXpp3Reader reader = new MavenXpp3Reader();
+		Model model;
+		String[] sources = SOURCE_DIR;
+		
+		try {
+			String path = root.getAbsolutePath() + "/pom.xml";
+			model = reader.read(new FileReader(path));
+			String sourcePath = model.getBuild().getSourceDirectory();
+			if(sourcePath != null) {
+				sources = sourcePath.split("/");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		List<String> result = getSourceFolders(root, sources);
+		return removeTestFolders(result); 
+    }
+	
+	private List<String> getSourceFolders(File root, String[] sources) {
 		List<String> result = new ArrayList<String>();
 
 		  for (File file : root.listFiles()) {
 		    if (file.isDirectory()) {
-		      if (file.getName().equals(SOURCE_DIR[1]) && 
-		        file.getParentFile().getName().equals(SOURCE_DIR[0])) {
+		      if (file.getName().equals(sources[1]) && 
+		        file.getParentFile().getName().equals(sources[0])) {
 		    	  result.add(file.getPath());
 		      } else {
-		    	  result.addAll(getSourceFolders(file));
+		    	  result.addAll(getSourceFolders(file, sources));
 		      }
 		    }
 		  }
 
-		  return removeTestFolders(result);
-    }
+		  return result;
+	}
 	
 	
 	private static synchronized Element extract(List<String> path) {
