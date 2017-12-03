@@ -120,15 +120,17 @@ A1, y1 = getData('database/sonarqube.json', 'diffs/versionDiff-sonarqube.json')
 A2, y2 = getData('database/graylog2-server.json', 'diffs/versionDiff-graylog.json')
 A3, y3 = getData('database/okhttp.json', 'diffs/versionDiff-okhttp.json')
 A4, y4 = getData('database/cloudify.json', 'diffs/versionDiff-cloudify.json')
-#structr
-#owlapi
-A5, y5 = getData('database/jOOQ.json', 'diffs/versionDiff-jooq.json')
-#checkstyle
-#vectorz
-A6, y6 = getData('database/java-driver.json', 'diffs/versionDiff-javaDriver.json')
+A5, y5 = getData('database/structr.json', 'diffs/versionDiff-structr.json')
+A6, y6 = getData('database/owlapi.json', 'diffs/versionDiff-owlapi.json')
+A7, y7 = getData('database/jOOQ.json', 'diffs/versionDiff-jooq.json')
+A8, y8 = getData('database/checkstyle.json', 'diffs/versionDiff-checkstyle.json')
+A9, y9 = getData('database/vectorz.json', 'diffs/versionDiff-vectorz.json')
+A10, y10 = getData('database/java-driver.json', 'diffs/versionDiff-javaDriver.json')
     
-A = np.concatenate((A1, A2, A3, A4, A5, A6), axis=0)
-y = y1 + y2 + y3 + y4 + y5 + y6
+A = np.concatenate((A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), axis=0)
+y = y1 + y2 + y3 + y4 + y5 + y6 + y7 + y8 + y9 + y10
+#A = A8
+#y = y8
 
 passed = 0
 for i in range(len(y)):
@@ -151,12 +153,12 @@ for k in range(len(y)):
 beforeStats = []
 for k in range(len(y)):
     sum = 0
-    for i in range(10):
+    for i in range(3):
         if (k-i) > 0:
             if y[k-i] == 0:
                 sum += 1
     beforeStats.append(sum)
 
 
-getResults(A, y)
+getResults(A, afterStats)
 
