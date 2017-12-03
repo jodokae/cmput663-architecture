@@ -67,7 +67,9 @@ public class PackageReconstructor extends AbstractArchitectureReconstructor {
 		}
 		
 		// Adds nodes as well
-		inputGraph.putEdgeValue(parts[1], parts[2], parts[0]);
+		if(!parts[1].equals(parts[2])) {
+			inputGraph.putEdgeValue(parts[1], parts[2], parts[0]);
+		}
 	}
 	
 	private void getClusters() {
