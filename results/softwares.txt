@@ -1,16 +1,16 @@
-+---------+--------------------------+---------+-----------------+
-| gh_lang | gh_project_name          | commits | tr_log_analyzer |
-+---------+--------------------------+---------+-----------------+
-| java    | SonarSource/sonarqube    |   11590 | java-maven      |
-| java    | Graylog2/graylog2-server |    8490 | java-maven      |
-| java    | square/okhttp            |    5367 | java-maven      |
-| java    | CloudifySource/cloudify  |    4984 | java-maven      |
-| java    | structr/structr          |    3809 | java-maven      |
-| java    | owlcs/owlapi             |    3238 | java-maven      |
-| java    | jOOQ/jOOQ                |    3196 | java-maven      |
-| java    | checkstyle/checkstyle    |    3029 | java-maven      |
-| java    | mikera/vectorz           |    3025 | java-maven      |
-| java    | datastax/java-driver     |    2961 | java-maven      |
-+---------+--------------------------+---------+-----------------+
++---------+--------------------------+---------+------------------+-----------------+----------------+--------------------------+
+| gh_lang | gh_project_name          | commits | analyzed commits | tr_log_analyzer | range in years | topic                    |
++---------+--------------------------+---------+------------------+-----------------+----------------+--------------------------+
+| java    | SonarSource/sonarqube    |   11590 |             2341 | java-maven      | 1.25           | code analyzer            |
+| java    | Graylog2/graylog2-server |    8490 |             4361 | java-maven      | 4.25           | log analyzer             |
+| java    | square/okhttp            |    5367 |             2143 | java-maven      | 3.5            | http client              |
+| java    | CloudifySource/cloudify  |    4984 |             4923 | java-maven      | 2.5            | orchestration framework  |
+| java    | structr/structr          |    3809 |             2016 | java-maven      | 2.5            | development app          |
+| java    | owlcs/owlapi             |    3238 |             1255 | java-maven      | 3.5            | OWL API                  |
+| java    | jOOQ/jOOQ                |    3196 |             1296 | java-maven      | 3              | SQL API                  |
+| java    | checkstyle/checkstyle    |    3029 |              842 | java-maven      | 2              | code analyzer            |
+| java    | mikera/vectorz           |    3025 |              954 | java-maven      | 3.5            | math library             |
+| java    | datastax/java-driver     |    2961 |              864 | java-maven      | 1.5            | cassandra API            |
++---------+--------------------------+---------+------------------+-----------------+----------------+--------------------------+
 10 rows in set (21,87 sec)
 

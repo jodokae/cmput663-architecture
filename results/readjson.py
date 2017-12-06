@@ -1,9 +1,15 @@
 import json
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr 
 from scipy.stats.stats import spearmanr
-from scipy.stats import pointbiserialr
-from scipy.stats import kendalltau
+from sklearn.model_selection import train_test_split
+from sklearn import ensemble
+from sklearn.dummy import DummyClassifier
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import cohen_kappa_score
 
 def getData(versionDiff, database): 
     with open(database) as json_data:
@@ -55,63 +61,96 @@ def getData(versionDiff, database):
         
     return (a, clearedStats)
     
-def getResults(A, y):
+def getPrevNext(y, threshold):
+    # Biased because of Cross Projects
+    afterStats = []
+    for k in range(len(y)):
+        sum = 0
+        for i in range(threshold):
+            if (k+i) < len(y)-1:
+                sum += y[k+i]
+        afterStats.append(sum)
+
+    beforeStats = []
+    for k in range(len(y)):
+        sum = 0
+        for i in range(threshold):
+            if (k-i) > 0:
+                sum += y[k-i]
+        beforeStats.append(sum)
+        
+    return (beforeStats, afterStats)
+    
+def getStatistics(A, y):
+
+    prNx_threshold = [2, 3, 5, 10]
+    change_threshold = [0, 0.1, 0.2, 0.5]
 
     for feature in range(A.shape[1]):
-        print(featureList[feature] + ': ' + str(spearmanr(A[:,feature], y)))
-        #plt.scatter(y, A[:,feature])
-        #plt.show()
-
-    '''
-    (p,b) = kendalltau(afterStats, relInst)
-    print(str(p) + ' ' + str(b))
+        print('\n')
+        print('#'*150)
+        print(featureList[feature])
         
-    maxNumNodes = 0
-    for i in range(len(d)):
-        if d[i]['metrics']['global']['numNodes'] > maxNumNodes:
-            maxNumNodes = d[i]['metrics']['global']['numNodes']
-    #print (maxNumNodes)
-
-    funnySum = np.zeros(len(relInst))
-    for i in range(len(relInst)):
-        for j in range(8):
-            funnySum[i] += a[i,j] * np.power(10, j)
-
-    print(len(funnySum))
-    print(len(afterStats))
-    (p, b) = pearsonr(afterStats, funnySum)
-    print(str(p) + ' ' + str(b))
-    '''
-
-    from sklearn.model_selection import train_test_split
-
-    from sklearn import ensemble
-    from sklearn.dummy import DummyClassifier
-    from sklearn.linear_model import LinearRegression
+        samples = A[:, feature]
+        
+        print('M vs Out ' + str(spearmanr(samples, y)))
+        
+        for ch_th in change_threshold:
+            B = (A[:,feature]>ch_th).astype(int)
+            print('Changes over Threshold ' + str(ch_th) + ': ' + str((B == 1).sum())) 
+            if ((B==1).sum()) > 0:
+                print('Ch (' + str(ch_th) + ') vs Out : ' + str(spearmanr(B, y)))
+        
+        for pr_th in prNx_threshold:
+            (before, after) = getPrevNext(y, pr_th)
+            print('M vs Bef (' + str(pr_th) + '): ' + str(pearsonr(samples[pr_th:], before[pr_th:])))
+            print('M vs Nxt (' + str(pr_th) + '): ' + str(pearsonr(samples[pr_th:], after[pr_th:])))
+            
+            for ch_th in change_threshold:
+                B = (A[:,feature]>ch_th).astype(int)
+                if ((B==1).sum()) > 0:
+                    print('Ch (' + str(ch_th) + ') vs Bef (' + str(pr_th) + '): ' + str(spearmanr(B[pr_th:], before[pr_th:])))
+                    print('Ch (' + str(ch_th) + ') vs Nxt (' + str(pr_th) + '): ' + str(spearmanr(B[pr_th:], after[pr_th:])))
+        
+        print('#'*150)
+        
+    
+def machineLearn(A, y):
 
     X_train, X_test, y_train, y_test = train_test_split(A, y, test_size=0.33, stratify=y)
 
-    #clf = DummyClassifier()
     clf = ensemble.RandomForestClassifier()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
 
-    from sklearn import metrics
+    tn, fp, fn, tp = confusion_matrix(y_test, pred).ravel()
+    print ( accuracy_score(y_test, pred))
+    print (cohen_kappa_score(y_test, pred))
 
-    #print(metrics.r2_score(y_test, pred))
+    print('TN: ' + str(tn))
+    print('TP: ' + str(tp))
+    print('FP: ' + str(fp))
+    print('FN: ' + str(fn))
+    
+def plot(A):
+    binwidth=0.05
+    for feature in range(A.shape[1]):
+        #print(featureList[feature])
+        #print('Min: ' + str(min(A[:, feature])))
+        #print('Max: ' + str(max(A[:, feature])))
+        plt.hist(A[:,0], bins=np.arange(min(A[:,feature]), max(A[:,feature]) + binwidth, binwidth))
+        plt.xlim([binwidth,1])
+        plt.ylim([0, 300])
+        plt.xlabel('Change percentage')
+        plt.ylabel('# Builds')
+        plt.title(featureList[feature])
+        plt.show()
 
-
-    from sklearn.metrics import confusion_matrix
-    from sklearn.metrics import accuracy_score
-    from sklearn.metrics import cohen_kappa_score
-    #tn, fp, fn, tp = confusion_matrix(y_test, pred).ravel()
-    #print ( accuracy_score(y_test, pred))
-    #print (cohen_kappa_score(y_test, pred))
-
-    #print('TN: ' + str(tn))
-    #print('TP: ' + str(tp))
-    #print('FP: ' + str(fp))
-    #print('FN: ' + str(fn))
+def metricCorr(A):
+    for i in range(8):
+        for j in range(i):
+            if i != j:
+                print(featureList[i] + ' ' + featureList[j] + ': ' + str(pearsonr(A[:,i], A[:,j])))
 
 featureList = ['NumNodes', 'NumEdges', 'AbsInst', 'RelInst', 
     'NodeDegree', 'a2a', 'cvgSource', 'cvgTarget']
@@ -129,8 +168,7 @@ A10, y10 = getData('database/java-driver.json', 'diffs/versionDiff-javaDriver.js
     
 A = np.concatenate((A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), axis=0)
 y = y1 + y2 + y3 + y4 + y5 + y6 + y7 + y8 + y9 + y10
-#A = A8
-#y = y8
+
 
 passed = 0
 for i in range(len(y)):
@@ -140,25 +178,7 @@ for i in range(len(y)):
 print(str(passed) + ' / ' + str(len(y)))
 print('Passes: ' + str(passed / len(y)))
 
-# Biased because of Cross Projects
-afterStats = []
-for k in range(len(y)):
-    sum = 0
-    for i in range(10):
-        if (k+i) < len(y)-1:
-            if y[k+i] == 0:
-                sum += 1
-    afterStats.append(sum)
-
-beforeStats = []
-for k in range(len(y)):
-    sum = 0
-    for i in range(3):
-        if (k-i) > 0:
-            if y[k-i] == 0:
-                sum += 1
-    beforeStats.append(sum)
-
-
-getResults(A, afterStats)
-
+metricCorr(A)
+#getStaistics(A, y)
+#machineLearn(A, y)
+#plot(A)
