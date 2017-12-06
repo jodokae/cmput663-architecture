@@ -10,6 +10,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import cohen_kappa_score
+from prettytable import PrettyTable
 
 def getData(versionDiff, database): 
     with open(database) as json_data:
@@ -147,10 +148,18 @@ def plot(A):
         plt.show()
 
 def metricCorr(A):
+    t = PrettyTable()
+    t.field_names = [''] + featureList
+
     for i in range(8):
-        for j in range(i):
-            if i != j:
-                print(featureList[i] + ' ' + featureList[j] + ': ' + str(pearsonr(A[:,i], A[:,j])))
+        row = [featureList[i]] + ['', '', '', '', '', '', '', ''] 
+        for j in range(8):
+        
+            (v, p) = pearsonr(A[:,i], A[:,j])
+            row[j+1] = format(v, '.2g') + ', ' + format(p, '.2g')
+            
+        t.add_row(row)
+    print(t)
 
 featureList = ['NumNodes', 'NumEdges', 'AbsInst', 'RelInst', 
     'NodeDegree', 'a2a', 'cvgSource', 'cvgTarget']
