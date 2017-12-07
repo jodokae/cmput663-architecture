@@ -1,0 +1,324 @@
+\documentclass{beamer}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{graphicx}
+ 
+\usetheme{Copenhagen}
+ 
+\defbeamertemplate*{footline}{shadow theme}{%
+	\leavevmode%
+	\hbox{\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm plus1fil,rightskip=.3cm]{author in head/foot}%
+			\usebeamerfont{author in head/foot}\hfill\insertshortauthor
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.4\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
+			\usebeamerfont{title in head/foot}\insertshorttitle\hfill%
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.1\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
+			\usebeamercolor{title in head/foot} \hfill\insertframenumber\,/\,\inserttotalframenumber
+		\end{beamercolorbox}}%
+		\vskip0pt%
+}
+ 
+%Information to be included in the title page:
+\title[Architectural Change in CI Builds]{Impact of Architectural Change on
+	Continuous Integration Build Outcome}
+\author{Johannes K{\"a}stle}
+\institute{University of Alberta}
+\date{12/07/2017}
+ 
+\begin{document}
+ 
+\frame{\titlepage}
+ 
+\section{Introduction}
+\subsection{Motivation}
+\begin{frame}
+\frametitle{Motivation}
+
+\begin{itemize}
+	\item Explore Architectural Change in Open-Source Projects
+	\item Decrease Number of Failing Builds
+	\item Increase Productivity
+\end{itemize}
+
+\pause
+
+\begin{block}{Research Question}
+Does change in architecture influence the outcome of a CI build?
+\end{block}
+
+\end{frame}
+
+
+\subsection{Background}
+\begin{frame}
+\frametitle{Background}
+
+\includegraphics[width=11cm]{assets/Background.pdf}
+
+\end{frame}
+
+\subsection{Related Works}
+\begin{frame}
+\frametitle{Related Works}
+
+
+\begin{itemize}
+	\item Build Prediction
+	\begin{itemize}
+		\item Correlation in TravisTorrent
+		\item Project / Person specific
+		\item (Cascading) Tree Classifier
+	\end{itemize}
+	\pause
+	\item Architecture
+	\begin{itemize}
+		\item Consistency
+		\item Reconstruction
+		\begin{itemize}
+			\item HUSACCT
+			\item ARCADE
+		\end{itemize}
+		\item Change
+		\begin{itemize}
+			\item Kernels
+			\item ARCADE
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{HUSAACT}
+	\framesubtitle{HU Software Architecture Complicane Checking}
+	
+	Leo Pruijt, HU University of Applied Sciences Utrecht
+	
+	\begin{itemize}
+			\item Conformance Framework
+			\item Java, C\#
+			\item Extracts from Source Files
+			\item Different Dependencies
+			\item Needs Module Definition
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{ARCADE}
+	\framesubtitle{Architecture Recovery, Change, And Decay Evaluator }
+	
+	University of Southern California
+	
+	\begin{itemize}
+		\item Software Workbench
+		\item Java, C, C++
+		\item Reconstructors
+		\begin{enumerate}
+			\item ACDC - Pattern Based
+			\item ARC - Semantic Based
+		\end{enumerate}
+		\item Change Metrics
+		\begin{enumerate}
+			\item a2a
+			\item cvg
+		\end{enumerate}
+	\end{itemize}
+		
+\end{frame}
+
+\begin{frame}
+	\frametitle{ARCADE Metrics}
+	
+		\[
+		a2a(A_i, A_j) = 1 - \frac{mto(A_i, A_j)}{aco(A_i) + aco(A_j)}
+		\]
+		
+		$mto(A_i, A_j)$ steps from $A_i$ to $A_j$
+		
+		$aco(A_i)$ = steps to create $A_i$
+		
+		\pause
+		
+		\[
+		cvg(A_i, A_j) = \frac{|simC(A_i, A_j)|}{|allC(A_i)|}
+		\]
+		
+		$simC(A_i, A_j)$ is number of clusters with $c2c >$ threshold. 
+		
+		\[
+		c2c(c_i, c_j) = \frac{|\text{entities}(c_i) \cap \text{entities}(c_j)|}{\max(|\text{entities}(c_i)|, |\text{entities}(c_j)|)}
+		\]
+\end{frame}
+
+\begin{frame}
+	\frametitle{Martin's Metrics}
+	
+	\begin{itemize}
+		\item Afferent Coupling A
+		\item Efferent Coupling E
+		\item Instability $I = \frac{E}{A + E} $
+	\end{itemize}
+	
+\end{frame}
+
+\section{Architectural Change on Build Outcome}
+\subsection{Methodology}
+\begin{frame}
+\frametitle{Methodology}
+
+\begin{block}{Toolchain}
+	\includegraphics[width=10cm]{assets/overview.pdf}
+\end{block}
+\pause[1]
+
+\only<2>{
+\begin{block}{Architecture}
+	\includegraphics[width=10cm]{assets/architecture.pdf}
+\end{block}
+}
+
+\only<3>{
+\begin{block}{Implemented}
+	\includegraphics[width=10cm]{assets/implementedArc.pdf}
+\end{block}
+}
+
+\end{frame}
+
+\subsection{Extracted Results}
+\begin{frame}
+	\frametitle{Studied Projects}
+	
+	17380 / 20995 Builds Passed
+
+	\input{assets/projects}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Metrics}
+	\framesubtitle{Correlation}
+	
+	\input{assets/metricCorr}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Metrics}
+	\framesubtitle{Distribution}
+	
+	\includegraphics[width=6cm]{assets/A2A.pdf}
+	\includegraphics[width=6cm]{assets/RelInst.pdf}
+	
+	\begin{block}{}
+		All metrics follow one of those two distributions
+	\end{block}
+	
+\end{frame}
+
+\subsection{Correlation}
+\begin{frame}
+	\frametitle{Correlation}
+	
+	Calculated Correlations
+	\begin{enumerate}
+		\item Metric vs Outcome
+		\item Metric vs Previous Outcomes
+		\item Metric vs Following Outcomes
+		\item Change vs Outcome
+		\item Change vs Previous Outcomes
+		\item Change vs Next Outcomes
+	\end{enumerate}
+	
+	Thresholds for
+	\begin{itemize}
+		\item Previous / Next: 2, 3, 5, 10
+		\item Change: 0.0, 0.1, 0.2, 0.5
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Correlation}
+	
+	\begin{block}{Results}
+		Most Correlations between $0.1- 3\%$
+	\end{block}
+	
+	Highest Values
+	\begin{itemize}
+		\item cvg Source /Target
+		\item Change Threshold $>0.0$
+		\item Prev / Next Threshold doesn't matter
+		\item $c\approx0.11, p\leq1$e-50
+	\end{itemize}
+	
+	
+\end{frame}
+
+\section{Interpretation}
+\subsection{Implications}
+\begin{frame}
+\frametitle{Implications}
+
+\begin{itemize}
+	\item Projects from different domains and large timescale
+	\item Projects from Build 1 and well established
+	\item Large number of commits
+	\item Low percentage of fails
+\end{itemize}
+\pause
+\begin{itemize}
+	\item Metrics follow same pattern
+	\item Architecture extraction consistent
+\end{itemize}
+\pause
+\begin{itemize}	
+	\item Architecture does not correlate with Build Results
+	\item Small impact from changing modules
+\end{itemize}
+
+\end{frame}
+
+\subsection{Threats \& Future Work}
+\begin{frame}
+\frametitle{Threats \& Future Work}
+
+Threats
+\begin{itemize}
+	\item Only 10 big Java projects
+	\item Low amount of build failures
+	\item HUSACCT and ARCADE
+	\item Wrong metrics
+\end{itemize}
+\vspace{0.25cm}
+\pause
+
+Future Work
+\begin{itemize}
+	\item More projects
+	\item More metrics
+	\item More different extractors / reconstructors
+\end{itemize}
+
+\end{frame}
+
+\subsection{Summary}
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+	\item Large Scale Architecture Reconstruction
+	\item easily expendable framework
+	\item Almost no correlation between architecture and Build Result
+\end{itemize}
+\pause
+\begin{center}
+	\includegraphics[width=5cm]{assets/professor.jpg}
+\end{center}
+
+\end{frame}
+ 
+\end{document}
