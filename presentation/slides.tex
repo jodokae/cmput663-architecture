@@ -21,16 +21,21 @@
 }
  
 %Information to be included in the title page:
-\title[Architectural Change in CI Builds]{Impact of Architectural Change on
-	Continuous Integration Build Outcome}
+\title[Architectural Change in CI Builds]{Impact of Architectural Change on Continuous Integration Build Outcome}
 \author{Johannes K{\"a}stle}
 \institute{University of Alberta}
 \date{12/07/2017}
  
 \begin{document}
- 
-\frame{\titlepage}
- 
+
+\begin{frame}
+	\titlepage
+	
+	\begin{center}
+		\url{https://github.com/jodokae/cmput663-architecture}
+	\end{center}
+\end{frame}
+
 \section{Introduction}
 \subsection{Motivation}
 \begin{frame}
@@ -210,14 +215,20 @@ Does change in architecture influence the outcome of a CI build?
 	\frametitle{Metrics}
 	\framesubtitle{Distribution}
 	
-	\includegraphics[width=6cm]{assets/A2A.pdf}
+	\includegraphics[width=6cm]{assets/cvgSource.pdf}
 	\includegraphics[width=6cm]{assets/RelInst.pdf}
 	
-	\begin{block}{}
-		All metrics follow one of those two distributions
-	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Metrics}
+	\framesubtitle{Distribution}
+	
+	\includegraphics[width=6cm]{assets/a2a.pdf}
+	\includegraphics[width=6cm]{assets/NodeDegree.pdf}
 	
 \end{frame}
+
 
 \subsection{Correlation}
 \begin{frame}
@@ -236,7 +247,7 @@ Does change in architecture influence the outcome of a CI build?
 	Thresholds for
 	\begin{itemize}
 		\item Previous / Next: 2, 3, 5, 10
-		\item Change: 0.0, 0.1, 0.2, 0.5
+		\item Change: 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5
 	\end{itemize}
 	
 \end{frame}
@@ -247,14 +258,20 @@ Does change in architecture influence the outcome of a CI build?
 	\begin{block}{Results}
 		Most Correlations between $0.1- 3\%$
 	\end{block}
-	
-	Highest Values
-	\begin{itemize}
-		\item cvg Source /Target
-		\item Change Threshold $>0.0$
-		\item Prev / Next Threshold doesn't matter
-		\item $c\approx0.11, p\leq1$e-50
-	\end{itemize}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			Highest Values
+			\begin{itemize}
+				\item cvg Source / Target
+				\item Prev / Next Threshold doesn't matter
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+		\begin{center}
+			\includegraphics[width=5.5cm]{assets/cvgSourceCorrPlot.pdf}
+		\end{center}
+		\end{column}
+	\end{columns}
 	
 	
 \end{frame}

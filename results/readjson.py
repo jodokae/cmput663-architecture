@@ -85,7 +85,7 @@ def getPrevNext(y, threshold):
 def getStatistics(A, y):
 
     prNx_threshold = [2, 3, 5, 10]
-    change_threshold = [0, 0.1, 0.2, 0.5]
+    change_threshold = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5]
 
     for feature in range(A.shape[1]):
         print('\n')
@@ -115,6 +115,21 @@ def getStatistics(A, y):
         
         print('#'*150)
         
+def plotSpecific(A, y):
+    change_threshold = np.arange(100) * 0.01
+    samples = A[:, 6]
+    (before, after) = getPrevNext(y, 5)
+    corr = []
+    for ch_th in change_threshold:
+        B = (samples>ch_th).astype(int)
+        (co, p) = spearmanr(B[5:], after[5:])
+        corr.append(co)
+    plt.plot(change_threshold, corr)
+    plt.xlim([0, 1])
+    plt.ylabel('Correlation')
+    plt.xlabel('Change Threshold')
+    plt.title('Spearman: ' + featureList[6] + ' vs Next 5 Builds')
+    plt.show()
     
 def machineLearn(A, y):
 
@@ -134,18 +149,23 @@ def machineLearn(A, y):
     print('FN: ' + str(fn))
     
 def plot(A):
-    binwidth=0.05
+    binwidth=0.01
+    #maximum = [350, 400, 300, 200, 300, 700, 1500 , 1500]
     for feature in range(A.shape[1]):
+        values = A[:, feature]
+        values = list(filter(lambda a: a != 0, values))
         #print(featureList[feature])
         #print('Min: ' + str(min(A[:, feature])))
         #print('Max: ' + str(max(A[:, feature])))
-        plt.hist(A[:,0], bins=np.arange(min(A[:,feature]), max(A[:,feature]) + binwidth, binwidth))
-        plt.xlim([binwidth,1])
-        plt.ylim([0, 300])
+        plt.hist(values, bins=np.arange(min(values), max(values) + binwidth, binwidth))
+        plt.xlim([0,1])
+        #plt.ylim([0, maximum[feature]])
         plt.xlabel('Change percentage')
         plt.ylabel('# Builds')
         plt.title(featureList[feature])
-        plt.show()
+        #plt.show()
+        plt.savefig(featureList[feature] + '.pdf')
+        plt.close()
 
 def metricCorr(A):
     t = PrettyTable()
@@ -187,7 +207,8 @@ for i in range(len(y)):
 print(str(passed) + ' / ' + str(len(y)))
 print('Passes: ' + str(passed / len(y)))
 
-metricCorr(A)
-#getStaistics(A, y)
+#metricCorr(A)
+#getStatistics(A, y)
 #machineLearn(A, y)
 #plot(A)
+plotSpecific(A, y)
