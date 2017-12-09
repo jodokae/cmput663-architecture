@@ -180,6 +180,13 @@ def metricCorr(A):
             
         t.add_row(row)
     print(t)
+    
+def getOutlier(A):
+    degree = A[:, 7]
+    print(degree.shape)
+    
+    print(-np.partition(-degree, 3)[:3])
+    
 
 featureList = ['NumNodes', 'NumEdges', 'AbsInst', 'RelInst', 
     'NodeDegree', 'a2a', 'cvgSource', 'cvgTarget']
@@ -207,8 +214,10 @@ for i in range(len(y)):
 print(str(passed) + ' / ' + str(len(y)))
 print('Passes: ' + str(passed / len(y)))
 
+print(np.count_nonzero(A, axis=0) / passed)
+
 #metricCorr(A)
 #getStatistics(A, y)
 #machineLearn(A, y)
 #plot(A)
-plotSpecific(A, y)
+#plotSpecific(A, y)

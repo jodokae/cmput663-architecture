@@ -2,3 +2,4 @@ diagrams/* linguist-vendored
 plots/* linguist-vendored
 presentation/* linguist-vendored
 report/* linguist-vendored
+source/arcadepy/* linguist-vendored
