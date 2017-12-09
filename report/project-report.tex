@@ -5,6 +5,7 @@
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
+
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -25,10 +26,6 @@ kaestle@ualberta.ca}
 TODO
 \end{abstract}
 
-\begin{IEEEkeywords}
-???
-\end{IEEEkeywords}
-
 \section{Introduction}
 
 Continuous integration (CI) is nowadays common practice in software development \cite{CI-Common}. It helps finding faults in the system earlier and therefore reducing the costs to fix them \cite{NutzenCI}. On the other hand, build failures decrease the pace of the development \cite{Costs-BuildFailures}. Hence, through decreasing the number broken builds, the speed of development is increased whereby the its costs are decreased.
@@ -41,10 +38,10 @@ Paixão et al. have found correlation between CI build outcomes and non-function
 
 To investigate the relationship between the CI and the architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, check consistency with the designed architecture \cite{ArcConf, ArcCons} investigating the impact on the business model \cite{ArcChange-Business} or the not-changed modules of the architecture \cite{Knowledge-AC}. 
 
-The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the ten software systems with the highest numbers of commits are analyzed. Every build of those systems is reviewed for change to its predecessor using different metrics. These are then compared against the build outcomes and used for trying to predict those.
+The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the ten software systems with the highest numbers of commits are analyzed. Every build of those systems is reviewed for change to its predecessor using 8 different metrics. These are then compared against the build outcomes and used for trying to predict those. The author hypothesizes that change is followed by failing builds, because if there is a bigger problem in the system, see-able in the failing builds, it is necessary to change the architecture. 
 
-%TODO Results in Introduction
-TODO: Results Short
+For that, a easy expandable framework is developed which allows to add new recovery tools and change metrics with only a few lines of code. 
+After calculating the change metrics for $20,000$ commits using two different architecture reconstruction techniques, almost no correlation could be found between change and build outcome. The hypothesis must therefore be rejected. 
 
 \section{Related Works}
 
@@ -106,11 +103,36 @@ Because the built tool impacts the outcome of the build but not on the architect
 Because there are possibly multiple builds for the same commit, we only use the build which builds a certain version of the software first, because this ensures that the change is directly correlated to the first build that introduces this change. These restrictions lower the number of considered builds by $x\%$. 
 %TODO Numbers and Table
 
+In general, to get an architectural change, we have to follow three steps. First, we need to extract the class structure out of the source code, then we reconstruct the architecture and eventually we take two architectures and compare them with each other to get a change metric (fig \ref{overview}).
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=7in]{assets/overview.pdf}
+	\caption{Overview of the process}
+	\label{overview}
+\end{figure*}
+
+
 \subsection{Framework}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=3.45in]{assets/architecture.pdf}
+	\caption{Structure of the Framework}
+	\label{frameworkStructure}
+\end{figure}
 
 The extraction of the architectural change metrics between two commits is implemented using a framework. The general structure (fig. \ref{frameworkStructure}) extracts the unique commit ID for GitHub out of the database, then downloads the commit and extracts the architecture out of the source files. The architecture is saved in a file using the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this filetype. This filetype saves simple relation triples in the form: type, source, target. Then, for every two subsequent commits the architectures are compared and the results are saved in a JSON file. The advantage of this framework model is, that all modules can simply be exchanged, and a new database or metric calculator can be implemented with little effort.
 
 In the following the implemented tools for the chain are explained. An overview can be found in figure \ref{implToolchain}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=3.45in]{assets/implementedArc.pdf}
+	\caption{Implemented tool chain}
+	\label{implToolchain}
+\end{figure}
+
 
 \subsubsection{Reconstruction}
 
@@ -130,22 +152,78 @@ The metrics are then compared pairwise. To compare proportional metrics, like in
 
 \subsection{Evaluation}
 
-%\section{Implementation}
-
-%Needed or in Framework?
+The calculated metrics are tested for correlation with the build result. This is done in multiple ways. It is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. Then, the metric is converted to a boolean change or no change with a given threshold $t$, where everything below $t$ is considered as no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. These values were chosen because most found changes were small. Every comparison with includes no boolean variables is run with Pearson correlation test, the others with Spearman's test. 
 
 \section{Results}
 
-\section{Threats to Validity}
+This section presents the findings of the proposed methodology. First, the projects under study are introduced, then calculated metrics are evaluated and, eventually, the correlation between the metrics and the build outcomes is shown.
+
+\subsection{Studied Projects}
+
+\input{assets/projects}
+
+For this study then ten biggest projects, according to the number of commits, out of the TravisTorrent projects are analyzed. Only projects and builds which are written in Java and use Maven as a build tool are considered. Because of change of configuration it is possible that some versions of the software is built multiple times. Since it is impossible that those builds have architectural change, only the first build per commit is considered. In the end, almost $21,000$ builds were studied with a pass rate of $83\%$. The builds range between one and four years of development time, some start at a well established state (Sonarqube at build number over 500), others at build 1 (e.g. Checkstyle). The projects vary in their application field, there are two code analyzers, three APIs, a webclient and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
+
+\subsection{Metric Evaluation}
+
+\input{assets/metricCorr}
+\input{assets/metrics}
+
+In table \ref{tableMetricCorr} the correlation between the metrics is shown. All p values were or close to 0. Most metrics are highly correlated and all at least somehow correlated. This is good, because it gives indication that all metrics are truly an indicator for architectural change if we assume that at least one of them is. This strengthens the confidence in the chosen tool chain. 
+
+Depending on the metric, most builds show no change (table \ref{tableMetric}). Only for a2a there are more builds with a change than without one. But then most of these changes are really small, as shown in figure \ref{a2aHist}. Most changes are quite small in other metrics as well, with only few big architectural changes (figure \ref{cvgHist} and \ref{numEdgesHist}). This is to be expected that architecture changes only sometimes in a big manner.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=3in]{assets/a2a.pdf}
+	\caption{Histogram of the a2a metric over all projects}
+	\label{a2aHist}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=3in]{assets/cvgSource.pdf}
+	\caption{Histogram of the cvg src metric over all projects}
+	\label{cvgHist}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=3in]{assets/NumEdges.pdf}
+	\caption{Histogram of the \#E metric over all projects}
+	\label{numEdgesHist}
+\end{figure}
+
+\subsection{Correlation}
+
+\begin{figure}
+\centering
+\includegraphics[width=3in]{assets/cvgSourceCorrPlot}
+\caption{cvg src vs next five builds over different change thresholds }
+\label{cvgPlot}
+\end{figure}
+
+
+Most found correlations, with a p-value under $5\%$, were between $0.1$ and $3\%$. Only some metrics show a higher correlation around $9-11\%$. The threshold how many previous or following builds were considered, had no significant impact. The highest correlation found was for cvg, regardless of source or target, with a change threshold of $0.0$, i.e. every little change was considered as change (figure \ref{cvgPlot}). But even the best correlation was only $11\%$.
+
+\section{Discussion}
+
+While checking ten big Java projects, no significant correlation between architectural change and build results was found. Apart from there actually being no correlation, there could be various factors influencing this result. First of all, only ten projects, although from different domains, were evaluated. Despite having projects which start at build one, the number of failing builds was relatively small. It is possible that the missing connection between architecture and build results lies there that all considered projects have a well thought-through architecture and do change it in a way that in produces problems. 
+
+It is also possible, that the problems which are produced by architectural change are not transfered into build results but to a different level, e.g.(1) code coverage or (2) number failed tests. Unfortunately the dataset does not give the opportunity to check for those, because they are (1) not reported and (b) have missing values in around $20\%$ of the builds. That software architecture is important is common knowledge. That it changes over the course of a project was shown. But it remains unknown how change affects the progress of the development process. 
+
+As \cite{arcRec-comparison} shows even the best recovery techniques have problems detecting the true architecture. Therefore, it is possible that HUSACCT and ARCADE are not the right tools for the research question. This problem was adressed since we consider multiple recovery techniques. The produces metrics highly correlate, which strengthens the claim that the change detection is working as intended. 
+
+In the future, different metrics and extractors should be added to the comparison as well as more projects should be considered. This will improve the trust in our findings, that architectural change does not impact the build results significantly. This is easily possible due to the nature of the framework.
 
 \section{Conclusion}
 
-\section*{Acknowledgment}
+This research conducts a large scale architecture recovery and change analysis for over $20,000$ builds from $10$ different Java Maven projects from various domains. For that a easily expandable framework was developed. Then, $8$ metrics using $2$ different recovery techniques were extracted. The hypothesis that architectural change has an impact on CI build outcomes at or near the change was rejected. The highest correlation found was around $11\%$. This could be due to the well established nature of the studied projects, or that the chosen metrics and techniques are not suitable for the problem. The built framework can be efficiently extended to consider more recovery tools and metrics. The hypothesis of the author is that the impact from architectural change has to be lie somewhere else but in the outcome of the build.
 
-Needed?
 Check References Einheitlich
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,literature}
 
 \end{document}
+\grid
