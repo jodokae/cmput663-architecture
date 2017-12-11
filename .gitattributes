@@ -1,4 +1,5 @@
 results/diagrams/* linguist-vendored
 results/plots/* linguist-vendored
-tex/* linguist-vendored
+tex/report/* linguist-vendored
+tex/presentation/* linguist-vendored
 source/arcadepy/* linguist-vendored
