@@ -27,7 +27,7 @@ kaestle@ualberta.ca}
 \maketitle
 
 \begin{abstract}
-TODO
+In order to reduce the number of failing CI builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. It analyzes the change between the architectures of two subsequent versions of a software by introducing an easily expandable framework which is capable of downloading the software, reverse engineering the architecture and comparing it to the next version fully automatic. 8 metrics using 3 different, well established techniques are used to achieve the data. While mining over 20,000 builds from ten big Java repositories, no significant correlation between change and build outcome could be found. The impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adopting to new research questions.
 \end{abstract}
 
 \section{Introduction}
@@ -139,14 +139,14 @@ To get a change view of the dependencies explicitly, we combine these metrics wi
 
 \section{Methodology}
 
-\input{assets/projects}
-
-\begin{figure*}
+\begin{figure*}[!t]
 	\centering
 	\includegraphics[width=7in]{assets/overview.pdf}
 	\caption{Overview of the process}
 	\label{overview}
 \end{figure*}
+
+\input{assets/projects}
 
 In this study the ten largest Java projects, in terms of number of commits, from the TravisTorrent dataset were analyzed. This ensures that there is enough data for making statistical reasonable results over a course of time for a project. A list of analyzed projects can be found in table \ref{tableProjects}.
 
@@ -157,7 +157,7 @@ In general, to get an architectural change, we have to follow three steps. First
 
 \subsection{Framework}
 
-\begin{figure}
+\begin{figure}[!t]
 	\centering
 	\includegraphics[width=3.45in]{assets/architecture.pdf}
 	\caption{Structure of the Framework}
@@ -167,23 +167,30 @@ In general, to get an architectural change, we have to follow three steps. First
 The extraction of the architectural change metrics between two commits is implemented using a framework (Fig. \ref{frameworkStructure}). First the unique commit ID is extracted out of the database, with which the snapshot can be downloaded from GitHub. 
 The ``Architecture'' module is split into two parts, the extraction of the class structure and the reconstruction of the architecture. Intermediate results are saved in a file using the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this filetype. This filetype saves simple relation triples in the form: type, source, target (see listing \ref{lst1:rsf}). This relational system is easy convertible into a graph structure or databases and stores the modules implicitly in the dependencies. This has an disadvantage that the modules cannot be extracted separately from the dependencies.
 
-\begin{lstlisting}[
-caption=Rigi Standard Format example,
-label=lst1:rsf,
-]
-subPkg checkstyle checkstyle.grammars
-subPkg checkstyle checkstyle.gui
-contains checkstyle checkstyle.Main
-\end{lstlisting}
-
 Then, for every two subsequent commits the architectures are compared and the results are saved in a JSON file. With the methodology structured into this framework, the research can easily be expanded with more reconstructors or metric calculators. Therefore, one needs only to implement an new subclass for the changing module, store its result as a rsf file and it can be integrated with all existing tools. Doing so, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. On another path we have implemented the package reconstruction and metrics (Fig. \ref{implToolchain}).
 
-\begin{figure}
+\begin{figure}[!t]
 	\centering
 	\includegraphics[width=3.45in]{assets/implementedArc.pdf}
 	\caption{Implemented tool chain}
 	\label{implToolchain}
 \end{figure}
+
+
+\begin{lstlisting}[
+aboveskip=-0.8 \baselineskip,
+belowskip=-0.8 \baselineskip,
+float,
+caption=Rigi Standard Format example,
+label=lst1:rsf,
+columns=space-flexible
+]
+subPkg   checkstyle checkstyle.grammars
+subPkg   checkstyle checkstyle.gui
+contains checkstyle checkstyle.Main
+\end{lstlisting}
+
+\input{assets/metrics}
 
 \subsubsection{Extraction}
 
@@ -219,7 +226,7 @@ c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
 The calculated metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means we look for correlation between change in build $x$ and the build result in the builds $\{x, x \pm 1, \hdots, d \pm b\}$. From this we can see if architectural change affects build failures in recent history or near future. 
 Then, the metric is converted to a boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. These values were chosen because most found changes were small (Fig. \ref{fig:histograms}) We do so to see if small changes distort the correlation. Every comparison which includes no boolean variables is run with Pearson's correlation test, the others with Spearman's test. 
 
-\begin{figure*}
+\begin{figure*}[!t]
 	\centering
 	\begin{subfigure}{2.3in}
 		\centering
@@ -253,26 +260,25 @@ For this study then ten biggest projects, according to the number of commits, ou
 
 \subsection{Metric Evaluation}
 
-\input{assets/metrics}
 \input{assets/metricCorr}
 
 We have extracted 8 architecture change metrics. Most builds show no change (table \ref{tableMetric}). This is to be expected, since most changes in the system should not be architectural changes. 
-Only a2a has more changing builds than non-changing builds. But then, most of these changes are really small, as shown in Fig. \ref{a2aHist}. In other metrics most changes are quite small as well, with only few big architectural changes (figure \ref{cvgHist} and \ref{numEdgesHist}). This seems usual, because architecture changes only sometimes in a big manner.
+Only a2a has more changing builds than non-changing builds. But then, most of these changes are really small, as shown in Fig. \ref{a2aHist}. In other metrics most changes are quite small as well, with only few big architectural changes (Fig. \ref{cvgHist} and \ref{numEdgesHist}). This seems usual, because architecture changes only sometimes in a big manner.
 
 In table \ref{tableMetricCorr} the correlation between the metrics is shown. All p values were equal or close to 0. Most metrics are highly correlated and all show some degree of correlation ($>0.2$). This gives the indication that all metrics are truly an indicator for architectural change if we assume that at least one of them is. This strengthens the confidence in the chosen tool chain. 
 
 \subsection{Correlation}
 
-\begin{figure}
-\centering
-\includegraphics[width=3in]{assets/cvgSourceCorrPlot}
-\caption{cvg src vs next five builds over different change thresholds }
-\label{cvgPlot}
-\end{figure}
-
-Most found correlations, with a p-value under $5\%$, were between $0.1$ and $3\%$. Only some metrics show a higher correlation around $9-11\%$. The threshold how many previous or following builds were considered, had no significant impact. The highest correlation found was for cvg, regardless of source or target, with a change threshold of $0.0$, i.e. every little change was considered as change (figure \ref{cvgPlot}). But even the best correlation was only $11\%$. 
+Most found correlations, with a p-value under $5\%$, were between $0.1$ and $3\%$. Only some metrics show a higher correlation around $9-11\%$. The threshold how many previous or following builds were considered, had no significant impact. The highest correlation found was for cvg, regardless of source or target, with a change threshold of $0.0$, i.e. every little change was considered as change (Fig. \ref{cvgPlot}). But even the best correlation was only $11\%$. 
 
 The small p values show that we have a significant relationship between change and build outcome. But this correlation for most metrics so small, that we cannot conclude this as a meaningful impact. Because taking the smallest changes into consideration increases the correlation coefficient, and the threshold for previous and following builds had no significant change on that coefficient, it must be assumed that the stronger correlations could be noise. Because the strongest correlation was found with the cvg metric, which works inside of the modules, the possible correlation is within the modules not between them. Furthermore, over all correlations, the tendency was towards a positive value (min: -0.03), which shows, if there truly is a correlation, then change impacts the build result positively. 
+
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=3in]{assets/cvgSourceCorrPlot}
+	\caption{cvg src vs next five builds over different change thresholds }
+	\label{cvgPlot}
+\end{figure}
 
 \section{Discussion}
 
@@ -288,8 +294,8 @@ In the future, more metrics and extractors should be added to the framework. The
 
 \section{Conclusion}
 
-While analyzing over $20,000$ builds from $10$ different Java Maven projects from various domains, we could not find any significant impact of architectural change to build outcome. 
-We approached this result through an easily expandable framework to recover the architecture from the builds using one extractor, two reconstructors and three metric sets. In total, $8$ metrics were tested for correlation in $6$ different scenarios including the previous and following builds. 
+While analyzing over $20,000$ builds from $10$ different Java Maven projects from various domains, we could not find any significant impact of architectural change to build outcome.
+We approached this result through an easily expandable framework to recover the architecture from the builds using one extractor, two reconstructors and three metric sets based on previous researches. In total, $8$ metrics were tested for correlation in $6$ different scenarios including the previous and following builds. 
 
 The hypothesis that architectural change impacts CI build outcomes at or near the change was rejected. The highest correlation found was around $11\%$ and would imply that change leads to fewer failures. This could just be noise, due to the well established nature of the studied projects, or that is no correlation between architectural change and build outcome. 
 
