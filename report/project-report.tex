@@ -10,6 +10,7 @@
 \usepackage{listings}
 \usepackage{subcaption}
 
+
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -27,7 +28,11 @@ kaestle@ualberta.ca}
 \maketitle
 
 \begin{abstract}
-In order to reduce the number of failing CI builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. It analyzes the change between the architectures of two subsequent versions of a software by introducing an easily expandable framework which is capable of downloading the software, reverse engineering the architecture and comparing it to the next version fully automatic. 8 metrics using 3 different, well established techniques are used to achieve the data. While mining over 20,000 builds from ten big Java repositories, no significant correlation between change and build outcome could be found. The impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adopting to new research questions.
+In order to reduce the number of failing CI builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. 
+It analyzes the change between the architectures of two subsequent versions of a software by introducing an easily expandable framework.
+This framework is capable of downloading the software, reverse engineering the architecture and comparing it to the next version fully automatic. 
+8 metrics using 3 different, well established techniques, are used to acquire the data. While mining over 20,000 builds from ten big Java repositories, no significant correlation between change and build outcome could be found. 
+Thus, the impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adopting to new research questions.
 \end{abstract}
 
 \section{Introduction}
@@ -183,7 +188,7 @@ belowskip=-0.8 \baselineskip,
 float,
 caption=Rigi Standard Format example,
 label=lst1:rsf,
-columns=space-flexible
+columns=flexible
 ]
 subPkg   checkstyle checkstyle.grammars
 subPkg   checkstyle checkstyle.gui
@@ -301,8 +306,6 @@ The hypothesis that architectural change impacts CI build outcomes at or near th
 
 We conclude that change does not impact the build outcome and, thus, the research questions have to be changed. Since it is known that the architecture impacts the development, other quantitative features must be found to measure the impact. We propose to extend the measured metrics, because we believe that one metric cannot explain the impact alone, and search for correlation in more non functional metrics, like code coverage or development pace.
 The built framework can be efficiently adapted for the new questions through extracting more facts out of the code using various tools. 
-
-%TODO Check References Einheitlich
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,literature}
