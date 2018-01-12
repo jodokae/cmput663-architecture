@@ -2,9 +2,9 @@ package architecture.commons;
 
 public class Compilable {
 	private String commitID;
-	private boolean compilable;
+	private int compilable;
 	
-	public Compilable(String commitID, boolean isCompilable) {
+	public Compilable(String commitID, int isCompilable) {
 		this.commitID = commitID;
 		this.compilable = isCompilable;
 	}
@@ -15,10 +15,10 @@ public class Compilable {
 	public void setCommitID(String commitID) {
 		this.commitID = commitID;
 	}
-	public boolean isCompilable() {
+	public int getCompilable() {
 		return compilable;
 	}
-	public void setCompilable(boolean compilable) {
+	public void setCompilable(int compilable) {
 		this.compilable = compilable;
 	}
 }

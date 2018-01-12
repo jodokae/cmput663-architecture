@@ -33,8 +33,8 @@ public class Factory {
 	}
 	
 	public static AbstractDatabase createDatabase(String projectName) {
-		return new MockDatabaseFromJSON(projectName);
-		//return new MySQLDatabase(projectName);
+		//return new MockDatabaseFromJSON(projectName);
+		return new MySQLDatabase(projectName);
 	}
 	
 	public static AbstractDatabase createDatabaseFile(String projectName) {

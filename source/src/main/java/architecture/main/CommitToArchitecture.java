@@ -2,17 +2,12 @@ package architecture.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import architecture.commons.Compilable;
 import architecture.commons.CompilationCheck;
 import architecture.commons.files.FileHandler;
-import architecture.commons.files.JSONFileHandler;
 import architecture.extraction.AbstractArchitectureExtractor;
 
 public class CommitToArchitecture {
