@@ -3,9 +3,8 @@ package architecture.similarity.direct;
 import java.io.File;
 import java.util.Map;
 
-import org.jfree.util.Log;
-
 import edu.usc.softarch.arcade.metrics.BatchSystemEvo;
+
 
 public class A2aSimiliarityComputer extends DirectSimiliarityComputer {
 

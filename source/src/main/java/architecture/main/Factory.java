@@ -20,6 +20,8 @@ public class Factory {
 	public final static String ACDC_FILE_BASE = "acdcArc";
 	public final static String PKG_FILE_BASE = "pkgArc";
 	
+	private static CompilableList compListInstance;
+	
 	public static AbstractArchitectureExtractor createExtractor() {
 		AbstractClassGraphExtractor extractor = new HusacctGraphExtractor(false);
 		AbstractArchitectureReconstructor reconstructorAcdc = new ACDCReconstructor(ACDC_FILE_BASE);
@@ -56,8 +58,15 @@ public class Factory {
 	}
 	
 	public static CommitToArchitecture createCommitToArchitecture(
-			String downloadFolder, String arcFolder, String project) {
-		return new CommitToArchitecture(downloadFolder, arcFolder, project);
+			String downloadFolder, String arcFolder, String compPath, String project) {
+		return new CommitToArchitecture(downloadFolder, arcFolder, createCompilableList(compPath), project);
+	}
+	
+	public synchronized static CompilableList createCompilableList(String path) {
+		if(compListInstance == null) {
+			compListInstance = new CompilableList(path);
+		}
+		return compListInstance;
 	}
 	
 	public static CompareAndSave createCompareAndSave(String path) {

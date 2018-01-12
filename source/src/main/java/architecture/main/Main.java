@@ -27,6 +27,7 @@ public class Main {
 	
 	private final String PROJECT_FOLDER;
 	private final String ARC_FOLDER;
+	private final String COMPILABLE_JSON_PATH;
 	private final String DIFF_JSON;
 	
 	static Logger log = Logger.getLogger(Main.class);
@@ -35,6 +36,7 @@ public class Main {
 		PROJECT_FOLDER = BASE_FOLDER + project + "/projects/";
 		ARC_FOLDER = BASE_FOLDER + project + "/architectures/";
 		DIFF_JSON = BASE_FOLDER + project + "/versionDiff.json";
+		COMPILABLE_JSON_PATH = BASE_FOLDER + project + "/compilable.json";
 	}
 	
 	public static void main(String[] args) {
@@ -110,7 +112,8 @@ public class Main {
 			}
 			
 			try {
-				CommitToArchitecture comToArc = Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, project);
+				CommitToArchitecture comToArc = 
+						Factory.createCommitToArchitecture(PROJECT_FOLDER, ARC_FOLDER, COMPILABLE_JSON_PATH, project);
 				architectures.put(commit, Optional.of(comToArc.downloadAndReconstruct(commit, true)));
 			} catch (IOException e) {
 				System.err.println("Could't extract Version " + commit);
@@ -118,6 +121,13 @@ public class Main {
 			}
 		//}
 		});
+		
+		try {
+			Factory.createCompilableList(COMPILABLE_JSON_PATH).storeJSON();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		if(architectures.size() < numberVersions) {
 			log.error("At least one version was not downloaded. Aborting comparison");

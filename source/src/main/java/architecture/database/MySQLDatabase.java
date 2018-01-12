@@ -10,16 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
-import architecture.commons.VersionDifference;
-
 
 public class MySQLDatabase extends AbstractDatabase {
 	

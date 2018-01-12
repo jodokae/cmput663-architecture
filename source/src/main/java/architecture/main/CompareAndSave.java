@@ -15,13 +15,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import architecture.commons.VersionDifference;
-import architecture.commons.files.DifferenceFileHandler;
+import architecture.commons.files.JSONFileHandler;
 import architecture.similarity.AbstractArchitectureSimilarityComputer;
 import architecture.similarity.pairwise.graph.GraphSimiliarityComputer;
 
 public class CompareAndSave {
 	
-	private DifferenceFileHandler handler;
+	private JSONFileHandler<VersionDifference> handler;
 	//private AbstractArchitectureSimilarityComputer a2aComp;
 	//private AbstractArchitectureSimilarityComputer cvgComp;
 	//private AbstractArchitectureSimilarityComputer pkgComp;
@@ -32,7 +32,7 @@ public class CompareAndSave {
 	static Logger log = Logger.getLogger(CompareAndSave.class);
 		
 	public CompareAndSave(String path) {
-		handler = new DifferenceFileHandler();
+		handler = new JSONFileHandler<VersionDifference>();
 //		a2aComp = Factory.createA2aComputer();
 //		cvgComp = Factory.createCvgComputer();
 //		pkgComp = Factory.createPkgComputer();
