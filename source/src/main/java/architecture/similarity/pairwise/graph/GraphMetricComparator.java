@@ -22,7 +22,7 @@ public class GraphMetricComparator extends AbstractComparator {
 				continue;
 				case GraphSimiliarityComputer.NUMBER_EDGES: compareSimMetric(metric, m1, m2, true);
 				continue;
-				case GraphSimiliarityComputer.AVG_NODE_DEG: compareSimMetric(metric, m1, m2, false);
+				case GraphSimiliarityComputer.AVG_NODE_DEG: compareSimMetric(metric, m1, m2, true);
 				continue;
 				case GraphSimiliarityComputer.AVG_ABS_INST: compareSimMetric(metric, m1, m2, false);
 				continue;

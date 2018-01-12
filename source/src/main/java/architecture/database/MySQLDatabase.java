@@ -38,6 +38,7 @@ public class MySQLDatabase extends AbstractDatabase {
 					+ "from travistorrent_8_2_2017 "
 					+ "where gh_project_name = \""+ project +"\" "
 					+ "&& tr_log_analyzer = \"java-maven\" "
+					+ "&& git_branch = \"master\" "
 					+ "order by tr_build_number ;";
 
 		
