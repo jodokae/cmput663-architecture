@@ -2,6 +2,7 @@ package architecture.commons.files;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import org.rauschig.jarchivelib.ArchiverFactory;
 public class FileHandler {
 	
 	public final static String FORMAT = ".tar.gz";
+	public final static String TXT_ENDING = ".txt";
 	
 	static Logger log = Logger.getLogger(FileHandler.class);
 	
@@ -24,6 +26,27 @@ public class FileHandler {
 		String projectName = separated[1];
 		
 		String filePath = folder + "/" + author + "-" + projectName + "-" + commit + FORMAT;
+		filePath = FilenameUtils.normalize(filePath);
+		
+		File file = new File(filePath);
+		if(file.exists()) {
+			log.info(" Archive " + path + " was already downloaded");
+			return file;
+		}
+		
+		FileUtils.copyURLToFile(path, file);
+		return file;
+	}
+	
+	public static File downloadLog(String project, String jobId, String folder) throws IOException {
+		URL path = new URL("https://api.travis-ci.org/v3/job/" + jobId + "/log.txt");
+		
+		String[] separated = project.split("/");
+		String author = separated[0];
+		String projectName = separated[1];
+		
+		String filePath = folder + "/" + author + "-" + projectName + "-" + jobId + TXT_ENDING;
+		
 		filePath = FilenameUtils.normalize(filePath);
 		
 		File file = new File(filePath);

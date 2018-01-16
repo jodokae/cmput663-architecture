@@ -11,6 +11,7 @@ public abstract class AbstractDatabase {
 	
 	protected Map<Integer, String> commits;
 	protected Map<Integer, String> statuses;
+	protected Map<Integer, String> jobIDs;
 		
 	public List<Integer> getBuildList() {
 		Set<Integer> commitSet = commits.keySet();
@@ -28,6 +29,10 @@ public abstract class AbstractDatabase {
 	
 	public String getOutcome(int build) {
 		return statuses.get(build);
+	}
+	
+	public String getJobID(int build) {
+		return jobIDs.get(build);
 	}
 	
 }

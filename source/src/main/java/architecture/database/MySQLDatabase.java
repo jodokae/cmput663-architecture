@@ -28,9 +28,10 @@ public class MySQLDatabase extends AbstractDatabase {
 	public MySQLDatabase(String project) {
 		commits = new HashMap<Integer, String>();
 		statuses = new HashMap<Integer, String>();
+		jobIDs = new HashMap<Integer, String>();
 		
 		 query = 
-					"select distinct tr_log_analyzer, gh_project_name, git_trigger_commit, tr_build_number, tr_status "
+					"select distinct tr_log_analyzer, gh_project_name, git_trigger_commit, tr_build_number, tr_job_id, tr_status "
 					+ "from travistorrent_8_2_2017 "
 					+ "where gh_project_name = \""+ project +"\" "
 					+ "&& tr_log_analyzer = \"java-maven\" "
@@ -60,6 +61,7 @@ public class MySQLDatabase extends AbstractDatabase {
 				String commit = rs.getString("git_trigger_commit");
 				int number = rs.getInt("tr_build_number");
 				String status = rs.getString("tr_status");
+				String jobID = rs.getString("tr_job_id");
 				
 				if(commits.containsValue(commit)) {
 					continue;
@@ -67,6 +69,7 @@ public class MySQLDatabase extends AbstractDatabase {
 				
 				commits.put(number, commit);
 				statuses.put(number, status);
+				jobIDs.put(number, jobID);
 				
 			}
 			

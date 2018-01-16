@@ -5,26 +5,20 @@ import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import architecture.commons.Compilable;
-import architecture.commons.CompilationCheck;
 import architecture.commons.files.FileHandler;
 import architecture.extraction.AbstractArchitectureExtractor;
 
 public class CommitToArchitecture {
 	private AbstractArchitectureExtractor extractor;
-	
-	private CompilableList compilableList;
-		
+
 	private String project;
 	private String downloadFolder;
 	private String arcFolder;
 	
 	static Logger log = Logger.getLogger(CommitToArchitecture.class);
 	
-	public CommitToArchitecture(String downloadFolder, String arcFolder, CompilableList compList, String project) {
+	public CommitToArchitecture(String downloadFolder, String arcFolder, String project) {
 		extractor = Factory.createExtractor();
-		
-		this.compilableList = compList;
 		
 		this.downloadFolder = downloadFolder;
 		this.arcFolder = arcFolder;
@@ -43,14 +37,10 @@ public class CommitToArchitecture {
 			
 		}
 		
+		log.info("Download Commit");
 		File archive = FileHandler.downloadCommit(project, commitID, downloadFolder);
 		File source = FileHandler.extract(archive, downloadFolder);
 		
-		if(!compilableList.contains(commitID)) {
-			compilableList.add(new Compilable(commitID, CompilationCheck.isCompilable(source)));
-			System.out.println("Compute comp for" + commitID);
-		}
-
 		File[] archictecture = extractor.computeArchitecture(source, architectureFolder);
 		
 		if(removeArchive) {

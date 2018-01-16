@@ -47,7 +47,7 @@ public class CompareAndSave {
 	}
 	
 	public void loadJSON() throws IOException {
-		list = Collections.synchronizedList(handler.readJson(path));
+		list = (List<VersionDifference>) Collections.synchronizedList(handler.readJson(VersionDifference.class, path));
 	}
 	
 	public void storeJSON() throws IOException {

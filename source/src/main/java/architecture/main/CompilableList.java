@@ -31,7 +31,7 @@ public class CompilableList {
 	}
 	
 	public void loadJSON() throws IOException {
-		compilablelist = Collections.synchronizedList(compileHandler.readJson(path));
+		compilablelist = Collections.synchronizedList(compileHandler.readJson(Compilable.class, path));
 	}
 	
 	

@@ -59,7 +59,11 @@ public class Factory {
 	
 	public static CommitToArchitecture createCommitToArchitecture(
 			String downloadFolder, String arcFolder, String compPath, String project) {
-		return new CommitToArchitecture(downloadFolder, arcFolder, createCompilableList(compPath), project);
+		return new CommitToArchitecture(downloadFolder, arcFolder, project);
+	}
+	
+	public static BuildResultAnalyzer createBuildResultAnalyzer(String downloadFolder, String project) {
+		return new BuildResultAnalyzer(downloadFolder, project);
 	}
 	
 	public synchronized static CompilableList createCompilableList(String path) {

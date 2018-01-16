@@ -27,6 +27,7 @@ public class MockDatabaseFromJSON extends AbstractDatabase {
 		
 		commits = intermediate.commits;
 		statuses = intermediate.statuses;
+		jobIDs = intermediate.jobIDs;
 		
 	}
 
