@@ -110,7 +110,7 @@ public class Main {
 			BuildResultAnalyzer brAnalyzer = Factory.createBuildResultAnalyzer(JOB_LOG_FOLDER, project);
 
 			int errorType = brAnalyzer.getFailReason(jobID);
-			System.out.println(errorType);
+			//System.out.println(errorType);
 			buildsCompilable.add(new Compilable(commit, errorType));
 		});
 		
