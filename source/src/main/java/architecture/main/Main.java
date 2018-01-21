@@ -106,12 +106,16 @@ public class Main {
 			int build = builds.get(i);
 			String commit = database.getCommit(build);
 			String jobID = database.getJobID(build);
+			
+			if(!buildsCompilable.contains(commit)) {
+				BuildResultAnalyzer brAnalyzer = Factory.createBuildResultAnalyzer(JOB_LOG_FOLDER, project);
 
-			BuildResultAnalyzer brAnalyzer = Factory.createBuildResultAnalyzer(JOB_LOG_FOLDER, project);
-
-			int errorType = brAnalyzer.getFailReason(jobID);
-			//System.out.println(errorType);
-			buildsCompilable.add(new Compilable(commit, errorType));
+				int errorType = brAnalyzer.getFailReason(jobID);
+				//System.out.println(errorType);
+				buildsCompilable.add(new Compilable(commit, errorType));
+			} else {
+				log.info("Build already checked for compilation");
+			}
 		});
 		
 		try {
@@ -120,6 +124,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 
 		IntStream.range(0, numberVersions).parallel().forEach(i -> {
 			// for(int i = 0; i < numberVersions; i++) {
@@ -200,6 +205,7 @@ public class Main {
 				}
 			}
 		}
+		
 
 		log.info("Done");
 

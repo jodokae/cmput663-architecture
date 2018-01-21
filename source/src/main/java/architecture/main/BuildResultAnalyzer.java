@@ -15,12 +15,13 @@ public class BuildResultAnalyzer {
 	public static int NO_ERROR = 0;
 	public static int DEPENDENCY_ERROR = 1;
 	public static int COMPILATION_ERROR = 2;
-	public static int UNKNOWN_ERROR = 3;
+	public static int TEST_ERROR = 3;
+	public static int UNKNOWN_ERROR = 4;
 	
 	private String downloadFolder;
 	private String project;
 	private int failReason;
-	
+		
 	static Logger log = Logger.getLogger(BuildResultAnalyzer.class);
 
 	public BuildResultAnalyzer(String downloadFolder, String project) {
@@ -31,6 +32,8 @@ public class BuildResultAnalyzer {
 	
 	public int getFailReason(String jobId) {
 		String architectureFolder = FilenameUtils.normalize(downloadFolder + "/" + jobId);
+		
+		
 		
 		File textFile;
 		try {
@@ -61,7 +64,13 @@ public class BuildResultAnalyzer {
     		if(line.contains("Compilation failure")) {
     			setFailReason(COMPILATION_ERROR);
     		}
+    		if(line.contains("There are test failures")) {
+    			setFailReason(TEST_ERROR);
+    		}
     	}
+		if(line.startsWith("[INFO] BUILD SUCCESS")) {
+			setFailReason(NO_ERROR);
+		}
 	}
 	
 	private void setFailReason(int failReason) {

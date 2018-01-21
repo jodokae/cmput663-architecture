@@ -40,7 +40,12 @@ public class CompilableList {
 	}
 
 	public synchronized boolean contains(String commitID) {
-		return compilablelist.contains(commitID);
+		for(Compilable comp : compilablelist) {
+			if(comp.getCommitID().equals(commitID)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public synchronized boolean add(Compilable compilable) {
