@@ -12,11 +12,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import cohen_kappa_score
 from prettytable import PrettyTable
 
-def getData(versionDiff, database): 
+def getDatabase(database):
     with open(database) as json_data:
-        d = json.load(json_data)
-        
-    with open(versionDiff) as json_data:
         t = json.load(json_data)
 
     statuses = t['statuses']
@@ -28,8 +25,27 @@ def getData(versionDiff, database):
             firstIt = False
             continue
         clearedStats.append(int(v=='passed'))
+    
+    return clearedStats
+    
 
-     
+def getCompilableStats(databaseFile, compFile):
+    with open(databaseFile) as json_data:
+        d = json.load(json_data)
+
+    commits = d['commits']
+    
+    with open(compFile) as json_data:
+        c = json.load(json_data)
+        
+    for k, v in sorted(commits.items(), key=lambda commits: int(commits[0])):
+        print(k)
+        print(v)
+    
+def getVersionDiff(versionDiffFile):
+    with open(versionDiffFile) as json_data:
+        d = json.load(json_data)
+             
     a2a = []
     relInst = []
     absInst = []
@@ -60,7 +76,10 @@ def getData(versionDiff, database):
         a[i][6] = cvgFrom[i]
         a[i][7] = cvgTarget[i]
         
-    return (a, clearedStats)
+    return a
+
+def getData(database, versionDiff):
+    return (getVersionDiff(versionDiff), getDatabase(database))
     
 def getPrevNext(y, threshold):
     # Biased because of Cross Projects
