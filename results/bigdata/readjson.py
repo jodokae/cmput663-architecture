@@ -260,7 +260,7 @@ print('Compilation Error: ' + str((comp == 2).sum()))
 print('Test Error: ' + str((comp == 3).sum()))
 print('Other Error: ' + str((comp == 4).sum()))
 #print((checkCompVsBuildRes(buildResults, comp) == False).sum())
-print('Build Passed: ' + str((buildResults == 0).sum()))
+print('Builds Failed: ' + str((buildResults == 0).sum()))
 
 print('\n')
 print('Successful analyzed projects')
@@ -304,6 +304,6 @@ print('Change Rate per Metric: ' + str(np.count_nonzero(A, axis=0) / passed))
 #getStatistics(A, y)
 #machineLearn(A, y)
 #plot(A)
-plotSpecific(A, c)
+#plotSpecific(A, c)
 
 

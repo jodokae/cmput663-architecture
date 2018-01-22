@@ -6,7 +6,7 @@ Dependency Error: 937
 Compilation Error: 785
 Test Error: 3999
 Other Error: 2773
-Build Passed: 10168
+Builds Failed: 10168
 
 
 Successful analyzed projects
