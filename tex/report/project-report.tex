@@ -34,12 +34,15 @@ kaestle@ualberta.ca}
 \maketitle
 
 \begin{abstract}
-In order to reduce the number of failing continuous integration (CI) builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. This work hypothesizes that either change in architecture leads to higher failing builds or the other way around.  
-It analyzes the change between the architectures of two subsequent versions of a software by introducing an easily expandable framework.
-This framework is capable of downloading the software, reverse engineering the architecture and comparing it to the next version fully automatic. 
-Eight metrics using three different, well-established techniques, are used to acquire the data. While mining almost 50,000 builds from 159 open-source Java repositories, no significant correlation between architectural change and build outcome could be found. 
-To strengthen these findings the point of failure in the CI was analyzed using the build logs, but there was no correlation with architectural change, either. 
-Thus, the impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adapting to new research questions.
+Continuous Integration (CI) is becoming an essential component in the software development process.
+However, the time cost of a CI build may often be high.
+Therefore, identifying reasons for build failure and warning developers about these likely failures can save valuable time and cost for developers.
+In this paper, we investigate if there is a relationship between architectural changes and CI build outcomes.
+We form two hypotheses about the relationship: (1) architectural changes lead to higher CI build failures and (2) higher CI build failures lead to architectural changes.
+To investigate these hypotheses, we design a fully automated extensible framework that analyzes the architectural changes between two consecutive versions of a software system.
+We use eight metrics, using three well-established techniques, to acquire the data.
+We mine almost 50,000 builds from 159 open-source Java repositories, but find no significant correlation between architectural change and build outcome. 
+To enable other researchers to replicate our negative results and to investigate additional architectural metrics, we publish our framework which can easily be extended for new research questions and metrics.
 \end{abstract}
 
 \section{Introduction}
