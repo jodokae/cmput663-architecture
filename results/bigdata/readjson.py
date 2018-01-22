@@ -142,7 +142,7 @@ def getStatistics(A, y):
 def plotSpecific(A, y):
     change_threshold = np.arange(100) * 0.01
     samples = A[:, 6]
-    (before, after) = getPrevNext(y, 5)
+    (before, after) = getPrevNext(y, 10)
     corr = []
     for ch_th in change_threshold:
         B = (samples>ch_th).astype(int)
@@ -152,7 +152,7 @@ def plotSpecific(A, y):
     plt.xlim([0, 1])
     plt.ylabel('Correlation')
     plt.xlabel('Change Threshold')
-    plt.title('Spearman: ' + featureList[6] + ' vs Next 5 Builds')
+    plt.title('Spearman: ' + featureList[6] + ' vs Next 10 Builds')
     plt.show()
     
 def machineLearn(A, y):
@@ -251,16 +251,20 @@ for project in os.listdir('combined/'):
 buildResults = np.array([z for x in buildResults for z in x])
 comp = np.array([z for x in comp for z in x])
 
-print(len(comp))
-print(countErrors(comp))
-print(countCompileAndDependencyErrors(comp))
-print((comp == 0).sum())
-print((comp == 1).sum())
-print((comp == 2).sum())
-print((comp == 3).sum())
-print((comp == 4).sum())
-print((checkCompVsBuildRes(buildResults, comp) == False).sum())
-print((buildResults == 0).sum())
+print('All analyzed builds: ' + str(len(comp)))
+print('Num of errors: ' + str(countErrors(comp)))
+print('Num of compilation or dependency errors: ' + str(countCompileAndDependencyErrors(comp)))
+print('No Error: ' + str((comp == 0).sum()))
+print('Dependency Error: ' + str((comp == 1).sum()))
+print('Compilation Error: ' + str((comp == 2).sum()))
+print('Test Error: ' + str((comp == 3).sum()))
+print('Other Error: ' + str((comp == 4).sum()))
+#print((checkCompVsBuildRes(buildResults, comp) == False).sum())
+print('Build Passed: ' + str((buildResults == 0).sum()))
+
+print('\n')
+print('Successful analyzed projects')
+print('\n')
 
 A = []
 y = []
@@ -281,7 +285,7 @@ A = np.array([z for x in A for z in x])
 y = np.array([z for x in y for z in x])
 c = np.array([z for x in c for z in x])
 
-print(numProjects)
+print('Number of Projects: ' + str(numProjects))
 #c[c == 2] = 1
 #c[c == 3] = 0
 #print(c)
@@ -291,15 +295,15 @@ for i in range(len(y)):
     if y[i] == True:
         passed += 1
         
-print(str(passed) + ' / ' + str(len(y)))
+print('Pass Rate: ' + str(passed) + ' / ' + str(len(y)))
 print('Passes: ' + str(passed / len(y)))
 
-print(np.count_nonzero(A, axis=0) / passed)
+print('Change Rate per Metric: ' + str(np.count_nonzero(A, axis=0) / passed))
 
 #metricCorr(A)
-#getStatistics(A, c)
+#getStatistics(A, y)
 #machineLearn(A, y)
 #plot(A)
-plotSpecific(A, y)
+plotSpecific(A, c)
 
 
