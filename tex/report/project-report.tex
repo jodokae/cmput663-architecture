@@ -40,7 +40,8 @@ Therefore, identifying reasons for build failure and warning developers about th
 In this paper, we investigate if there is a relationship between architectural changes and CI build outcomes.
 We form two hypotheses about the relationship: (1) architectural changes lead to higher CI build failures and (2) higher CI build failures lead to architectural changes.
 To investigate these hypotheses, we design a fully automated extensible framework that analyzes the architectural changes between two consecutive versions of a software system.
-We use three well-established techniques to reconstruct the projects' architecture and measure change with eight metrics.
+We use three well-established techniques to reconstruct the projects' architecture from the source code and measure change with eight metrics. 
+In addition, we analyze the build logs to investigate the point of failure during the build. 
 We mine almost 50,000 builds from 159 open-source Java repositories, but find no significant correlation between architectural change and build outcome. 
 To enable other researchers to replicate our negative results and to investigate additional architectural metrics, we publish our framework which can easily be extended for new research questions and metrics.
 \end{abstract}
