@@ -23,16 +23,23 @@
 \IEEEauthorblockA{\textit{University of Alberta}\\
 Edmonton, Canada \\
 kaestle@ualberta.ca}
+
+\and
+\IEEEauthorblockN{Sarah Nadi}
+	\IEEEauthorblockA{\textit{University of Alberta}\\
+		Edmonton, Canada \\
+		nadi@ualberta.ca}
 }
 
 \maketitle
 
 \begin{abstract}
-In order to reduce the number of failing CI builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. 
+In order to reduce the number of failing continuous integration (CI) builds, and therefore increase development speed, this research investigates the correlation between architectural change and CI build outcomes. This work hypothesizes that either change in architecture leads to higher failing builds or the other way around.  
 It analyzes the change between the architectures of two subsequent versions of a software by introducing an easily expandable framework.
 This framework is capable of downloading the software, reverse engineering the architecture and comparing it to the next version fully automatic. 
-8 metrics using 3 different, well-established techniques, are used to acquire the data. While mining over 20,000 builds from ten big Java repositories, no significant correlation between change and build outcome could be found. 
-Thus, the impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adopting to new research questions.
+Eight metrics using three different, well-established techniques, are used to acquire the data. While mining almost 50,000 builds from 159 open-source Java repositories, no significant correlation between architectural change and build outcome could be found. 
+To strengthen these findings the point of failure in the CI was analyzed using the build logs, but there was no correlation with architectural change, either. 
+Thus, the impact of bad architecture on the resulting software has to be measured with different metrics, but the proposed framework is capable of adapting to new research questions.
 \end{abstract}
 
 \section{Introduction}
