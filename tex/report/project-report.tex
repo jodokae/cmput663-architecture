@@ -56,23 +56,23 @@ Continuous integration (CI) is nowadays common practice in software development 
 There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged, using for example cascaded tree classifiers \cite{Pred-Cascade} or based upon the person who was submitting the commit \cite{ContrInvolv}. In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
 These meta-data based ML approaches alone do not have high enough accuracy, because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. This paper wants to investigate this route further. 
 
-Paixão et al. have found correlation between CI build outcomes and non-functional requirements \cite{Fail-NFReq}. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
+Paix\~{a}o et al. have found correlation between CI build outcomes and non-functional requirements \cite{Fail-NFReq}. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed in the problematic area.
 
 To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
 
-The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the ten software systems with the highest numbers of commits are analyzed. Every build of those systems is reviewed for architectural change with respect to its predecessor using 8 different metrics. These are then compared against the build outcomes and later used prediction. We hypothesize that architectural change is either (1) preceded or (2) followed by failing builds. 
+The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the $159$ Java Maven software systems are analyzed. Every build of those systems is reviewed for architectural change with respect to its predecessor using 8 different metrics. These are then compared against the build outcomes and later used prediction. We hypothesize that architectural change is either (1) preceded or (2) followed by failing builds. 
 The change is preceded by failing builds because if there is a bigger problem in the system, see-able through failing builds, it is necessary to change the architecture. 
 On the other hand, it may be possible that change in the architecture results in unexpected consequences and lead, therefore, to build failures (2).
 
-To investigate this problem, we develop an easy extensible framework. It allows to run a tool chain which automatically downloads snapshots of a software system, reconstructs the architecture and computes change metrics. With only a few lines of code, new extractors, reconstructors and metric calculators can be added. Doing so, we reuse tools for all mentioned steps from previous researches, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade} and Martin's metrics \cite{martinsMetrics}.
+To investigate this problem, we develop an easy extensible framework. It allows to run a toolchain which automatically downloads snapshots of a software system, reconstructs the architecture and computes change metrics. With only a few lines of code, new extractors, reconstructors and metric calculators can be added. Doing so, we reuse tools for all mentioned steps from previous researches, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade} and Martin's metrics \cite{martinsMetrics}.
 
-After calculating the change metrics for over $20,000$ commits using two different architecture reconstruction techniques, almost no correlation was found between change and build outcome. In total, $48$ correlations are calculated with $32$ different configurations. The hypothesis that architectural change impacts the build outcome must therefore be rejected under the tested circumstances. 
+After calculating the change metrics for almost $50,000$ commits using two different architecture reconstruction techniques, almost no correlation was found between change and build outcome. In total, $48$ correlations are calculated with $32$ different configurations. The hypothesis that architectural change impacts the build outcome must therefore be rejected under the tested circumstances. 
 
 \section{Background}
 
 The TravisTorrent dataset \cite{TravisTorrent} consists of over 3.5 million build samples done in TravisCI from over 1,300 projects, written in Java, JavaScript and Ruby. TravisCI is a continuous integration tool which is tightly integrated into GitHub. CI is used to automatically compile, build and test a software system, whenever new code is committed to the repository. This helps the developer to find bugs and should increase the development speed. 
-TravisTorrent saves over fifty features for every build, including the project name, the commit id of the build and the outcome.
+TravisTorrent saves over fifty features for every build, including the project name, the commit ID of the build and the outcome.
 
 Software architecture is usually represented as a graph of the high-level components, called modules, of a software system which are connected through links, called dependencies. It can be modeled with architecture description languages (ADLs), like the component diagram of the UML, though there is no standardized way \cite{UML-Arch}. 
 As there is no single way for describing an architecture, there is no best way for reverse engineering the architecture. The most basic way is using the package structure. This assumes that the developers have thought about the architecture and translated it into packages. In that case, high level packages are modules, and module A is dependent on module B if an element of package A is using an element which is contained in package B.
@@ -127,7 +127,7 @@ However, the metrics and the recovery technique are promising in our context. He
 
 To measure the similarity or change between two architectures, or even between designed and implemented architecture, there are several approaches, as described in Section \ref{sec:RelWork}. For OO software systems, as studied here, the so-called Martin's metrics \cite{martinsMetrics} were introduced, i.e. afferent (Aff), efferent (Eff) coupling and instability (I).
 Those metrics describe the independence of modules. Coupling describes how many incoming or outgoing transitions a module has. For example, if class \texttt{Car} of module \texttt{Vehicles} implements the interface \texttt{Engine} of the module \texttt{Parts}, then \texttt{Vehicles} has an outgoing transition to \texttt{Parts}, which itself has the corresponding incoming transition. In other words, \texttt{Vehicles} depends on \texttt{Parts}.
-Instability is the ratio between efferent coupling and the complete coupling, which represents if a module is highly dependent on other modules (I close to 1) or if many modules depend on this one (I close to 0).
+Instability is the ratio between efferent coupling and the complete coupling, which represents if a module is highly dependent on other modules ($I$ close to 1) or if many modules depend on this one ($I$ close to 0).
 
 \begin{equation} \label{eq:inst}
 I = \textit{Eff} / (\textit{Eff} + \textit{Aff})
@@ -180,10 +180,10 @@ To get a view of the change of the dependencies explicitly, we combine a2a and c
 
 \input{assets/projects}
 
-In this study, the ten largest Java projects, in terms of number of commits, from the TravisTorrent dataset were analyzed. This ensures that there is enough data for making reasonably statistical conclusions over a course of time for a project. A list of analyzed projects can be found in table \ref{tableProjects}.
+In this study, we have analyzed $159$ projects from the TravisTorrent dataset, which use Java and Maven. In the dataset are $241$ projects which use Java as their main programming language and are built with Maven. We excluded projects, which do not have pushed anything to the master branch or only have one commit, because we cannot compare architectures if there is only one. Then there are some projects where builds or logs could not be retrieved anymore from GitHub and TravisCI or the toolchain was unable to reconstruct the architecture. We are left with $49,531$ commits. An exemplary list of the ten biggest analyzed projects, in terms of unrestricted commits, can be found in table \ref{tableProjects}.
 
 Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we will limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. 
-Because there are possibly multiple builds for the same commit, we only use the build that builds a certain version of the software first. The following builds are most likely only configuration changes of the CI server and do not introduce new change. Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. These restrictions lower the number of considered builds by $42\%$ (cf. Table \ref{tableProjects}). 
+Because there are possibly multiple builds for the same commit, we only use the build that builds a certain version of the software first. The following builds are most likely only configuration changes of the CI server and do not introduce new change. Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
 
 In general, to get an architectural change, we have to follow three steps. First, we need to extract the class structure out of the source code, then we reconstruct the architecture and eventually we take two architectures and compare them with each other to get a change metric (Fig. \ref{overview}). The complete source code and results can be found in our GitHub repository.\footnote{\url{https://github.com/jodokae/cmput663-architecture}}
 
@@ -233,7 +233,7 @@ Two different reconstruction techniques were implemented. We chose ACDC, because
 %TODO Compile Errors
 
 The other technique is the package reconstruction which is often used as ground truth analysis.
-This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, 10 was considered the minimum amount of modules needed. As dependencies all ``references'' edges were considered and added to their respective parent module. This is a valid approach according to Song et al \cite{ArcAsGraph}. 
+This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, 10 was considered the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed intended architecture. As dependencies all ``references'' edges were considered and added to their respective parent module. This is a valid approach according to Song et al \cite{ArcAsGraph}. 
 
 \subsubsection{Change Metrics}
 
@@ -262,6 +262,30 @@ Then, every metric is converted to a Boolean, which is true if there is a change
 	\centering
 	\begin{subfigure}{2.3in}
 		\centering
+		\includegraphics[width=2.3in]{assets/NumNodes.pdf}
+		\caption{\#V}
+		\label{numNodesHist}
+	\end{subfigure}%
+	\begin{subfigure}{2.3in}
+		\centering
+		\includegraphics[width=2.3in]{assets/NumEdges.pdf}
+		\caption{\#E}
+		\label{numEdgesHist}
+	\end{subfigure}%
+	\begin{subfigure}{2.3in}
+		\centering
+		\includegraphics[width=2.3in]{assets/RelInst.pdf}
+		\caption{rel. Inst}
+		\label{relInstHist}
+	\end{subfigure}
+	\begin{subfigure}{2.3in}
+		\centering
+		\includegraphics[width=2.3in]{assets/NodeDegree.pdf}
+		\caption{deg(V)}
+		\label{nodDegHist}
+	\end{subfigure}%
+	\begin{subfigure}{2.3in}
+		\centering
 		\includegraphics[width=2.3in]{assets/a2a.pdf}
 		\caption{a2a}
 		\label{a2aHist}
@@ -269,27 +293,23 @@ Then, every metric is converted to a Boolean, which is true if there is a change
 	\begin{subfigure}{2.3in}
 		\centering
 		\includegraphics[width=2.3in]{assets/cvgSource.pdf}
-		\caption{cvg Source}
+		\caption{cvg src}
 		\label{cvgHist}
-	\end{subfigure}%
-	\begin{subfigure}{2.3in}
-		\centering
-		\includegraphics[width=2.3in]{assets/NumEdges.pdf}
-		\caption{\#Edges}
-		\label{numEdgesHist}
 	\end{subfigure}
 	\caption{Histograms metric over all projects}
 	\label{fig:histograms}
+	
 \end{figure*}
 
 \section{Results}
 
+%TODO
 This section presents the findings with the proposed methodology. First, the projects under study are introduced, then calculated metrics are evaluated and, eventually, the correlation between the metrics and the build outcomes is shown.
 
 \subsection{Studied Projects}
 
-For this study, the ten biggest projects, according to the number of commits, out of the TravisTorrent projects are analyzed. Only projects and builds which are written in Java and use Maven as a build tool are considered. Because of change of configuration it is possible that a version of the software is built multiple times. Since it is impossible that those builds have architectural change, only the first build per commit is considered. 
-At the end, $20,995$ builds were studied with a pass rate of $83\%$. The builds range between one and four years of development time, some start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), others at build 1 (e.g. Checkstyle). The projects vary in their application field. There are two code analyzers, three APIs, a web client and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
+We have studied $49,531$ commits from $159$ projects which use Java Maven. The pass rate is $84.9\%$. Around $10\%$ of the builds failed because of errors before or during the compilation of the software. On third of the errors could be mapped to test errors. The remaining part of the fails were not further separated, but are for example configuration errors or wrong used maven plugins.
+The active time of the projects varies. For the ten biggest projects (in terms of number of commits) it is between one and four years of development time, some start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), others at build 1 (e.g. Checkstyle). The projects vary in their application field. In the ten biggest projects, there are two code analyzers, three APIs, a web client and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
 
 \subsection{Metric Evaluation}
 
@@ -312,9 +332,16 @@ The small p values show that we have a statistical significant relationship betw
 
 \begin{figure}[!t]
 	\centering
-	\includegraphics[width=3in]{assets/cvgSourceCorrPlot}
-	\caption{cvg src vs next five builds over different change thresholds }
-	\label{cvgPlot}
+	\includegraphics[width=3in]{assets/a2aCorr}
+	\caption{a2a vs next ten and eighty builds over different change thresholds }
+	\label{a2aPlot}
+\end{figure}
+
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=3in]{assets/PrevN}
+	\caption{a2a vs previous n builds over 0.0 threshold }
+	\label{a2aPrevN}
 \end{figure}
 
 \section{Discussion}
@@ -326,7 +353,7 @@ First of all, only ten projects, although from different domains, were evaluated
 
 It is also possible, that the problems which are produced by architectural change are not transferred into build results but to a different level, e.g. (1) code coverage or (2) number failed tests. Unfortunately, the dataset does not give the opportunity to check for those, because they are (1) not reported and (b) have missing values in around $20\%$ of the builds. The fact that software architecture is important is common knowledge. We showed that it changes over the lifetime of a project. However, it remains unknown how architecture change affects the progress of the development process.
 
-As Garcia et al. \cite{arcRec-comparison} shows even the best recovery techniques have problems detecting the true architecture. Therefore, it is possible that HUSACCT and ARCADE are not the right tools for the research question. This problem was addressed since we consider multiple recovery techniques and rely on studies which evaluate ARCADE as being one of the most accurate recovery tools. The produced metrics highly correlate, which strengthens the claim that the change detection is working as intended. Still, it is possible that the chosen metrics are not the best set. Because they correlate so strongly, they are a weak feature set if one would try to use machine learning techniques to predict the build outcome. For this, a broader set of metrics is necessary. 
+As Garcia et al. \cite{arcRec-comparison} show even the best recovery techniques have problems detecting the true architecture. Therefore, it is possible that HUSACCT and ARCADE are not the right tools for the research question. This problem was addressed since we consider multiple recovery techniques and rely on studies which evaluate ARCADE as being one of the most accurate recovery tools. The produced metrics highly correlate, which strengthens the claim that the change detection is working as intended. Still, it is possible that the chosen metrics are not the best set. Because they correlate so strongly, they are a weak feature set if one would try to use machine learning techniques to predict the build outcome. For this, a broader set of metrics is necessary. 
 
 In the future, more metrics and extractors should be added to the framework. Then, it is necessary to broaden the research to find better quantitative data which show problems in the software that could be caused by bad or changing architecture. Because this work introduces an easy expandable framework, this should be possible with little to no effort.
 
