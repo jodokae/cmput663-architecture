@@ -1,6 +1,7 @@
-\documentclass[conference]{IEEEtran}
+\documentclass[sigplan, anonymous, review]{acmart}
+%\documentclass[sigconf]{acmart}
 
-\usepackage{cite}
+%\usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{array}
 \usepackage{algorithmic}
@@ -9,29 +10,29 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{subcaption}
+\usepackage{booktabs} % For formal tables
+%\usepackage{balance}
 
-
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Impact of Architectural Change on
-	Continuous Integration Build Outcome\\
+\title[Architectural Change vs CI Build Outcome]{On the Relationship Between Architectural Changes and Continuous Integration Build Outcome
 }
 
-\author{\IEEEauthorblockN{Johannes K{\"a}stle}
-\IEEEauthorblockA{\textit{University of Alberta}\\
-Edmonton, Canada \\
-kaestle@ualberta.ca}
-
-\and
-\IEEEauthorblockN{Sarah Nadi}
-	\IEEEauthorblockA{\textit{University of Alberta}\\
-		Edmonton, Canada \\
-		nadi@ualberta.ca}
+\author{Johannes K{\"a}stle}
+\affiliation{%
+	\institution{University of Alberta}
+	\city{Edmonton}
+	\country{Canada}
 }
+\email{kaestle@ualberta.ca}
 
-\maketitle
+\author{Sarah Nadi}
+\affiliation{%
+	\institution{University of Alberta}
+	\city{Edmonton}
+	\country{Canada}
+}
+\email{nadi@ualberta.ca}
 
 \begin{abstract}
 Continuous Integration (CI) is becoming an essential component in the software development process.
@@ -45,6 +46,8 @@ In addition, we analyze the build logs to investigate the point of failure durin
 We mine almost 50,000 builds from 159 open-source Java repositories, but find no significant correlation between architectural change and build outcome. 
 To enable other researchers to replicate our negative results and to investigate additional architectural metrics, we publish our framework which can easily be extended for new research questions and metrics.
 \end{abstract}
+
+\maketitle
 
 \section{Introduction}
 
@@ -337,8 +340,8 @@ The hypothesis that architectural change impacts CI build outcomes at or near th
 We conclude that change does not impact the build outcome and, thus, the research questions have to be changed. Since it is known that the architecture impacts the development, other quantitative features must be found to measure the impact. We propose to extend the measured metrics, because we believe that one metric cannot explain the impact alone, and search for correlation in more nonfunctional metrics, like code coverage or development pace.
 The built framework can be efficiently adapted for the new questions through extracting more facts out of the code using various tools. 
 
-\bibliographystyle{IEEEtran}
-\bibliography{IEEEabrv,literature}
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{literature}
 
 \end{document}
 \grid
