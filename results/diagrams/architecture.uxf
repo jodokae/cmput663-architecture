@@ -104,7 +104,7 @@
       <w>42</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;&lt;-
 group=1</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
   </element>
@@ -152,7 +152,7 @@ group=1</panel_attributes>
       <w>42</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-
+    <panel_attributes>lt=&lt;&lt;-
 group=2</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
   </element>

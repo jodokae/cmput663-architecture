@@ -10,7 +10,8 @@
       <h>40</h>
     </coordinates>
     <panel_attributes>SourceCode
-group=2</panel_attributes>
+group=2
+/build n/</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -129,7 +130,8 @@ group=2</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>SourceCode
-group=1</panel_attributes>
+group=1
+/build n+1/</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
