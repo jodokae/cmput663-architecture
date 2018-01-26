@@ -222,7 +222,7 @@ cvg(A_i, A_j) = \frac{|simC(A_i, A_j)|}{|allC(A_i)|}
 The problem with a2a and cvg is that they do not explicitly take the dependencies between modules into account. This is only done while reconstructing the architecture itself, which we do with the pattern based ACDC from the ARCADE framework. 
 To get a view of the change of the dependencies explicitly, we combine a2a and cvg with the widely accepted Martin's metrics \cite{Val-MartinsMet}, which especially account for the change in between the modules. 
 
-\section{Methodology}
+\section{Methodology for Architectural Comparison}
 
 \begin{figure*}[!t]
 	\centering
@@ -233,19 +233,13 @@ To get a view of the change of the dependencies explicitly, we combine a2a and c
 
 \input{assets/projects}
 
-In this study, we have analyzed $159$ projects from the TravisTorrent dataset, which use Java and Maven. In the dataset are $241$ projects which use Java as their main programming language and are built with Maven. We excluded projects, which do not have pushed anything to the master branch or only have one commit, because we cannot compare architectures if there is only one. Then there are some projects where builds or logs could not be retrieved anymore from GitHub and TravisCI or the toolchain was unable to reconstruct the architecture. We are left with $49,531$ commits. An exemplary list of the ten biggest analyzed projects, in terms of unrestricted commits, can be found in table \ref{tableProjects}.
-
-As described, we see failures at or before compilation as a source of build failures. 
-Vassallo et al. \cite{CIFailTypes} classified the different fail types based on Maven goals. Because it is inefficient for us to rerun every build we analyzed for multiple goals, we will use a simpler approach. Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. Still, we base our heuristic on the Maven goals.
-Hence, we analyze the log files from TravisCI for all builds, to classify the build outcome further, than in success and failure. We used a heuristic to filter first lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for ``Compilation failure'', ``dependencies'' or ``test failures'' to categorize the failures. We map this with the actual build result to mitigate errors in the heuristic, so that only if the actual build failed, we use one the fail categories. We end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure or (4) unknown error. 
-
-Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we will limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. 
-Because there are possibly multiple builds for the same commit, we only use the build that builds a certain version of the software first. The following builds are most likely only configuration changes of the CI server and do not introduce new change. Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
-
-In general, to get an architectural change, we have to follow three steps. First, we need to extract the class structure out of the source code, then we reconstruct the architecture and eventually we take two architectures and compare them with each other to get a change metric (Fig. \ref{overview}). 
-The complete source code and results can be found in our GitHub repository.\footnote{\url{https://github.com/jodokae/cmput663-architecture}}
-
-\subsection{Framework}
+To establish the relationship between architectural changes and CI build outcome, we need to determine the architectural changes that occurred between two versions of the system.
+In this section, we describe the methodology we use to calculate these architectural changes.
+Figure~\ref{overview} shows an overview of the methodology we use.
+On a high level, given two versions of the source code, we extract the class structure of each version and use it to reconstruct each architecture. We then compare both architectures to calculate a set of change metrics. 
+We implement a framework to extract the considered architectural change metrics between two commits of a given project.~\sn{Which language is this implemented in }
+Figure \ref{frameworkStructure} shows an overview of the structure of our framework.
+The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}}
 
 \begin{figure}[!t]
 	\centering
@@ -254,8 +248,7 @@ The complete source code and results can be found in our GitHub repository.\foot
 	\label{frameworkStructure}
 \end{figure}
 
-We implement a framework to extract the considered architectural change metrics between two commits of a given project.~\sn{Which language is this implemented in and provide link to github repo.. this link can also be provided in the beginning of the section once we settle on the final structure}
-Figure \ref{frameworkStructure} shows an overview of the structure of our framework.
+
  
 \paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database~\sn{please say TravisTorrent in the box instead of "Database".. also differentiate between process/step boxes and input/output sources.. right now, all are boxes but the boxes mean different things. Maybe also use Step 1, Step 2 etc. in the figure. For a process, use nouns "Repo Downloader" etc. or verbs "Download Repo" .. the important thing is to be consistent and to use meaningful names}.
 
@@ -301,10 +294,9 @@ This technique looks for the root packages in the system. If there are only a fe
 As explained in Section \ref{sec:Metrics}, we use the ARCADE metrics a2a and cvg as well as Martin's metrics. We calculate the ARCADE metrics on the architecture extracted by ACDC. Cvg is calculated twice, one based on the modules of the first version (called \textit{source}) and one based on the second version (called \textit{target}).
 The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics~\sn{first time these package metrics are mentioned? what's the relation to Section 3?}; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.
 For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is instead considered one~\sn{why is it considered one?}, so it is not measured how tightly connected two modules are, just if they are connected at all.
-
 Since we need to calculate the change for the complete architecture, and not for each module, we calculate the mean instabilities and node degree as well as the absolute number of modules (vertexes) and dependencies (edges).
 
-We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}). For metrics with absolute numbers, like node degree, the similarity is the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
+We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}~\sn{shouldn't it be max - min?}). For metrics with absolute numbers, like node degree, we calculate the similarity as the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
 
 \begin{equation} \label{eq:relDiff}
 c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
@@ -315,14 +307,39 @@ c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
 \end{equation} 
 
 
-\sn{moved here temporarily till I figure out where it belongs}
-Then, for every two subsequent commits, we compare the architectures and save the results in a JSON file. With the methodology structured into this framework, the research can easily be expanded with more reconstructors or metric calculators. Therefore, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. Doing so, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
+We save the corresponding comparison results of each pair of architectures, corresponding to two consecutive commits, in a JSON file. Given the architecture of our framework, our methodology can easily be expanded with more architecture reconstructors or metric calculators. ~\sn{the rest of this paragraph is not clear.. and I wonder if it should be moved somewhere else} Therefore, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. Doing so, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
 
-\subsection{Evaluation}
+\section{Methodology for CI Build Outcome Extraction}
+\label{sec:ci-build-outcome}
 
-The calculated metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means we look for correlation between change in build $x$ and the build result in the builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future. 
-Because we have different types of failures, for testing in the near past and future, the fail types get categorized into non-failure and failure. In this way, we get a single integer how many builds failed, instead of having multiple variables. 
-Then, every metric is converted to a Boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. These values were chosen because most found changes in the dataset were small (Fig. \ref{fig:histograms}) We take these thresholds to find out if small changes affect the amount correlation present in the data. Every comparison which includes no Boolean variables is run with Pearson's correlation test, the others with Spearman's test. 
+\sn{need some intro sentences here}
+
+~\sn{this paragraph is not clear. Please rewrite}As described, we see failures at or before compilation as a source of build failures. 
+Vassallo et al. \cite{CIFailTypes} classified the different fail types based on Maven goals. Because it is inefficient for us to rerun every build we analyzed for multiple goals, we will use a simpler approach. Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. Still, we base our heuristic on the Maven goals.
+Hence, we analyze the log files from TravisCI for all builds, to classify the build outcome further, than in success and failure. We used a heuristic to filter first lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for ``Compilation failure'', ``dependencies'' or ``test failures'' to categorize the failures. We map this with the actual build result to mitigate errors in the heuristic, so that only if the actual build failed, we use one the fail categories. We end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure or (4) unknown error. 
+
+Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. ~\sn{don't understand the next part}
+Because there are possibly multiple builds for the same commit, we only use the build that builds a certain version of the software first. The following builds are most likely only configuration changes of the CI server and do not introduce new change. Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
+
+\section{Evaluation Setup}
+
+We now explain the setup we use for our evaluation.
+
+\paragraph{Data Set.}
+To investigate our hypotheses, we analyze projects from the TravisTorrent dataset, which use Java and Maven. 
+The TavisTorrent dataset contains $241$ projects that use Java as their main programming language and are built with Maven. 
+From these $241$ projects, we exclude ones that have have less than two commits on the master branch, because we need at least two commits to be able to compare architectures. 
+This left us with \todo{$X$} projects.
+We further filter this list to exclude projects where we could not retrieve their builds or logs from GitHub and TravisCI~\sn{why would this ever happen? aren't these stored in the travistorrent data set?}, or where our toolchain was unable to reconstruct the architecture~\sn{again why would this happen?}
+This left us with $159$ projects to analyze, containing a total of
+$49,531$ commits. A list of the ten biggest analyzed projects, in terms of unrestricted commits~\sn{what is an unrestricted commit?}, can be found in table \ref{tableProjects}.
+
+
+\paragraph{Calculated Correlations.}
+\sn{this needs another revision}
+The calculated architectural metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means that we look for correlations between a change in build $x$ and the build result in builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future (i.e., the relationships mentioned in our two hypotheses). 
+~\sn{Before I try to rewrite this, I need to  understand why you don't consider the individual types of build failures if you differentiate between them? So if you do record why the build failed, why don't you see if there is a correlation with failure in general and then with the individual types of failure?} Because there are different reasons for a CI build failure (see Section~\ref{sec:ci-build-outcome}, for testing in the near past and future, the fail types get categorized into non-failure and failure. In this way, we get a single integer of how many builds failed, instead of having multiple variables. 
+Then, every architectural metric is converted to a Boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. We chose this range of thresholds, because most of the architectural changes in our dataset were small (as will later be explained through Figure \ref{fig:histograms}). We take these thresholds to find out if small changes affect the amount correlation present in the data. Every comparison which includes no Boolean variables is run with Pearson's correlation test, while others are run with Spearman's test. 
 
 \begin{figure*}[!t]
 	\centering
