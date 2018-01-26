@@ -369,9 +369,9 @@ print('Passes: ' + str(passed / len(c)))
 
 print('Change Rate per Metric: ' + str(np.count_nonzero(A, axis=0) / passed))
 
-#metricCorr(A)
-#getStatistics(A, merged)
-#machineLearn(A, booleanize(merged))
-#plot(A)
-#plotSpecific(A, merged)
+metricCorr(A)
+getStatistics(A, merged)
+machineLearn(A, booleanize(merged))
+plot(A)
+plotSpecific(A, merged)
 
