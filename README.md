@@ -1,8 +1,10 @@
 # cmput663-architecture
 
-This repository is created for the CMPUT663 course at the University of Alberta in the Fall 2017. It analyzes the impact of architectural change on the build result of ten big Java projects. The introduced framework can easily be reused for different tasks where GitHub versions must be downloaded and their architecture reconstructed and compared.
+This repository is the source code for the "On the Relationship Between Architectural Changes and Continuous Integration Build Outcome" paper. 
 
-For a full report see tex/report. All foudn results can be found and recalculated from results/.
+# Results
+
+All found results can be found and recalculated from results/. The first analysis, using only ten projects, is stored under firstResults, while the real analysis of all projects is stored under results/final.
 
 # Setup
 
@@ -46,6 +48,10 @@ Important: The folders arcadepy and cfg must be in the same folder as the *.jar 
 
 # Usage
 
+The already created binaries are in the bin/ folder.
+
+## Extraction
+
 Invoke with 
 ```
 java -jar architecture-0.0.1-SNAPSHOT-shaded.jar PROJECT_NAME VALUE
@@ -53,12 +59,21 @@ java -jar architecture-0.0.1-SNAPSHOT-shaded.jar PROJECT_NAME VALUE
 
 If VALUE is 0 all project versions will be analyzed, if set to a positive integer this many versions will be analyzed. If set to -1 a JSON database file for this project is created out of the MySQL database (if script needs to run on a machine without MySQL)
 
-Results will be in the extracted folder.
+Results will be in the extracted/ folder.
 
-# Analyzed Projects 
+Altnernatively you can create all database files and run on all projects using the two shell scripts in the bin/ folder. The results for every project will be stored in the extracted/ folder.
 
-select gh_lang, gh_project_name, count(gh_project_name) as commits, tr_log_analyzer from travistorrent_8_2_2017 where gh_lang = "java" and tr_log_analyzer="java-maven" group by gh_project_name order by commits desc limit 10;
+## Analysis
 
-To analyze these projects, create all database files and then runn the runProjects.sh script.
+With the combine.sh script, all necessary files get copied into one directory which can be used afterwards for simpler usage. Some basic information about the extracted projects can be received from the scripts.sh script.
+To calculate the correlations, plots and interesting informations, invoke the readjson.py script in the bin/ folder. 
 
+# Add more Analysis Tools
+
+To extend the analysis with another extractor, reconstructor or metric calculator, follow these steps:
+
+1. Create Subclass of the corrsesponding abstract class "AbstractClassGraphExtractor", "AbstractArchitectureReconstructor" or "AbstractArchitectureSimilarityComputer". 
+2. Implement the necessary methods according to their description. If you don't know what to do, just try follow the steps of the package reconstruction.
+3. Change the Factory to include your new Tool.
+4. Done
 
