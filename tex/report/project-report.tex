@@ -227,7 +227,7 @@ To get a view of the change of the dependencies explicitly, we combine a2a and c
 \begin{figure*}[!t]
 	\centering
 	\includegraphics[width=7in]{assets/overview.pdf}
-	\caption{Overview of the process}
+	\caption{Overview of the process~\sn{I still find figures 1 and 2 confusing.. there is a relationship between them but some things are not consistent.. Can you unify this in one figure with clearer steps and then modify the text description accordingly?}}
 	\label{overview}
 \end{figure*}
 
@@ -250,14 +250,22 @@ The complete source code and results can be found in our GitHub repository.\foot
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=3.45in]{assets/architecture.pdf}
-	\caption{Structure of the Framework}
+	\caption{Structure of the Framework~\sn{see my comments about improving this diagram.. In general, it needs to be clear the input/output of each process and the order.. For example, extractor and reconstructor appear as parallel things while it seems that one uses the output of the other.. If you want to indicate they are part of the same step, you can put a bigger dotted box around them for instance}}
 	\label{frameworkStructure}
 \end{figure}
 
-We implemented the extraction of the architectural change metrics between two commits using a framework (Fig. \ref{frameworkStructure}). First, the unique commit ID is extracted out of the TravisTorrent database, with which the snapshot can be downloaded from GitHub. 
-The ``Architecture'' module is split into two parts, the extraction of the class structure and the reconstruction of the architecture. Intermediate results are saved in a file using the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this filetype. This filetype saves simple relation triples in the form: type, source, target (see listing \ref{lst1:rsf}). This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. Fortunately, this is irrelevant for our work.
+We implement a framework to extract the considered architectural change metrics between two commits of a given project.~\sn{Which language is this implemented in and provide link to github repo.. this link can also be provided in the beginning of the section once we settle on the final structure}
+Figure \ref{frameworkStructure} shows an overview of the structure of our framework.
+ 
+\paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database~\sn{please say TravisTorrent in the box instead of "Database".. also differentiate between process/step boxes and input/output sources.. right now, all are boxes but the boxes mean different things. Maybe also use Step 1, Step 2 etc. in the figure. For a process, use nouns "Repo Downloader" etc. or verbs "Download Repo" .. the important thing is to be consistent and to use meaningful names}.
 
-Then, for every two subsequent commits, we compare the architectures and save the results in a JSON file. With the methodology structured into this framework, the research can easily be expanded with more reconstructors or metric calculators. Therefore, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. Doing so, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
+\paragraph{Step 2} uses the commit ID extracted in step 1 to download a snapshot of the project from GitHub.
+
+
+\paragraph{Step 3} extracts the architecture information needed to compare two commits in the next step. 
+Specifically, Step 3 is split into two parts, (a) the extraction of the class structure and (b) the reconstruction of the architecture. 
+
+In Step 3a, we use the extractor of the HUSACCT framework~\cite{todo} to extract relation triples in the form of relationship type, source, target (see listing \ref{lst1:rsf}), and save this information in the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this format. This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. ~\sn{I don't understand the next part about the downside. please elaborate} The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. Fortunately, this is irrelevant for our work. For simplicity, and because it is not used in the further analyses~\sn{if it is not used in further analysis, why do you extract it?}, the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``subPkg'' means \todo{...}, ``contains'' means that that a package contains a Java type, and ``references'' is any dependency between two Java types. The results are then fed into the reconstruction.
 
 \begin{figure}[!t]
 	\centering
@@ -270,7 +278,7 @@ Then, for every two subsequent commits, we compare the architectures and save th
 frame = single, 
 belowskip=-0.8 \baselineskip,
 float,
-caption=Rigi Standard Format example,
+caption=Rigi Standard Format example~\sn{maybe have a references relation there too?},
 label=lst1:rsf,
 columns=flexible
 ]
@@ -281,26 +289,22 @@ contains checkstyle checkstyle.Main
 
 \input{assets/metrics}
 
-\subsubsection{Extraction}
+In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We implement~\sn{implement or use?} two different architecture reconstruction techniques.
 
-To extract the class structure from the source files, the extractor of the HUSACCT framework is used. For simplicity, and because it is not used in the further analyses, the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``contains'' means that that a package contains a Java type and ``references'' is any dependency between two Java types. The results are then fed into the reconstruction.
+The first is ACDC, because it has one of the best reconstruction accuracy rates when compared to other commonly used techniques \cite{arcRec-comparison}. 
+While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (here:~\sn{what is "here"? Can't you cite previous work?} $10\%$ of the builds) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}
 
-\subsubsection{Reconstruction}
+The second reconstruction technique is package reconstruction, which is often used as ground truth analysis~\sn{cite source? and also why do we need two techniques ?}.
+This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. ~\sn{it is not clear.. did you implement this yourself? Make that clear}
 
-Two different reconstruction techniques were implemented. We chose ACDC, because it was evaluated to have one of the best reconstruction accuracy \cite{arcRec-comparison} in comparison with other common techniques. ACDC, in its implementation given in the ARCADE framework, is working directly on the Java byte code. Given that a prominent reason for failing builds (here: $10\%$ of the builds) is compilation error this is problematic. Therefore, we feed the class structure from the HUSACCT extractor into ACDC and deactivate its own first level extraction.
+\paragraph{Step 4} calculates the architectural changes between two given commits.
+As explained in Section \ref{sec:Metrics}, we use the ARCADE metrics a2a and cvg as well as Martin's metrics. We calculate the ARCADE metrics on the architecture extracted by ACDC. Cvg is calculated twice, one based on the modules of the first version (called \textit{source}) and one based on the second version (called \textit{target}).
+The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics~\sn{first time these package metrics are mentioned? what's the relation to Section 3?}; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.
+For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is instead considered one~\sn{why is it considered one?}, so it is not measured how tightly connected two modules are, just if they are connected at all.
 
-The other technique is the package reconstruction which is often used as ground truth analysis.
-This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, 10 was considered the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed intended architecture. As dependencies all ``references'' edges were considered and added to their respective parent module. This is a valid approach according to Song et al \cite{ArcAsGraph}. 
+Since we need to calculate the change for the complete architecture, and not for each module, we calculate the mean instabilities and node degree as well as the absolute number of modules (vertexes) and dependencies (edges).
 
-\subsubsection{Change Metrics}
-
-As explained in Section \ref{sec:Metrics}, the ARCADE metrics a2a and cvg as well as Martin's metrics are used. We calculate the ARCADE metrics on the ACDC architecture. Cvg is calculated twice, one based on the modules of the first version (called source) and one based on the second version (called target).
-The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics; thus, we have 8 metrics in total (cf. table \ref{tableMetric}).
-For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is instead considered one, so it is not measured how tightly connected two modules are, just if they are connected at all.
-
-Since we need the change for the complete architecture, and not for each module, we calculate the mean instabilities and node degree as well as the absolute number of modules (vertexes) and dependencies (edges).
-
-The metrics are then compared pairwise. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}). For metrics with absolute numbers, like node degree, the similarity is the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
+We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}). For metrics with absolute numbers, like node degree, the similarity is the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
 
 \begin{equation} \label{eq:relDiff}
 c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
@@ -309,6 +313,10 @@ c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
 \begin{equation} \label{eq:absDiff}
 	c_{abs}(m_1, m_2) = 1 - \frac{\min\{m1, m2\}}{\max\{m1, m2\}}
 \end{equation} 
+
+
+\sn{moved here temporarily till I figure out where it belongs}
+Then, for every two subsequent commits, we compare the architectures and save the results in a JSON file. With the methodology structured into this framework, the research can easily be expanded with more reconstructors or metric calculators. Therefore, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. Doing so, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
 
 \subsection{Evaluation}
 
