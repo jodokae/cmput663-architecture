@@ -10,7 +10,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{subcaption}
-\usepackage{booktabs} % For formal tables
+%\usepackage{booktabs} % For formal tables
 %\usepackage{balance}
 
 \begin{document}
@@ -60,6 +60,9 @@ Paix\~{a}o et al. have found correlation between CI build outcomes and non-funct
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed in the problematic area.
 
 To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
+
+Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their change in the code actually affects their architecture. If made aware, the developers tend to be more careful and the overall architecture gets improved deliberately by them. 
+If we can prove to the developers that their actions that change the architecture influence the outcome of their builds, something they can see on a daily basis, this should increase their awareness. 
 
 The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the $159$ Java Maven software systems are analyzed. Every build of those systems is reviewed for architectural change with respect to its predecessor using 8 different metrics. These are then compared against the build outcomes and later used prediction. We hypothesize that architectural change is either (1) preceded or (2) followed by failing builds. 
 The change is preceded by failing builds because if there is a bigger problem in the system, see-able through failing builds, it is necessary to change the architecture. 
@@ -114,6 +117,7 @@ In both studied projects, the architecture stabilizes relatively quickly and has
 HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. They argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
 The framework extracts several types of dependencies between source code elements (e.g. classes, interfaces, packages). HUSAACT needs to have a module specification, i.e. which root packages or classes are part of which architecture module. If given this, it maps the defined architecture vs the real implementation and reports violations.
 If no such specification is available, it is not possible to compare two versions of software on a higher level than the implementation graph. 
+Hillemacher \cite{MScSteffen} has compared four different tools for architecture extraction and conformance checking and elected HUSACCT to be the best extraction tool, which is what we need here.
 
 In his PhD thesis \cite{arcade-thesis}, Garcia developed the ARCADE framework. It is used to detect architectural decay, also called thrift and erosion, as well as architecture smells. During this, various recovery techniques were compared \cite{arcRec-comparison}, whereat ACDC \cite{ACDC} and ARC were the most successful. 
 ACDC clusters modules based on patterns. Patterns are, for example, if two elements are in the same package, are used together, or if they depend on the same resources. For Java, ACDC recovers the architecture from the class files. ARC is introduced by Garcia himself, clusters entities based on semantic similarity using a statistical language model based on comments and identifiers in the source code.
@@ -121,7 +125,9 @@ The ARCADE framework uses these different recovery techniques to compute similar
 The first one defines similarity based on the minimum number of steps to get from one architecture graph to the other. For example, removing one dependency or adding one node is each one step. While a2a looks at the architecture from a top-level perspective, cvg looks into the modules, or clusters, and computes if they are still the same module. For example, if all classes in a module are changed but the module name itself is untouched, it cannot still be considered to be the same module. Hence, it compares the entities inside the modules and only considers two modules equal, if at least $x \%$ of the entities are equal.
 
 One reason for failing builds are syntax errors. Because builds with syntax errors are uncompilable, we do not want to use recovery techniques which rely on the compiled class files. Thus, we do not use the SWAG Kit or ARCADE directly.
-However, the metrics and the recovery technique are promising in our context. Hence, we combine the strengths of HUSAACT in extracting the structure from the source files with the recovery technique ACDC and the metrics from ARCADE. The cvg metric is comparable to kernel based similarity whereas a2a considers change. Coupling in the architecture will be addressed with Martin's metrics. We reuse the modules from HUSACCT and ARCADE directly, while we need to implement the Martin's metrics ourself. 
+However, the metrics and the recovery technique are promising in our context. Hence, we combine the strengths of HUSAACT in extracting the structure from the source files with the recovery technique ACDC and the metrics from ARCADE. 
+In previous studies, other researchers \cite{MScSteffen, arcRec-comparison} have given us confidence that the choices HUSACCT and ACDC are indeed some of the best tools, which we can use.
+The cvg metric is comparable to kernel based similarity whereas a2a considers change. Coupling in the architecture will be addressed with Martin's metrics. We reuse the modules from HUSACCT and ARCADE directly, while we need to implement the Martin's metrics ourself. 
 
 \section{Metrics} \label{sec:Metrics}
 
@@ -182,10 +188,15 @@ To get a view of the change of the dependencies explicitly, we combine a2a and c
 
 In this study, we have analyzed $159$ projects from the TravisTorrent dataset, which use Java and Maven. In the dataset are $241$ projects which use Java as their main programming language and are built with Maven. We excluded projects, which do not have pushed anything to the master branch or only have one commit, because we cannot compare architectures if there is only one. Then there are some projects where builds or logs could not be retrieved anymore from GitHub and TravisCI or the toolchain was unable to reconstruct the architecture. We are left with $49,531$ commits. An exemplary list of the ten biggest analyzed projects, in terms of unrestricted commits, can be found in table \ref{tableProjects}.
 
+As described, we see failures at or before compilation as a source of build failures. 
+Vassallo et al. \cite{CIFailTypes} classified the different fail types based on Maven goals. Because it is inefficient for us to rerun every build we analyzed for multiple goals, we will use a simpler approach. Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. Still, we base our heuristic on the Maven goals.
+Hence, we analyze the log files from TravisCI for all builds, to classify the build outcome further, than in success and failure. We used a heuristic to filter first lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for ``Compilation failure'', ``dependencies'' or ``test failures'' to categorize the failures. We map this with the actual build result to mitigate errors in the heuristic, so that only if the actual build failed, we use one the fail categories. We end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure or (4) unknown error. 
+
 Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we will limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. 
 Because there are possibly multiple builds for the same commit, we only use the build that builds a certain version of the software first. The following builds are most likely only configuration changes of the CI server and do not introduce new change. Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
 
-In general, to get an architectural change, we have to follow three steps. First, we need to extract the class structure out of the source code, then we reconstruct the architecture and eventually we take two architectures and compare them with each other to get a change metric (Fig. \ref{overview}). The complete source code and results can be found in our GitHub repository.\footnote{\url{https://github.com/jodokae/cmput663-architecture}}
+In general, to get an architectural change, we have to follow three steps. First, we need to extract the class structure out of the source code, then we reconstruct the architecture and eventually we take two architectures and compare them with each other to get a change metric (Fig. \ref{overview}). 
+The complete source code and results can be found in our GitHub repository.\footnote{\url{https://github.com/jodokae/cmput663-architecture}}
 
 \subsection{Framework}
 
@@ -229,8 +240,7 @@ To extract the class structure from the source files, the extractor of the HUSAC
 
 \subsubsection{Reconstruction}
 
-Two different reconstruction techniques were implemented. We chose ACDC, because it was evaluated to have one of the best reconstruction accuracy \cite{arcRec-comparison} in comparison with other common techniques. ACDC, in its implementation given in the ARCADE framework, is working directly on the Java byte code. Given that a prominent reason for failing builds is compilation error this is problematic. Therefore, we feed the class structure from the HUSACCT extractor into ACDC and deactivate its own first level extraction.
-%TODO Compile Errors
+Two different reconstruction techniques were implemented. We chose ACDC, because it was evaluated to have one of the best reconstruction accuracy \cite{arcRec-comparison} in comparison with other common techniques. ACDC, in its implementation given in the ARCADE framework, is working directly on the Java byte code. Given that a prominent reason for failing builds (here: $10\%$ of the builds) is compilation error this is problematic. Therefore, we feed the class structure from the HUSACCT extractor into ACDC and deactivate its own first level extraction.
 
 The other technique is the package reconstruction which is often used as ground truth analysis.
 This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, 10 was considered the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed intended architecture. As dependencies all ``references'' edges were considered and added to their respective parent module. This is a valid approach according to Song et al \cite{ArcAsGraph}. 
@@ -256,6 +266,7 @@ c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
 \subsection{Evaluation}
 
 The calculated metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means we look for correlation between change in build $x$ and the build result in the builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future. 
+Because we have different types of failures, for testing in the near past and future, the fail types get categorized into non-failure and failure. In this way, we get a single integer how many builds failed, instead of having multiple variables. 
 Then, every metric is converted to a Boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. These values were chosen because most found changes in the dataset were small (Fig. \ref{fig:histograms}) We take these thresholds to find out if small changes affect the amount correlation present in the data. Every comparison which includes no Boolean variables is run with Pearson's correlation test, the others with Spearman's test. 
 
 \begin{figure*}[!t]
@@ -303,7 +314,6 @@ Then, every metric is converted to a Boolean, which is true if there is a change
 
 \section{Results}
 
-%TODO
 This section presents the findings with the proposed methodology. First, the projects under study are introduced, then calculated metrics are evaluated and, eventually, the correlation between the metrics and the build outcomes is shown.
 
 \subsection{Studied Projects}
@@ -316,26 +326,32 @@ The active time of the projects varies. For the ten biggest projects (in terms o
 \input{assets/metricCorr}
 
 We have extracted 8 architecture change metrics. Most builds show no change (table \ref{tableMetric}). This is to be expected, since most changes in the system should not be architectural changes. 
-%TODO Confirm with new data
-Only a2a has more changing builds than non-changing builds. But then, most of these changes are really small, as shown in Fig. \ref{a2aHist}. In other metrics, most changes are quite small as well, with only few big architectural changes (Fig. \ref{cvgHist} and \ref{numEdgesHist}). This seems usual, because we assume that the architecture does not have big changes that often.
+Only a2a has more changing builds than non-changing builds. But then, most of these changes are really small, as shown in Fig. \ref{a2aHist}. In other metrics, most changes are quite small as well, with only few big architectural changes (Fig. \ref{cvgHist} and \ref{numEdgesHist}). This seems usual, because we assume that the architecture does not have big changes that often. Only the number of nodes (Fig. \ref{numNodesHist}) has more widespread changes, which lies in the nature of the reconstruction process. Because a minimum number of ten nodes per architecture is hard coded into the package-architecture reconstruction, but is done level wise, a change from ten to nine nodes cannot appear, but will result in a change from 10 to 18 nodes. The effects of this red line are not as bad as they sound, because the node degree and number of edges metrics are in the expected norm, so that it is indicated that the few outliers do not affect the results badly.
 
-%TODO Confirm p Values
-%TODO Maybe make table with all values
-In table \ref{tableMetricCorr} the correlation between the metrics is shown. All p values were equal or close to 0. Most metrics are highly correlated, and all show some degree of correlation ($>0.2$). This gives the indication that all metrics are truly an indicator for architectural change if we assume that at least one of them is. This strengthens the confidence in the chosen tool chain. 
-%TODO Manual Sampling - Check some values
+
+In table \ref{tableMetricCorr} the correlation between the metrics is shown. All p values were equal or close to 0. the highest p value cross-metric wise is $3.7^{-102}$. 
+The package metrics are highly correlated, all with c values above $0.6$ up to $0.92$. a2a does not correlate with the other metrics strongly, only between $0.10-0.17$, while cvg shows low to medium correlation to the package metrics. 
+Still, this gives the indication that all metrics are truly an indicator for architectural change if we assume that at least one of them is, since the p-values do not leave any doubt, that the metrics are dependent.
+As expected, the metrics look at disjunct types of architectural change, a2a and cvg highlight the change at the module level, whereat the Martin's metrics take the focus at the relationship between the modules. This strengthens our confidence in the chosen tool chain. 
+
+
+\subsection{Relationship}
+
+Around $16\%$ of all builds that had architectural change failed ($P(f|c)$). This we found while extracting data for all metrics for all tested change thresholds, at the median. The values ranged from $8-18\%$. 
+If we check for the probability of change under the condition that the build failed ($P(c|f)$), we get a range from $0\%$ up to $60\%$. For the package metrics, the probability was almost always low, but the the ARCADE metrics, the results are more interesting. First, the probability drastically decreases while the change threshold increases. If we look at the probability of architectural change according to the a2a metric, and we consider every change, then we end up with $61\%$.. Of course, this is natural since we do not change the number of failing builds but the number of considered changes when we change the threshold of what we consider a change. 
+Constant values around $p(f|c) = 16\%$ and peak values for $p(c|f)$ with $61\%$ for a2a and $35-36\%$ for cvg, leads us to the possibility that there is also some correlation between the data.
 
 \subsection{Correlation}
 
-Most found correlations, with a p-value under $5\%$, were between $0.1$ and $3\%$. Only some metrics show a higher correlation around $9-11\%$. The threshold controls how many previous or following builds were considered, had no significant impact. The highest correlation found was for cvg, regardless of source or target, with a change threshold of $0.0$, i.e. every little change was considered as change (Fig. \ref{cvgPlot}). But even the best correlation was only $11\%$. 
+%TODO Maybe make table with all values
+%TODO Manual Sampling - Check some values
 
-The small p values show that we have a statistical significant relationship between change and build outcome. But this correlation is so small for most metrics, that we cannot conclude this as a meaningful impact. Because taking the smallest changes into consideration increases the correlation coefficient, and the threshold for previous and following builds had no significant change on that coefficient, it must be assumed that the stronger correlations could be noise. Because the strongest correlation was found with the cvg metric, which works inside of the modules, the possible correlation is within the modules not between them. Furthermore, over all correlations, the tendency was towards a positive value (min: -0.03), which shows, if there truly is a correlation, then change is occurring more often around non failing builds, whereas a static architecture shows in the near of failing builds. 
+When we first analyzed only the ten biggest projects, we found lot of correlation values between $0.1\%$ and $3\%$, with even some values as high as $11\%$. Now, when analyzing all projects, the feeling, that there is no correlation gets confirmed. When calculating correlation between architectural change and the different types of build outcome, some of the metrics show no correlation at all ($c < 0.4\%$ and $p > 0.25$), while the top metrics, a2a and cvg, peak at $4.3\%$ ($p = 6.8 \cdot 10^{-22}$) and $3.0\%$ ($p=1.2 \cdot 10^{-11}$). 
+The threshold that controls how many previous or following builds were considered, had no large impact. Only when going really high, so it considers more than $40$ previous builds, it was possible to see a significant rise in the correlation (Fig. \ref{a2aPrevN}). But first, a rise from $3\%$ to $6\%$, although it is a doubling, is not that interesting, and second to consider the previous $80$ builds, where the peak occurred, is more by chance than by actual correlation. In other words, it is improbable that code that was committed $80$ builds before the current one, influences the architecture. 
+Nevertheless, we computed the correlation values over the next $80$ builds for different change thresholds, and confirmed this educated feeling that the correlation is even lower than the one for the next $10$ builds after the initial peak.
+The highest correlation found for a2a was the one with a change threshold of $0.0$, i.e. every little change was considered as change. But even the best correlation, in a realistic scenario, was only $4\%$ over the next ten builds (Fig. \ref{a2aPlot}). 
 
-\begin{figure}[!t]
-	\centering
-	\includegraphics[width=3in]{assets/a2aCorr}
-	\caption{a2a vs next ten and eighty builds over different change thresholds }
-	\label{a2aPlot}
-\end{figure}
+Some of the metrics have low p-values which shows that there is a statistical significant relationship between build outcome and those metrics. But this correlation is so small that we cannot conclude this as a meaningful impact. Because taking the smallest changes into consideration increases the correlation coefficient, and the threshold for previous and following builds had no big significant change on that coefficient, it must be assumed that the stronger correlations could be noise. Because the strongest correlation was found with the a2a metric, which works on the modules and not the relationship between them, the possible correlation is at the modules and within them. Furthermore, over all correlations, the tendency was towards a positive value, with $38\%$ negative correlation values. This shows, if there truly is a correlation, then change is occurring more often around non failing builds, whereas a static architecture shows in the near of failing builds. 
 
 \begin{figure}[!t]
 	\centering
@@ -344,7 +360,17 @@ The small p values show that we have a statistical significant relationship betw
 	\label{a2aPrevN}
 \end{figure}
 
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=3in]{assets/a2aCorr}
+	\caption{a2a vs next ten and eighty builds over different change thresholds }
+	\label{a2aPlot}
+\end{figure}
+
+
 \section{Discussion}
+
+%TODO
 
 While checking ten big Java projects, no significant correlation between architectural change and build results was found. Apart from there actually being no correlation, there could be various factors influencing this result. 
 
@@ -358,6 +384,8 @@ As Garcia et al. \cite{arcRec-comparison} show even the best recovery techniques
 In the future, more metrics and extractors should be added to the framework. Then, it is necessary to broaden the research to find better quantitative data which show problems in the software that could be caused by bad or changing architecture. Because this work introduces an easy expandable framework, this should be possible with little to no effort.
 
 \section{Conclusion}
+
+%TODO
 
 While analyzing over $20,000$ builds from $10$ different Java Maven projects from various domains, we could not find any significant impact of architectural change on build outcome.
 We approached this result through an easily expandable framework to recover the architecture from the builds using one extractor, two reconstructors, and three metric sets based on previous researches. In total, $8$ metrics were tested for correlation in $6$ different scenarios including the previous and following builds. 
