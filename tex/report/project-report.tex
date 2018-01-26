@@ -10,8 +10,14 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{subcaption}
+\usepackage{xcolor}
 %\usepackage{booktabs} % For formal tables
 %\usepackage{balance}
+
+\newcommand{\sn}[1]{{\color{blue}\textbf{Sarah:}~#1}}
+\newcommand{\jk}[1]{{\color{darkgreen}\textbf{Johannes:}~#1}}
+\newcommand{\checkNum}[1]{{\color{orange}#1}}
+\newcommand{\todo}[1]{{ \color{red} \textbf{TODO:}~#1}}
 
 \begin{document}
 
@@ -36,7 +42,7 @@
 
 \begin{abstract}
 Continuous Integration (CI) is becoming an essential component in the software development process.
-However, the time cost of a CI build may often be high, if the build is broken.
+However, the time cost of a CI build may often be high, if the build is broken.~\sn{isn't the cost of a build high regardless of whether it passes or fails?}
 Therefore, identifying reasons for build failure and warning developers about these likely failures can save valuable time and cost for developers.
 In this paper, we investigate if there is a relationship between architectural changes and CI build outcomes.
 We form two hypotheses about the relationship: (1) architectural changes lead to higher CI build failures and (2) higher CI build failures lead to architectural changes.
@@ -51,54 +57,78 @@ To enable other researchers to replicate our negative results and to investigate
 
 \section{Introduction}
 
-Continuous integration (CI) is nowadays common practice in software development \cite{CI-Common}. It helps finding faults earlier and therefore reduces the costs to fix them \cite{NutzenCI}. On the other hand, build failures decrease the pace of the development \cite{Costs-BuildFailures}. Hence, by decreasing the number broken builds, the speed of development is increased whereby costs are decreased.
+Continuous integration (CI) is nowadays a common practice in software development \cite{CI-Common}. It helps finding faults earlier and therefore reduces the costs to fix them \cite{NutzenCI}. On the other hand, build failures decrease the development pace \cite{Costs-BuildFailures}. Hence, by decreasing the number broken builds, the speed of development is increased whereby costs are decreased.
 
-There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged, using for example cascaded tree classifiers \cite{Pred-Cascade} or based upon the person who was submitting the commit \cite{ContrInvolv}. In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
-These meta-data based ML approaches alone do not have high enough accuracy, because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. This paper wants to investigate this route further. 
+There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged, using for example cascaded tree classifiers \cite{Pred-Cascade} or based upon the person who was submitting the commit \cite{ContrInvolv}~\sn{the two parts here are not on the same "level".. cascaded tree classifiers are an ML technique and you can feed them any type of features while "the person submitting the commit" is one feature that is based on the meta data of the project. I think you want to re-write this paragraph to make it clearer that the point is to say that the majority of work done on CI failures used meta-data of the project instead of source code metrics (but plz verify that this is indeed true}. In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
+These meta-data based ML approaches alone do not have high enough accuracy, because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. In this paper, we further investigate such source code metrics.
 
-Paix\~{a}o et al. have found correlation between CI build outcomes and non-functional requirements \cite{Fail-NFReq}. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
-This could happen if, for example, multiple builds fail and, thus, the architecture gets changed in the problematic area.
+~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architecture}s  Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
+This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
 To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
 
-Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their change in the code actually affects their architecture. If made aware, the developers tend to be more careful and the overall architecture gets improved deliberately by them. 
-If we can prove to the developers that their actions that change the architecture influence the outcome of their builds, something they can see on a daily basis, this should increase their awareness. 
+Paixao~\sn{you sometimes have the special character in this name and sometimes not.. make sure to find the right spelling and fix it} et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
+Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
 
-The contribution of this work is the combination of architectural change with the prediction of continuous integration build outcomes. For that, the TravisTorrent dataset is exploited and the $159$ Java Maven software systems are analyzed. Every build of those systems is reviewed for architectural change with respect to its predecessor using 8 different metrics. These are then compared against the build outcomes and later used prediction. We hypothesize that architectural change is either (1) preceded or (2) followed by failing builds. 
-The change is preceded by failing builds because if there is a bigger problem in the system, see-able through failing builds, it is necessary to change the architecture. 
-On the other hand, it may be possible that change in the architecture results in unexpected consequences and lead, therefore, to build failures (2).
+In this work, we explore the relationship between architectural change and CI build outcome.
+~\sn{when talking about things that you are doing, try to always use the active voice.. I changed things in the intro already but just so you are aware in the future and in next drafts}
+We analyze $159$ Java Maven software systems from the TravisTorrent dataset~\cite{addcitation}. 
+We extract the architectural changes in every CI build by comparing the corresponding version of the system to its predecessor.
+We use eight different architecture metrics from the literature to evaluate architectural changes.  
+We store those extracted architectural changes along with the outcome of the build and use this data to investigate the relation between architecture and build outcome.
+We hypothesize that architectural changes are either (1) preceded or (2) followed by failing builds. 
+Our intuition for the first hypothesis is that many failing builds indicate a big problem in the system, which might entail changing the architecture to solve it. 
+On the other hand, our intuition for the second hypothesis is that a change in the architecture may result in unexpected consequences that would then lead to build failures.
 
-To investigate this problem, we develop an easy extensible framework. It allows to run a toolchain which automatically downloads snapshots of a software system, reconstructs the architecture and computes change metrics. With only a few lines of code, new extractors, reconstructors and metric calculators can be added. Doing so, we reuse tools for all mentioned steps from previous researches, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade} and Martin's metrics \cite{martinsMetrics}.
+To automate our investigation, we develop an extensible framework that runs a toolchain which automatically downloads snapshots of a software system, reconstructs the architecture, and computes change metrics. With only a few lines of code, new extractors, reconstructors, and metric calculators can be added. 
+The architecture of our framework allows us to easily reuse existing architectural extraction tools and metrics, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade}, and Martin's metrics \cite{martinsMetrics}.
 
-After calculating the change metrics for almost $50,000$ commits using two different architecture reconstruction techniques, almost no correlation was found between change and build outcome. In total, $48$ correlations are calculated with $32$ different configurations. The hypothesis that architectural change impacts the build outcome must therefore be rejected under the tested circumstances. 
+Our analysis of almost $50,000$ commits using two different architecture reconstruction techniques shows that almost no significant correlation exists between architecture changes and CI build outcome. In total, we investigated $48$ different correlations using $32$ configurations. Based on our results, we reject the hypothesis that architectural change impacts the build outcome.~\sn{should we formulate this as accepting the null hypothesis? Typically, you formulate things using the null hypothesis and if you find a correlation, you reject the null hypothesis}
 
-\section{Background}
 
-The TravisTorrent dataset \cite{TravisTorrent} consists of over 3.5 million build samples done in TravisCI from over 1,300 projects, written in Java, JavaScript and Ruby. TravisCI is a continuous integration tool which is tightly integrated into GitHub. CI is used to automatically compile, build and test a software system, whenever new code is committed to the repository. This helps the developer to find bugs and should increase the development speed. 
-TravisTorrent saves over fifty features for every build, including the project name, the commit ID of the build and the outcome.
+To summarize, the main contributions of this paper are:
+\begin{itemize}
+\item \todo{put list of contributions}
+\end{itemize}
 
-Software architecture is usually represented as a graph of the high-level components, called modules, of a software system which are connected through links, called dependencies. It can be modeled with architecture description languages (ADLs), like the component diagram of the UML, though there is no standardized way \cite{UML-Arch}. 
-As there is no single way for describing an architecture, there is no best way for reverse engineering the architecture. The most basic way is using the package structure. This assumes that the developers have thought about the architecture and translated it into packages. In that case, high level packages are modules, and module A is dependent on module B if an element of package A is using an element which is contained in package B.
-Other approaches for reconstructing architecture are ACDC or ARC as introduced in the following section.
 
-\section{Related Work}
-\label{sec:RelWork}
+\section{Background and Related Work}
 
-This section is split up into research about continuous integration builds and architecture change and consistency. This work combines both parts and is new in this regard. 
+In this section, we first give some background about the terminology we use in this paper and then discuss two categories of related work. The first is work done to investigate continuous integration practices and reasons for build failure, and the second is work related to software architecture.
+
+\subsection{Background}
+TravisCI is a continuous integration (CI) tool that is tightly integrated into GitHub. CI is the process of automatically compiling, building, and testing a software system, whenever new code is pushed to a repository. This helps developers find bugs earlier and increase the development speed. 
+The TravisTorrent dataset \cite{TravisTorrent} consists of over 3.5 million TravisCI build samples from over 1,300 projects, written in Java, JavaScript, and Ruby.
+TravisTorrent saves over fifty features for every build, including the project name, the commit ID of the build, and the build outcome.
+
+\textit{Software architecture}~\sn{can you first provide a definition for software architecture and then say how it is typically represented} is usually represented as a graph of the high-level components, called \textit{modules}, of a software system which are connected through links, called \textit{dependencies}. While there is no uniform standard for describing a system's architecture, it is typically modeled using Architecture Description Languages (ADLs), such as the component diagram of the Unified Modeling Language (UML)~\cite{UML-Arch}. ~\sn{can you add other modeling languages/notations?}
+Since there is no single way for describing an architecture, there is also no universally accepted technique for reverse engineering the architecture of a system. The most basic way is using the package structure in the code. This assumes that the developers have thought about the architecture and translated it into packages. In that case, high level packages correspond to modules, and module A is dependent on module B if an element of package A is using an element that is contained in package B.~\cite{todo}
+Other approaches for reconstructing architecture are ACDC or ARC, which are introduced in the following section.
 
 \subsection{Continuous Integration}
 
-Islam and Zibran \cite{FailsCorr} have studied the relationship between build outcome, and project and build metrics. They found, that there is no correlation between size or the number of contributors in the project and build outcomes. 
-They also discovered that which tool is used for building the software (e.g. Maven or Ant) impacts the result of the build as well as the number of changed lines and files. Test code as well as the development branch did not impact the result. 
-Since the number of changed lines and files affects the build result, we can conclude that source code has a relationship to the the build outcome, and architecture, which is directly affected by the source code, is a valid idea for investigation.
+Islam and Zibran \cite{FailsCorr} have studied the relationship between build outcome, and project and build metrics. 
+They found that the size of the project, the test code~\sn{not sure what that means: test code}, and the development branch\sn{what does the "Development branch" refer to? is it which branch used for the build?} all do not affect the build outcome.
+On the other hand, the build tool used (e.g. Maven or Ant) as well as the number of changed lines and files do have an impact on the build outcome.
+The fact that the previous research found that the number of changed lines and files affects the build result suggests that investigating the relationship between architectural changes and build outcome is a valid idea.~\sn{I don't like the term "is a valid idea" but can't think of something better now}
 
-In 2006, a study achieved a 69\% specificity rate (detecting failures) with decision trees using meta data about the developer and the project itself \cite{Pred-Tree}.
-The research was continued for the MSR '17 challenge by using cascading tree classifiers. The authors improved the prediction accuracy using information about previous builds, e.g. the outcome of the last build \cite{Pred-Cascade}. 
-In that research, the prediction was only done per project because it was shown that certain subsystems or developers are more erroneous. While this is certainly useful in practice, it does not help to mitigate the reasons of failing builds on a more general (i.e. cross-project) level.
+In 2006, a study by Hassan and Zhang~\cite{Pred-Tree} used decision trees to investigate the relation between failures~\sn{is this CI build failures as well?} and the meta data of developers and the project.
+They achieved an accuracy~\sn{I don't know what specificity rate is.. is this an actual term? If so, change the accuracy that I use} of 69\%.
+In follow-up work by Ni and Li as part of the MSR '17 challenge, the prediction accuracy was further improved by using cascading tree classifiers as well as additional information about the outcome of the previous build\cite{Pred-Cascade}. 
+In that research, the prediction was only done per project, because it was shown that certain subsystems or developers are more erroneous. ~\sn{I'm not sure I understand the reasoning of doing it per project?}
+While this is certainly useful in practice, it does not help to mitigate the reasons of failing builds on a more general (i.e. cross-project) level.
+
+~\sn{it seems you focused the CI-related work on build failure prediction, which is OK but you need to clearly state that. Check what other categories of CI work are there and say something like there are two directions of work on CI: x [couple of main citations] and y. Given the nature of our work, we mainly focus on y. I also sent you some references that I think should be included for build failure prediction}
 
 \subsection{Architecture}
+\label{sec:relwork-arch}
 
-There are numerous approaches how architecture is researched in software engineering. Generally, there are two topics. First, the reconstruction (1) of the implemented architecture in the code and, second, the comparison (2) of this architecture against (a) the designed architecture or (b) the architecture of different versions of the system, i. e. architecture evolution. 
+\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that}
+
+Software architecture is a well-researched topic in software engineering.
+There are generally two directions of research in the area.
+The first is related to the reconstruction of the implemented architecture from the code, while the second is related to comparing this reconstructed architecture against (a) the intended or documented architecture and (b) different versions of the system (i.e., architecture evolution).
+We discuss related work from both these general directions.
 
 The ARAMIS workbench \cite{Aramis} takes the step from static reconstruction of the architecture based on method calls and inheritance to extracting the data flow during runtime to check it against the predefined structure. 
 For model-driven and generative software development, the task of extracting architecture is more complex than in traditional projects, because it passes through different layers of abstraction and possibly multiple DSLs. 
@@ -111,7 +141,7 @@ Nakamura and Basili \cite{StructDist} introduced the measuring of architectural 
 Because it works on the complete class graph and not an abstracted version, i.e. the architecture, this technique is not viable for consistency checking, as the designed architecture is not represented down to the class level. 
 Since the graph is compared to kernels, it is necessary to define a distance measurement for this. A similar approach is used by Garcia \cite{arcade-thesis} with the cluster coverage metric.
 
-Tonu et al. \cite{Swag} have researched architecture stability, primarily in C and C++ projects, but also introduced support for Java.\footnote{\url{http://www.swag.uwaterloo.ca/javex/}} Using four different types of metrics, growth, change, cohesion and coupling, they try to analyze when the architecture of a software system stabilizes and then predict stability for future versions. It does so by extracting facts from the source code (or in case of Java byte code) and reconstructing the architecture. A fact can be anything, from LoC to function calls and classes. 
+Tonu et al. \cite{Swag} have researched architecture stability using the SWAG kit, primarily in C and C++ projects, but also introduced support for Java.\footnote{\url{http://www.swag.uwaterloo.ca/javex/}} Using four different types of metrics, growth, change, cohesion and coupling, they try to analyze when the architecture of a software system stabilizes and then predict stability for future versions. It does so by extracting facts from the source code (or in case of Java byte code) and reconstructing the architecture. A fact can be anything, from LoC to function calls and classes. 
 In both studied projects, the architecture stabilizes relatively quickly and has only small changes afterwards. Unfortunately, we cannot use this tool in our research, because we want to study the source files and not the byte code of Java projects. But we do analyze change and coupling metrics.
 
 HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. They argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
@@ -129,23 +159,38 @@ However, the metrics and the recovery technique are promising in our context. He
 In previous studies, other researchers \cite{MScSteffen, arcRec-comparison} have given us confidence that the choices HUSACCT and ACDC are indeed some of the best tools, which we can use.
 The cvg metric is comparable to kernel based similarity whereas a2a considers change. Coupling in the architecture will be addressed with Martin's metrics. We reuse the modules from HUSACCT and ARCADE directly, while we need to implement the Martin's metrics ourself. 
 
-\section{Metrics} \label{sec:Metrics}
+\section{Architecture Metrics Used} \label{sec:Metrics}
 
-To measure the similarity or change between two architectures, or even between designed and implemented architecture, there are several approaches, as described in Section \ref{sec:RelWork}. For OO software systems, as studied here, the so-called Martin's metrics \cite{martinsMetrics} were introduced, i.e. afferent (Aff), efferent (Eff) coupling and instability (I).
-Those metrics describe the independence of modules. Coupling describes how many incoming or outgoing transitions a module has. For example, if class \texttt{Car} of module \texttt{Vehicles} implements the interface \texttt{Engine} of the module \texttt{Parts}, then \texttt{Vehicles} has an outgoing transition to \texttt{Parts}, which itself has the corresponding incoming transition. In other words, \texttt{Vehicles} depends on \texttt{Parts}.
-Instability is the ratio between efferent coupling and the complete coupling, which represents if a module is highly dependent on other modules ($I$ close to 1) or if many modules depend on this one ($I$ close to 0).
+As part of our work, we need to extract metrics that describe the architectural change that happened in a given version of the code. 
+In Section~\ref{sec:relwork-arch}, we provided a general description of several approaches that exist in the literature.
+In this section, we provide a detailed description of the \checkNum{eight} metrics we use in our work, and the reasoning behind the choice.
+
+
+\paragraph{Martin's metrics} 
+The first set of metrics we use have been developed by Robert Martin~\cite{martinsMetrics}.
+We refer to the set of metrics he introduced as \textit{Martin's metrics}.
+Specifically, we use three of these metrics~\sn{Are there more or are these three the only ones?}: \textit{afferent} coupling (Aff), \textit{efferent} coupling (Eff), and instability (I).
+These metrics describe the independence of modules. 
+\textit{Coupling} describes how many incoming (i.e., afferent) or outgoing (i.e., efferent) transitions a module has. ~\sn{please check the i.e.,s to make sure I didn't switch it}
+For example, if class \texttt{Car} of module \texttt{Vehicles} implements the interface \texttt{Engine} of the module \texttt{Parts}, then \texttt{Vehicles} has an outgoing transition to \texttt{Parts}, and \texttt{Parts} has the corresponding incoming transition. 
+In other words, \texttt{Vehicles} depends on \texttt{Parts}.
+\textit{Instability}, shown in Equation~\ref{eq:inst}, is then defined as the ratio between efferent coupling and the complete coupling.
+The equation shows if a module is highly dependent on other modules ($I$ close to 1) or if many modules depend on it ($I$ close to 0).
 
 \begin{equation} \label{eq:inst}
 I = \textit{Eff} / (\textit{Eff} + \textit{Aff})
 \end{equation}
 
-In the context of architectural change, this metric can be used in the following way: If the instability changes, this module has an increase or decrease in the number of dependencies. This would not be the case, if the module has the same change in afferent and efferent coupling, but this is unlikely. Still, this metric remains a heuristic.
+In the context of architectural change, the instability metric can be used as follows. If the instability of a given module changes, then this module must have had an increase or decrease in its number of dependencies. 
+Obviously, a corner case is if the module had the exact same number of changes in its afferent and efferent coupling, leading to a constant instability value despite the changes.
 
-More sophisticated change metrics are a2a and cvg. Architecture to architecture measures the minimum amount of steps to get from the first to the second architecture divided by the sum of the steps needed to build both architectures themselves (Equation \ref{eq:a2a}). A step is either the adding, removing or moving of an entity inside a module or the creation or deletion of a module. 
+\paragraph{\textit{a2a} and \textit{cvg}} More sophisticated change metrics are Architecture to Architecture {a2a} and Cluster Average (cvg). 
+
+a2a measures the minimum amount of steps to get from the first to the second architecture divided by the sum of the steps needed to build both architectures themselves (Equation \ref{eq:a2a}). A step is either the adding, removing, or moving of an entity inside a module or the creation or deletion of a module. 
 
 \begin{gather} \label{eq:a2a}
 a2a(A_i, A_j) = 1 - \frac{mto(A_i, A_j)}{aco(A_i) + aco(A_j)}
-\intertext{Where:}
+\intertext{where:}
 \begin{tabular}{>{$}r<{$}@{\ =\ }l}
 mto(A_i, A_j) & steps from $A_i$ to $A_j$ \\
 aco(A_i) & steps to create $A_i$
@@ -153,9 +198,9 @@ aco(A_i) & steps to create $A_i$
 \end{gather}
 
 
-The cluster coverage (cvg) is a metric that measures how the inside of modules is changing. For that, the cluster to cluster (c2c) metric is calculated, which defines how many elements of the cluster overlap divided by the number of elements in the bigger cluster (Equation \ref{eq:c2c}). 
-As an example, if a module has 20 elements, and from one version to another two elements get removed and three are added, then $c2c = \frac{18}{21}$. 
-If this ratio is above a predefined threshold, the clusters are called equal (Equation \ref{eq:simC}). The cvg metric then calculates the ratio between equal modules and the amount of modules in the architecture (Equation \ref{eq:cvg}). In ARCADE the cvg is calculated with a threshold of $75\%$ from the earlier version to the latter one ($\text{cvg}_\text{src}$) and with $66\%$ the other way around ($\text{cvg}_\text{tar}$). These are the standard settings in ARCADE, but it is not explained why these numbers are chosen. One explanation might be that adding functionality to a module does not change its behavior as much as removing elements. Therefore, the higher threshold for $\text{cvg}_\text{src}$ is accounting for this.
+cvg is a metric that measures how a given module is changing. For that, the \textit{Cluster to Cluster} (c2c) metric is calculated, which defines how many elements of the cluster overlap divided by the number of elements in the bigger cluster (Equation \ref{eq:c2c})~\sn{not clear.. what is a cluster here? Is it the same module being compared or what?}. 
+As an example, if a module has 20 elements, and from one version to another, two elements get removed and three are added, then $c2c = \frac{18}{21}$. 
+If this ratio is above a predefined threshold $th_{cvg}$, the clusters are considered similar, according to the similarity metric $simC$ in Equation \ref{eq:simC}. The cvg metric then calculates the ratio between equal modules and the amount of modules in the architecture (Equation \ref{eq:cvg}). In ARCADE~\cite{todo}, the cvg is calculated with a threshold of $75\%$ from the earlier version to the latter one ($\text{cvg}_\text{src}$) and with $66\%$ the other way around ($\text{cvg}_\text{tar}$). These are the standard settings in ARCADE, but it is not explained why these numbers are chosen. One explanation might be that adding functionality to a module does not change its behavior as much as removing elements. Therefore, the higher threshold for $\text{cvg}_\text{src}$ is accounting for this.~\sn{this is confusing.. is this assuming that the next version always adds and not removes?}
 
 \begin{equation} \label{eq:c2c}
 c2c(c_i, c_j) = \frac{|\text{entities}(c_i) \cap \text{entities}(c_j)|}{\max(|\text{entities}(c_i)|, |\text{entities}(c_j)|)}
@@ -172,7 +217,9 @@ simC(A_i, A_j) = \{c_i | c_i \in A_i, \exists c_j \in A_j) \\
 cvg(A_i, A_j) = \frac{|simC(A_i, A_j)|}{|allC(A_i)|}
 \end{equation}
 
-The problem with a2a and cvg is, that they do not explicitly take the dependencies between modules into account. This is only done while reconstruction the architecture itself, which we do with the pattern based ACDC from the ARCADE framework. 
+\paragraph{Combining metrics} 
+~\sn{I don't really understand how you combine them. Can you elaborate?}
+The problem with a2a and cvg is that they do not explicitly take the dependencies between modules into account. This is only done while reconstructing the architecture itself, which we do with the pattern based ACDC from the ARCADE framework. 
 To get a view of the change of the dependencies explicitly, we combine a2a and cvg with the widely accepted Martin's metrics \cite{Val-MartinsMet}, which especially account for the change in between the modules. 
 
 \section{Methodology}
