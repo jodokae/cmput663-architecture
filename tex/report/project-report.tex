@@ -334,12 +334,18 @@ We further filter this list to exclude projects where we could not retrieve thei
 This left us with $159$ projects to analyze, containing a total of
 $49,531$ commits. A list of the ten biggest analyzed projects, in terms of unrestricted commits~\sn{what is an unrestricted commit?}, can be found in table \ref{tableProjects}.
 
+The pass rate of the studied projects is $84.9\%$. Around $10\%$ of the builds failed because of errors before or during the compilation of the software. One third of the errors could be mapped to test errors. We did not further separate the other types of failures, but sampling shows that some of the reasons for the other category include configuration errors or incorrect maven plugins.
+The active time of the projects in the data set varies.
+For the ten biggest projects (in terms of number of commits), it is between one and four years of development time, some of which start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), while others start at build 1 (e.g. Checkstyle)~\sn{ is the part about where they start general to all projects or to the top 10?}.
+The projects also belong to a range of different domains.
+In the ten biggest projects, there are two code analyzers, three APIs~\sn{libraries? and what kind of libraries? libraries have domains too}, a web client and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
+
 
 \paragraph{Calculated Correlations.}
-\sn{this needs another revision}
+
 The calculated architectural metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means that we look for correlations between a change in build $x$ and the build result in builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future (i.e., the relationships mentioned in our two hypotheses). 
 ~\sn{Before I try to rewrite this, I need to  understand why you don't consider the individual types of build failures if you differentiate between them? So if you do record why the build failed, why don't you see if there is a correlation with failure in general and then with the individual types of failure?} Because there are different reasons for a CI build failure (see Section~\ref{sec:ci-build-outcome}, for testing in the near past and future, the fail types get categorized into non-failure and failure. In this way, we get a single integer of how many builds failed, instead of having multiple variables. 
-Then, every architectural metric is converted to a Boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. We chose this range of thresholds, because most of the architectural changes in our dataset were small (as will later be explained through Figure \ref{fig:histograms}). We take these thresholds to find out if small changes affect the amount correlation present in the data. Every comparison which includes no Boolean variables is run with Pearson's correlation test, while others are run with Spearman's test. 
+Then, every architectural metric is converted to a Boolean, which is true if there is a change and false if there is none. This is calculated with a threshold $t$, where everything below $t$ is considered to be no change, and anything above as a change for $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$. We chose this range of thresholds, because most of the architectural changes in our dataset were small (as will later be explained through Figure \ref{fig:histograms}). We take these thresholds to find out if small changes affect the amount correlation present in the data. Every comparison which includes no Boolean variables is run with Pearson's correlation test, while others are run with Spearman's test. ~\sn{this previous paragraph generally needs another revision}
 
 \begin{figure*}[!t]
 	\centering
@@ -388,26 +394,28 @@ Then, every architectural metric is converted to a Boolean, which is true if the
 
 This section presents the findings with the proposed methodology. First, the projects under study are introduced, then calculated metrics are evaluated and, eventually, the correlation between the metrics and the build outcomes is shown.
 
-\subsection{Studied Projects}
-
-We have studied $49,531$ commits from $159$ projects which use Java Maven. The pass rate is $84.9\%$. Around $10\%$ of the builds failed because of errors before or during the compilation of the software. On third of the errors could be mapped to test errors. The remaining part of the fails were not further separated, but are for example configuration errors or wrong used maven plugins.
-The active time of the projects varies. For the ten biggest projects (in terms of number of commits) it is between one and four years of development time, some start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), others at build 1 (e.g. Checkstyle). The projects vary in their application field. In the ten biggest projects, there are two code analyzers, three APIs, a web client and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
-
-\subsection{Metric Evaluation}
+\subsection{Evaluation of Architecture Metrics}
 
 \input{assets/metricCorr}
 
-We have extracted 8 architecture change metrics. Most builds show no change (table \ref{tableMetric}). This is to be expected, since most changes in the system should not be architectural changes. 
-Only a2a has more changing builds than non-changing builds. But then, most of these changes are really small, as shown in Fig. \ref{a2aHist}. In other metrics, most changes are quite small as well, with only few big architectural changes (Fig. \ref{cvgHist} and \ref{numEdgesHist}). This seems usual, because we assume that the architecture does not have big changes that often. Only the number of nodes (Fig. \ref{numNodesHist}) has more widespread changes, which lies in the nature of the reconstruction process. Because a minimum number of ten nodes per architecture is hard coded into the package-architecture reconstruction, but is done level wise, a change from ten to nine nodes cannot appear, but will result in a change from 10 to 18 nodes. The effects of this red line are not as bad as they sound, because the node degree and number of edges metrics are in the expected norm, so that it is indicated that the few outliers do not affect the results badly.
+We have extracted 8 architecture change metrics. 
+Table~\ref{tableMetric} shows the number of percentage of builds that show changes using the corresponding metric ~\sn{does this mean that the value of the metric is greater than 0?}.
+We can see that most builds show no change.
+This is to be expected, since most changes in the system should not be architectural changes. 
+Only a2a has more changing builds than non-changing builds. 
+However, an investigation of these changes in Figure~\ref{a2aHist} show that most of them have a really small a2a value. 
+Figures \ref{numEdgesHist} and \ref{cvgHist}~\sn{why not Fig4c too?} show that for the other metrics, most changes are quite small as well, with only few big architectural changes. 
+Only the number of nodes shown in Figure \ref{numNodesHist} has more widespread changes.
+This could be due to the nature of the reconstruction process. ~\sn{I don't understand the next part. Please rewrite} Since a minimum number of ten nodes per architecture is hard coded into the package-architecture reconstruction, but is done level wise, a change from ten to nine nodes cannot appear, but will result in a change from 10 to 18 nodes. The effects of this red line are not as bad as they sound, because the node degree and number of edges metrics are in the expected norm, so that it is indicated that the few outliers do not affect the results badly.
 
 
-In table \ref{tableMetricCorr} the correlation between the metrics is shown. All p values were equal or close to 0. the highest p value cross-metric wise is $3.7^{-102}$. 
-The package metrics are highly correlated, all with c values above $0.6$ up to $0.92$. a2a does not correlate with the other metrics strongly, only between $0.10-0.17$, while cvg shows low to medium correlation to the package metrics. 
-Still, this gives the indication that all metrics are truly an indicator for architectural change if we assume that at least one of them is, since the p-values do not leave any doubt, that the metrics are dependent.
-As expected, the metrics look at disjunct types of architectural change, a2a and cvg highlight the change at the module level, whereat the Martin's metrics take the focus at the relationship between the modules. This strengthens our confidence in the chosen tool chain. 
+Before using the calculated metrics in further analyses, we need to ensure that our chosen metrics make sense in practice and do not all measure the exact same aspect of architectural evolution. Thus, we calculate the \todo{??} correlation between all the metrics we use, shown in Table \ref{tableMetricCorr}. All p values for these correlations were equal or close to 0; the highest p value we got from all the cross-metric correlations is $3.7^{-102}$. 
+The results show that the package metrics~\sn{which ones are the package metrics?} are highly correlated~\sn{first, indicate the ranges you use for weak, medium, and high correlation then also mark high correlations in bold in the table}, all with correlation values above $0.6$ up to $0.92$. a2a does not have any strong correlation with any of the other metrics (all values between $0.10-0.17$), while cvg shows low to medium correlation with the package metrics. 
+These correlations suggest that all metrics are truly an indicator for architectural change if we assume that at least one of them is, since the p-values do not leave any doubt that the metrics are dependent.
+As expected, the metrics look at disjunct types of architectural change, a2a and cvg highlight the change at the module level, whereas the Martin's metrics focus on the relationship between the modules. This strengthens our confidence in the chosen tool chain. ~\sn{you somehow say they are dependent but then say they look at disjunct types of changes.. can you revise the text to make the poitn clearer}
 
 
-\subsection{Relationship}
+\subsection{Relationship Between Architectural Changes and Build Outcome}
 
 Around $16\%$ of all builds that had architectural change failed ($P(f|c)$). This we found while extracting data for all metrics for all tested change thresholds, at the median. The values ranged from $8-18\%$. 
 If we check for the probability of change under the condition that the build failed ($P(c|f)$), we get a range from $0\%$ up to $60\%$. For the package metrics, the probability was almost always low, but the the ARCADE metrics, the results are more interesting. First, the probability drastically decreases while the change threshold increases. If we look at the probability of architectural change according to the a2a metric, and we consider every change, then we end up with $61\%$.. Of course, this is natural since we do not change the number of failing builds but the number of considered changes when we change the threshold of what we consider a change. 
