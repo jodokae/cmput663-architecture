@@ -15,7 +15,7 @@
 %\usepackage{balance}
 
 \newcommand{\sn}[1]{{\color{blue}\textbf{Sarah:}~#1}}
-\newcommand{\jk}[1]{{\color{darkgreen}\textbf{Johannes:}~#1}}
+\newcommand{\jk}[1]{{\color{violet}\textbf{Johannes:}~#1}}
 \newcommand{\checkNum}[1]{{\color{orange}#1}}
 \newcommand{\todo}[1]{{ \color{red} \textbf{TODO:}~#1}}
 
@@ -42,7 +42,7 @@
 
 \begin{abstract}
 Continuous Integration (CI) is becoming an essential component in the software development process.
-However, the time cost of a CI build may often be high, if the build is broken.~\sn{isn't the cost of a build high regardless of whether it passes or fails?}
+However, the time cost of a CI build may often be high, if the build is broken.~\sn{isn't the cost of a build high regardless of whether it passes or fails?} \jk{The general cost of a CI build should be low. Only the time to fix a broken build is costly.}
 Therefore, identifying reasons for build failure and warning developers about these likely failures can save valuable time and cost for developers.
 In this paper, we investigate if there is a relationship between architectural changes and CI build outcomes.
 We form two hypotheses about the relationship: (1) architectural changes lead to higher CI build failures and (2) higher CI build failures lead to architectural changes.
@@ -59,20 +59,26 @@ To enable other researchers to replicate our negative results and to investigate
 
 Continuous integration (CI) is nowadays a common practice in software development \cite{CI-Common}. It helps finding faults earlier and therefore reduces the costs to fix them \cite{NutzenCI}. On the other hand, build failures decrease the development pace \cite{Costs-BuildFailures}. Hence, by decreasing the number broken builds, the speed of development is increased whereby costs are decreased.
 
-There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged, using for example cascaded tree classifiers \cite{Pred-Cascade} or based upon the person who was submitting the commit \cite{ContrInvolv}~\sn{the two parts here are not on the same "level".. cascaded tree classifiers are an ML technique and you can feed them any type of features while "the person submitting the commit" is one feature that is based on the meta data of the project. I think you want to re-write this paragraph to make it clearer that the point is to say that the majority of work done on CI failures used meta-data of the project instead of source code metrics (but plz verify that this is indeed true}. In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
-These meta-data based ML approaches alone do not have high enough accuracy, because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. In this paper, we further investigate such source code metrics.
+There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged.
+Multiple researches have been using meta-data about the person who was submitting the commit \cite{ContrInvolv} or meta-data from previous commits \cite{Pred-Cascade}. The latter study has shown that cascaded tree classifiers have achieved the best results with this type of data. ~\sn{the two parts here are not on the same "level".. cascaded tree classifiers are an ML technique and you can feed them any type of features while "the person submitting the commit" is one feature that is based on the meta data of the project. I think you want to re-write this paragraph to make it clearer that the point is to say that the majority of work done on CI failures used meta-data of the project instead of source code metrics (but plz verify that this is indeed true}. \jk{is this clearer?}
+In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
+These meta-data based ML approaches alone do not have high enough accuracy.
 
-~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architecture}s  Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
+Not only meta-data, but also source code metrics impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures was already investigates by various studies \cite{MetricsSource1, MetricsSource2}. 
+because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. 
+In this paper, we further investigate such source code metrics. 
+Bengtsson \cite{arc-metrics} has adapted source code metrics so that they are metrics for software architecture. Therefore, they should should also impact the build outcome. 
+~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architecture}s  Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}. For example will a build break if a timing constraint is introduced, so that the code itself is not working anymore in the necessary parameters. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
 To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
 
-Paixao~\sn{you sometimes have the special character in this name and sometimes not.. make sure to find the right spelling and fix it} et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
+Paixao~\sn{you sometimes have the special character in this name and sometimes not.. make sure to find the right spelling and fix it} \jk{he is a different person with the same last name but different spelling, thats maybe confusing, but it is correct this way} et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
 
 In this work, we explore the relationship between architectural change and CI build outcome.
 ~\sn{when talking about things that you are doing, try to always use the active voice.. I changed things in the intro already but just so you are aware in the future and in next drafts}
-We analyze $159$ Java Maven software systems from the TravisTorrent dataset~\cite{addcitation}. 
+We analyze $159$ Java Maven software systems from the TravisTorrent dataset~\cite{TravisTorrent}. 
 We extract the architectural changes in every CI build by comparing the corresponding version of the system to its predecessor.
 We use eight different architecture metrics from the literature to evaluate architectural changes.  
 We store those extracted architectural changes along with the outcome of the build and use this data to investigate the relation between architecture and build outcome.
@@ -80,15 +86,27 @@ We hypothesize that architectural changes are either (1) preceded or (2) followe
 Our intuition for the first hypothesis is that many failing builds indicate a big problem in the system, which might entail changing the architecture to solve it. 
 On the other hand, our intuition for the second hypothesis is that a change in the architecture may result in unexpected consequences that would then lead to build failures.
 
+We propose the null hypotheses:
+
+\paragraph{$\mathbf{H_0}$:} Architectural change does not correlate with Continuous Integration build outcome. 
+
 To automate our investigation, we develop an extensible framework that runs a toolchain which automatically downloads snapshots of a software system, reconstructs the architecture, and computes change metrics. With only a few lines of code, new extractors, reconstructors, and metric calculators can be added. 
 The architecture of our framework allows us to easily reuse existing architectural extraction tools and metrics, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade}, and Martin's metrics \cite{martinsMetrics}.
 
-Our analysis of almost $50,000$ commits using two different architecture reconstruction techniques shows that almost no significant correlation exists between architecture changes and CI build outcome. In total, we investigated $48$ different correlations using $32$ configurations. Based on our results, we reject the hypothesis that architectural change impacts the build outcome.~\sn{should we formulate this as accepting the null hypothesis? Typically, you formulate things using the null hypothesis and if you find a correlation, you reject the null hypothesis}
+Our analysis of almost $50,000$ commits using two different architecture reconstruction techniques shows that almost no significant correlation exists between architecture changes and CI build outcome. In total, we investigated $48$ different correlations using $32$ configurations. Based on our results, we are unable to reject the null hypothesis. Architectural change does not correlate, and therefore does not impact, with build outcome.
+~\sn{should we formulate this as accepting the null hypothesis? Typically, you formulate things using the null hypothesis and if you find a correlation, you reject the null hypothesis} \jk{done}
 
 
 To summarize, the main contributions of this paper are:
 \begin{itemize}
-\item \todo{put list of contributions}
+\item The combination of architectural change and build outcome prediction
+\item The development of an easy extensible framework for 
+\begin{itemize}
+	\item source code and log mining
+	\item architecture reconstruction
+	\item architecture metric calculation
+\end{itemize}
+\item comprehensive study of almost $50,000$ commits
 \end{itemize}
 
 
@@ -97,12 +115,14 @@ To summarize, the main contributions of this paper are:
 In this section, we first give some background about the terminology we use in this paper and then discuss two categories of related work. The first is work done to investigate continuous integration practices and reasons for build failure, and the second is work related to software architecture.
 
 \subsection{Background}
-TravisCI is a continuous integration (CI) tool that is tightly integrated into GitHub. CI is the process of automatically compiling, building, and testing a software system, whenever new code is pushed to a repository. This helps developers find bugs earlier and increase the development speed. 
+TravisCI is a continuous integration (CI) tool that is tightly integrated into GitHub. CI is the process of automatically compiling, building, and testing a software system, whenever new code is pushed to the single repository. This helps developers find bugs earlier and increase the development speed \footnote{\url{https://www.martinfowler.com/articles/continuousIntegration.html}}. 
 The TravisTorrent dataset \cite{TravisTorrent} consists of over 3.5 million TravisCI build samples from over 1,300 projects, written in Java, JavaScript, and Ruby.
 TravisTorrent saves over fifty features for every build, including the project name, the commit ID of the build, and the build outcome.
 
-\textit{Software architecture}~\sn{can you first provide a definition for software architecture and then say how it is typically represented} is usually represented as a graph of the high-level components, called \textit{modules}, of a software system which are connected through links, called \textit{dependencies}. While there is no uniform standard for describing a system's architecture, it is typically modeled using Architecture Description Languages (ADLs), such as the component diagram of the Unified Modeling Language (UML)~\cite{UML-Arch}. ~\sn{can you add other modeling languages/notations?}
-Since there is no single way for describing an architecture, there is also no universally accepted technique for reverse engineering the architecture of a system. The most basic way is using the package structure in the code. This assumes that the developers have thought about the architecture and translated it into packages. In that case, high level packages correspond to modules, and module A is dependent on module B if an element of package A is using an element that is contained in package B.~\cite{todo}
+Aesop
+
+\textit{Software architecture} is defined as the structural or hierarchical view of the system's components and the description of the relationships \cite{arcDef}. It is usually represented as a graph of the high-level components, called \textit{modules}, of a software system which are connected through links, called \textit{dependencies}. While there is no uniform standard for describing a system's architecture, it is typically modeled using Architecture Description Languages (ADLs), such as the component diagram of the Unified Modeling Language (UML)~\cite{UML-Arch}. Of course there is a huge amount of different ADLs, like Aesop, ATL or QVT \cite{ADLs1, ADLs2}.
+Since there is no single way for describing an architecture, there is also no universally accepted technique for reverse engineering the architecture of a system. The most basic way is using the package structure in the code. This assumes that the developers have thought about the architecture and translated it into packages \cite{arcPkg}. In that case, high level packages correspond to modules, and module A is dependent on module B if an element of package A is using an element that is contained in package B. 
 Other approaches for reconstructing architecture are ACDC or ARC, which are introduced in the following section.
 
 \subsection{Continuous Integration}
