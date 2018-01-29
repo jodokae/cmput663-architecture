@@ -128,22 +128,22 @@ Other approaches for reconstructing architecture are ACDC or ARC, which are intr
 \subsection{Continuous Integration}
 
 Islam and Zibran \cite{FailsCorr} have studied the relationship between build outcome, and project and build metrics. 
-They found that the size of the project, the test code~\sn{not sure what that means: test code}, and the development branch\sn{what does the "Development branch" refer to? is it which branch used for the build?} all do not affect the build outcome.
+They found that the size of the project, the test code~\sn{not sure what that means: test code}\jk{when I write a test, this is "test code"}, and the development branch (i.e. the branch from which the build is initiated) \sn{what does the "Development branch" refer to? is it which branch used for the build?} all do not affect the build outcome.
 On the other hand, the build tool used (e.g. Maven or Ant) as well as the number of changed lines and files do have an impact on the build outcome.
-The fact that the previous research found that the number of changed lines and files affects the build result suggests that investigating the relationship between architectural changes and build outcome is a valid idea.~\sn{I don't like the term "is a valid idea" but can't think of something better now}
+The fact that the previous research found that the number of changed lines and files affects the build result suggests that investigating the relationship between architectural changes and build outcome is conclusive.~\sn{I don't like the term "is a valid idea" but can't think of something better now} \jk{I tried with "conclusive", what do you think?}
 
-In 2006, a study by Hassan and Zhang~\cite{Pred-Tree} used decision trees to investigate the relation between failures~\sn{is this CI build failures as well?} and the meta data of developers and the project.
-They achieved an accuracy~\sn{I don't know what specificity rate is.. is this an actual term? If so, change the accuracy that I use} of 69\%.
-In follow-up work by Ni and Li as part of the MSR '17 challenge, the prediction accuracy was further improved by using cascading tree classifiers as well as additional information about the outcome of the previous build\cite{Pred-Cascade}. 
-In that research, the prediction was only done per project, because it was shown that certain subsystems or developers are more erroneous. ~\sn{I'm not sure I understand the reasoning of doing it per project?}
+In 2006, a study by Hassan and Zhang~\cite{Pred-Tree} used decision trees to investigate the relation between build failures and the meta data of developers and the project.
+They achieved an specificity rate \footnote{Specificity: Rate between true negative and all negatives}~\sn{I don't know what specificity rate is.. is this an actual term? If so, change the accuracy that I use} of 69\%.
+In an follow-up work by Ni and Li as part of the MSR '17 challenge, the prediction accuracy was further improved by using cascading tree classifiers as well as additional information about the outcome of the previous build\cite{Pred-Cascade}. 
+In that research, the prediction was only done per project, because they aim to predict the error only based on this project's specific data. In consequence, the prediction is getting more accurate as more builds are in the history.
 While this is certainly useful in practice, it does not help to mitigate the reasons of failing builds on a more general (i.e. cross-project) level.
 
-~\sn{it seems you focused the CI-related work on build failure prediction, which is OK but you need to clearly state that. Check what other categories of CI work are there and say something like there are two directions of work on CI: x [couple of main citations] and y. Given the nature of our work, we mainly focus on y. I also sent you some references that I think should be included for build failure prediction}
+~\sn{it seems you focused the CI-related work on build failure prediction, which is OK but you need to clearly state that. Check what other categories of CI work are there and say something like there are two directions of work on CI: x [couple of main citations] and y. Given the nature of our work, we mainly focus on y. I also sent you some references that I think should be included for build failure prediction} \todo{This note is not yet processed}
 
 \subsection{Architecture}
 \label{sec:relwork-arch}
 
-\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that}
+\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} \todo{this note is not yet processed}
 
 Software architecture is a well-researched topic in software engineering.
 There are generally two directions of research in the area.
@@ -183,15 +183,15 @@ The cvg metric is comparable to kernel based similarity whereas a2a considers ch
 
 As part of our work, we need to extract metrics that describe the architectural change that happened in a given version of the code. 
 In Section~\ref{sec:relwork-arch}, we provided a general description of several approaches that exist in the literature.
-In this section, we provide a detailed description of the \checkNum{eight} metrics we use in our work, and the reasoning behind the choice.
+In this section, we provide a detailed description of the eight \jk{yes, 8 is right, we could refer to table 2 here.} metrics we use in our work, and the reasoning behind the choice.
 
 
 \paragraph{Martin's metrics} 
 The first set of metrics we use have been developed by Robert Martin~\cite{martinsMetrics}.
 We refer to the set of metrics he introduced as \textit{Martin's metrics}.
-Specifically, we use three of these metrics~\sn{Are there more or are these three the only ones?}: \textit{afferent} coupling (Aff), \textit{efferent} coupling (Eff), and instability (I).
+Specifically, we use three of the five metrics: \textit{afferent} coupling (Aff), \textit{efferent} coupling (Eff), and instability (I).
 These metrics describe the independence of modules. 
-\textit{Coupling} describes how many incoming (i.e., afferent) or outgoing (i.e., efferent) transitions a module has. ~\sn{please check the i.e.,s to make sure I didn't switch it}
+\textit{Coupling} describes how many incoming (i.e., afferent) or outgoing (i.e., efferent) transitions a module has. 
 For example, if class \texttt{Car} of module \texttt{Vehicles} implements the interface \texttt{Engine} of the module \texttt{Parts}, then \texttt{Vehicles} has an outgoing transition to \texttt{Parts}, and \texttt{Parts} has the corresponding incoming transition. 
 In other words, \texttt{Vehicles} depends on \texttt{Parts}.
 \textit{Instability}, shown in Equation~\ref{eq:inst}, is then defined as the ratio between efferent coupling and the complete coupling.
@@ -218,9 +218,9 @@ aco(A_i) & steps to create $A_i$
 \end{gather}
 
 
-cvg is a metric that measures how a given module is changing. For that, the \textit{Cluster to Cluster} (c2c) metric is calculated, which defines how many elements of the cluster overlap divided by the number of elements in the bigger cluster (Equation \ref{eq:c2c})~\sn{not clear.. what is a cluster here? Is it the same module being compared or what?}. 
+cvg is a metric that measures how a given module is changing. For that, the \textit{Cluster to Cluster} (c2c) metric is calculated, which defines how many elements of the cluster overlap divided by the number of elements in the bigger cluster (Equation \ref{eq:c2c}) In the context of architecture a cluster is synonymous to a module.
 As an example, if a module has 20 elements, and from one version to another, two elements get removed and three are added, then $c2c = \frac{18}{21}$. 
-If this ratio is above a predefined threshold $th_{cvg}$, the clusters are considered similar, according to the similarity metric $simC$ in Equation \ref{eq:simC}. The cvg metric then calculates the ratio between equal modules and the amount of modules in the architecture (Equation \ref{eq:cvg}). In ARCADE~\cite{todo}, the cvg is calculated with a threshold of $75\%$ from the earlier version to the latter one ($\text{cvg}_\text{src}$) and with $66\%$ the other way around ($\text{cvg}_\text{tar}$). These are the standard settings in ARCADE, but it is not explained why these numbers are chosen. One explanation might be that adding functionality to a module does not change its behavior as much as removing elements. Therefore, the higher threshold for $\text{cvg}_\text{src}$ is accounting for this.~\sn{this is confusing.. is this assuming that the next version always adds and not removes?}
+If this ratio is above a predefined threshold $th_{cvg}$, the clusters are considered similar, according to the similarity metric $simC$ in Equation \ref{eq:simC}. The cvg metric then calculates the ratio between equal modules and the amount of modules in the architecture (Equation \ref{eq:cvg}). In ARCADE~\cite{todo}, the cvg is calculated with a threshold of $75\%$ from the earlier version to the latter one ($\text{cvg}_\text{src}$) and with $66\%$ the other way around ($\text{cvg}_\text{tar}$). These are the standard settings in ARCADE, but it is not explained why these numbers are chosen. One explanation might be that adding functionality to a module does not change its behavior as much as removing elements. Therefore, the higher threshold for $\text{cvg}_\text{src}$ is accounting for this.~\sn{this is confusing.. is this assuming that the next version always adds and not removes?} \jk{its more, if I got from 3 to 4 it's 33\% change, but if I go from 4 to 3 it's only 25\% change.}
 
 \begin{equation} \label{eq:c2c}
 c2c(c_i, c_j) = \frac{|\text{entities}(c_i) \cap \text{entities}(c_j)|}{\max(|\text{entities}(c_i)|, |\text{entities}(c_j)|)}
@@ -238,7 +238,7 @@ cvg(A_i, A_j) = \frac{|simC(A_i, A_j)|}{|allC(A_i)|}
 \end{equation}
 
 \paragraph{Combining metrics} 
-~\sn{I don't really understand how you combine them. Can you elaborate?}
+~\sn{I don't really understand how you combine them. Can you elaborate?} \jk{Maybe combine is just the wrong word. I mean I just use all of them as a set. }
 The problem with a2a and cvg is that they do not explicitly take the dependencies between modules into account. This is only done while reconstructing the architecture itself, which we do with the pattern based ACDC from the ARCADE framework. 
 To get a view of the change of the dependencies explicitly, we combine a2a and cvg with the widely accepted Martin's metrics \cite{Val-MartinsMet}, which especially account for the change in between the modules. 
 
@@ -257,20 +257,20 @@ To establish the relationship between architectural changes and CI build outcome
 In this section, we describe the methodology we use to calculate these architectural changes.
 Figure~\ref{overview} shows an overview of the methodology we use.
 On a high level, given two versions of the source code, we extract the class structure of each version and use it to reconstruct each architecture. We then compare both architectures to calculate a set of change metrics. 
-We implement a framework to extract the considered architectural change metrics between two commits of a given project.~\sn{Which language is this implemented in }
+We implement a framework in Java to extract the considered architectural change metrics between two commits of a given project.
 Figure \ref{frameworkStructure} shows an overview of the structure of our framework.
-The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}}
+The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}} \todo{URL change}
 
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=3.45in]{assets/architecture.pdf}
-	\caption{Structure of the Framework~\sn{see my comments about improving this diagram.. In general, it needs to be clear the input/output of each process and the order.. For example, extractor and reconstructor appear as parallel things while it seems that one uses the output of the other.. If you want to indicate they are part of the same step, you can put a bigger dotted box around them for instance}}
+	\caption{Structure of the Framework~\sn{see my comments about improving this diagram.. In general, it needs to be clear the input/output of each process and the order.. For example, extractor and reconstructor appear as parallel things while it seems that one uses the output of the other.. If you want to indicate they are part of the same step, you can put a bigger dotted box around them for instance}} \todo{not yet processed}
 	\label{frameworkStructure}
 \end{figure}
 
 
  
-\paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database~\sn{please say TravisTorrent in the box instead of "Database".. also differentiate between process/step boxes and input/output sources.. right now, all are boxes but the boxes mean different things. Maybe also use Step 1, Step 2 etc. in the figure. For a process, use nouns "Repo Downloader" etc. or verbs "Download Repo" .. the important thing is to be consistent and to use meaningful names}.
+\paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database~\sn{please say TravisTorrent in the box instead of "Database".. also differentiate between process/step boxes and input/output sources.. right now, all are boxes but the boxes mean different things. Maybe also use Step 1, Step 2 etc. in the figure. For a process, use nouns "Repo Downloader" etc. or verbs "Download Repo" .. the important thing is to be consistent and to use meaningful names}. \todo{not yet processed}
 
 \paragraph{Step 2} uses the commit ID extracted in step 1 to download a snapshot of the project from GitHub.
 
@@ -278,7 +278,8 @@ The complete source code of the framework, as well as our results which are expl
 \paragraph{Step 3} extracts the architecture information needed to compare two commits in the next step. 
 Specifically, Step 3 is split into two parts, (a) the extraction of the class structure and (b) the reconstruction of the architecture. 
 
-In Step 3a, we use the extractor of the HUSACCT framework~\cite{todo} to extract relation triples in the form of relationship type, source, target (see listing \ref{lst1:rsf}), and save this information in the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this format. This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. ~\sn{I don't understand the next part about the downside. please elaborate} The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. Fortunately, this is irrelevant for our work. For simplicity, and because it is not used in the further analyses~\sn{if it is not used in further analysis, why do you extract it?}, the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``subPkg'' means \todo{...}, ``contains'' means that that a package contains a Java type, and ``references'' is any dependency between two Java types. The results are then fed into the reconstruction.
+In Step 3a, we use the extractor of the HUSACCT framework \cite{Husacct1} to extract relation triples in the form of relationship type, source, target (see listing \ref{lst1:rsf}), and save this information in the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this format. This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. 
+~\sn{I don't understand the next part about the downside. please elaborate} \todo{not yet processed} The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. Fortunately, this is irrelevant for our work. For simplicity the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``subPkg'' means that a package is a sub package of another one, ``contains'' means that that a package contains a Java type, and ``references'' is any dependency between two Java types. The results are then fed into the reconstruction.
 
 \begin{figure}[!t]
 	\centering
@@ -291,35 +292,36 @@ In Step 3a, we use the extractor of the HUSACCT framework~\cite{todo} to extract
 frame = single, 
 belowskip=-0.8 \baselineskip,
 float,
-caption=Rigi Standard Format example~\sn{maybe have a references relation there too?},
+caption=Rigi Standard Format example,
 label=lst1:rsf,
 columns=flexible
 ]
 subPkg   checkstyle checkstyle.grammars
 subPkg   checkstyle checkstyle.gui
 contains checkstyle checkstyle.Main
+references checkstyle.Factory checkstyle.Main
 \end{lstlisting}
 
 \input{assets/metrics}
 
-In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We implement~\sn{implement or use?} two different architecture reconstruction techniques.
+In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We use two different architecture reconstruction techniques.
 
 The first is ACDC, because it has one of the best reconstruction accuracy rates when compared to other commonly used techniques \cite{arcRec-comparison}. 
-While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (here:~\sn{what is "here"? Can't you cite previous work?} $10\%$ of the builds) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}
+While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (in our work $10\%$ of the builds, $11\%$ in Vassallo et. al \cite{CIFailTypes}) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}\jk{right, I changed it to use there}
 
-The second reconstruction technique is package reconstruction, which is often used as ground truth analysis~\sn{cite source? and also why do we need two techniques ?}.
-This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. ~\sn{it is not clear.. did you implement this yourself? Make that clear}
+The second reconstruction technique is package reconstruction, which is often used as ground truth analysis \cite{arcRec-comparison} ~\sn{cite source? and also why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything}. We implemented this techniques ourselves based on the HUSACCT extraction.
+This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?}\jk{by me ... I needed to define a value, so I tried to find one, which gave results that seemed to be components} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. 
 
 \paragraph{Step 4} calculates the architectural changes between two given commits.
 As explained in Section \ref{sec:Metrics}, we use the ARCADE metrics a2a and cvg as well as Martin's metrics. We calculate the ARCADE metrics on the architecture extracted by ACDC. Cvg is calculated twice, one based on the modules of the first version (called \textit{source}) and one based on the second version (called \textit{target}).
-The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics~\sn{first time these package metrics are mentioned? what's the relation to Section 3?}; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.
-For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is instead considered one~\sn{why is it considered one?}, so it is not measured how tightly connected two modules are, just if they are connected at all.
+The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics, some basic information on the package based architecture and the Martin's metrics; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.
+For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is booleanized, i.e. is $0$ if there is no connection or $1$ if there is one, so it is not measured how tightly connected two modules are, just if they are connected at all.
 Since we need to calculate the change for the complete architecture, and not for each module, we calculate the mean instabilities and node degree as well as the absolute number of modules (vertexes) and dependencies (edges).
 
-We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}~\sn{shouldn't it be max - min?}). For metrics with absolute numbers, like node degree, we calculate the similarity as the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
+We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}. For metrics with absolute numbers, like node degree, we calculate the similarity as the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
 
 \begin{equation} \label{eq:relDiff}
-c_{rel}(m_1, m_2) =  \min\{m1, m2\} - \max\{m1, m2\}
+c_{rel}(m_1, m_2) =  \max\{m1, m2\} - \min\{m1, m2\}
 \end{equation} 
 
 \begin{equation} \label{eq:absDiff}
