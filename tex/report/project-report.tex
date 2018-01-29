@@ -150,12 +150,14 @@ Rausch et al. \cite{FailsinCIFlow} have studied reasons for failing builds, as w
 \subsection{Architecture}
 \label{sec:relwork-arch}
 
-\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} \todo{this note is not yet processed}
+\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} \todo{citation done, revamp TODO, not yet quite sure how to do it}
 
 Software architecture is a well-researched topic in software engineering.
 There are generally two directions of research in the area.
 The first is related to the reconstruction of the implemented architecture from the code, while the second is related to comparing this reconstructed architecture against (a) the intended or documented architecture and (b) different versions of the system (i.e., architecture evolution).
 We discuss related work from both these general directions.
+
+Already in 2001 the Gail Murphy's reflexion models \cite{MurphyRefl} considered the gap between designed and actual architecture of a software system as a problem. For that, they developed a technique to map the reverse engineered model with the designed or expected one to visualize and measure the drift between them. These reflexion models can help find violations in the architecture and are a basis for nowadays architecture conformance checking tools. 
 
 The ARAMIS workbench \cite{Aramis} takes the step from static reconstruction of the architecture based on method calls and inheritance to extracting the data flow during runtime to check it against the predefined structure. 
 For model-driven and generative software development, the task of extracting architecture is more complex than in traditional projects, because it passes through different layers of abstraction and possibly multiple DSLs. 
