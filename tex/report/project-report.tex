@@ -250,31 +250,21 @@ To get a view of the change of the dependencies explicitly, we combine a2a and c
 
 \begin{figure*}[!t]
 	\centering
-	\includegraphics[width=7in]{assets/overview.pdf}
-	\caption{Overview of the process~\sn{I still find figures 1 and 2 confusing.. there is a relationship between them but some things are not consistent.. Can you unify this in one figure with clearer steps and then modify the text description accordingly?}}
-	\label{overview}
+	\includegraphics[width=7in]{assets/combined.pdf}
+	\caption{Process from Dataset to Change Metrics}
+	\label{architecture}
 \end{figure*}
 
 \input{assets/projects}
 
 To establish the relationship between architectural changes and CI build outcome, we need to determine the architectural changes that occurred between two versions of the system.
 In this section, we describe the methodology we use to calculate these architectural changes.
-Figure~\ref{overview} shows an overview of the methodology we use.
-On a high level, given two versions of the source code, we extract the class structure of each version and use it to reconstruct each architecture. We then compare both architectures to calculate a set of change metrics. 
-We implement a framework in Java to extract the considered architectural change metrics between two commits of a given project.
-Figure \ref{frameworkStructure} shows an overview of the structure of our framework.
+Figure \ref{architecture} shows an overview of the methodology we use.
+We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code to this commit. Inside the architecture reconstruction, we first extract the class diagram to then reconstruct an architecture based on the classes. 
+The extracted architecture is used to calculate metrics based on this architecture and these metrics are then compared with the architecture metrics from another commit to compute a set of architectural change metrics.
 The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}} \todo{URL change}
-
-\begin{figure}[!t]
-	\centering
-	\includegraphics[width=3.45in]{assets/architecture.pdf}
-	\caption{Structure of the Framework~\sn{see my comments about improving this diagram.. In general, it needs to be clear the input/output of each process and the order.. For example, extractor and reconstructor appear as parallel things while it seems that one uses the output of the other.. If you want to indicate they are part of the same step, you can put a bigger dotted box around them for instance}} \todo{not yet processed}
-	\label{frameworkStructure}
-\end{figure}
-
-
  
-\paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database~\sn{please say TravisTorrent in the box instead of "Database".. also differentiate between process/step boxes and input/output sources.. right now, all are boxes but the boxes mean different things. Maybe also use Step 1, Step 2 etc. in the figure. For a process, use nouns "Repo Downloader" etc. or verbs "Download Repo" .. the important thing is to be consistent and to use meaningful names}. \todo{not yet processed}
+\paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database.
 
 \paragraph{Step 2} uses the commit ID extracted in step 1 to download a snapshot of the project from GitHub.
 
@@ -314,7 +304,7 @@ The first is ACDC, because it has one of the best reconstruction accuracy rates 
 While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (in our work $10\%$ of the builds, $11\%$ in Vassallo et. al \cite{CIFailTypes}) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}\jk{right, I changed it to use there}
 
 The second reconstruction technique is package reconstruction, which is often used as ground truth analysis \cite{arcRec-comparison}. 
-~\sn{ cite source? and also why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything} 
+\sn{ why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything} 
 We implemented this techniques ourselves based on the HUSACCT extraction.
 This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?}\jk{by me ... I needed to define a value, so I tried to find one, which gave results that seemed to be components} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. 
 
