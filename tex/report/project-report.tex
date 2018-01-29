@@ -69,7 +69,11 @@ Not only meta-data, but also source code metrics impact the build outcome \cite{
 because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. 
 In this paper, we further investigate such source code metrics. 
 Bengtsson \cite{arc-metrics} has adapted source code metrics so that they are metrics for software architecture. Therefore, they should should also impact the build outcome. 
-~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architecture}s  Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}. For example will a build break if a timing constraint is introduced, so that the code itself is not working anymore in the necessary parameters. Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
+~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architectures} \jk{this better?}
+Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}.
+For example will a build break if a timing constraint is introduced, so that the code itself is not working anymore in the necessary parameters.
+\jk{now clear?}
+Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
 To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
@@ -78,7 +82,6 @@ Paixao~\sn{you sometimes have the special character in this name and sometimes n
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
 
 In this work, we explore the relationship between architectural change and CI build outcome.
-~\sn{when talking about things that you are doing, try to always use the active voice.. I changed things in the intro already but just so you are aware in the future and in next drafts}
 We analyze $159$ Java Maven software systems from the TravisTorrent dataset~\cite{TravisTorrent}. 
 We extract the architectural changes in every CI build by comparing the corresponding version of the system to its predecessor.
 We use eight different architecture metrics from the literature to evaluate architectural changes.  
@@ -129,12 +132,12 @@ Other approaches for reconstructing architecture are ACDC or ARC, which are intr
 \subsection{Continuous Integration}
 
 Islam and Zibran \cite{FailsCorr} have studied the relationship between build outcome, and project and build metrics. 
-They found that the size of the project, the test code~\sn{not sure what that means: test code}\jk{when I write a test, this is "test code"}, and the development branch (i.e. the branch from which the build is initiated) \sn{what does the "Development branch" refer to? is it which branch used for the build?} all do not affect the build outcome.
+They found that the size of the project, the test code~\sn{not sure what that means: test code}\jk{when I write a test, this is "test code"}, and the development branch (i.e. the branch from which the build is initiated) all do not affect the build outcome.
 On the other hand, the build tool used (e.g. Maven or Ant) as well as the number of changed lines and files do have an impact on the build outcome.
 The fact that the previous research found that the number of changed lines and files affects the build result suggests that investigating the relationship between architectural changes and build outcome is conclusive.~\sn{I don't like the term "is a valid idea" but can't think of something better now} \jk{I tried with "conclusive", what do you think?}
 
 In 2006, a study by Hassan and Zhang~\cite{Pred-Tree} used decision trees to investigate the relation between build failures and the meta data of developers and the project.
-They achieved an specificity rate \footnote{Specificity: Rate between true negative and all negatives}~\sn{I don't know what specificity rate is.. is this an actual term? If so, change the accuracy that I use} of 69\%.
+They achieved an specificity rate \footnote{Specificity: Rate between true negative and all negatives}~\sn{I don't know what specificity rate is.. is this an actual term? If so, change the accuracy that I use} \jk{added a footnote} of 69\%.
 In an follow-up work by Ni and Li as part of the MSR '17 challenge, the prediction accuracy was further improved by using cascading tree classifiers as well as additional information about the outcome of the previous build\cite{Pred-Cascade}. 
 In that research, the prediction was only done per project, because they aim to predict the error only based on this project's specific data. In consequence, the prediction is getting more accurate as more builds are in the history.
 While this is certainly useful in practice, it does not help to mitigate the reasons of failing builds on a more general (i.e. cross-project) level.
@@ -310,7 +313,9 @@ In Step 3b, we reconstruct the architecture of the current version of the system
 The first is ACDC, because it has one of the best reconstruction accuracy rates when compared to other commonly used techniques \cite{arcRec-comparison}. 
 While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (in our work $10\%$ of the builds, $11\%$ in Vassallo et. al \cite{CIFailTypes}) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}\jk{right, I changed it to use there}
 
-The second reconstruction technique is package reconstruction, which is often used as ground truth analysis \cite{arcRec-comparison} ~\sn{cite source? and also why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything}. We implemented this techniques ourselves based on the HUSACCT extraction.
+The second reconstruction technique is package reconstruction, which is often used as ground truth analysis \cite{arcRec-comparison}. 
+~\sn{ cite source? and also why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything} 
+We implemented this techniques ourselves based on the HUSACCT extraction.
 This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?}\jk{by me ... I needed to define a value, so I tried to find one, which gave results that seemed to be components} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. 
 
 \paragraph{Step 4} calculates the architectural changes between two given commits.
@@ -332,7 +337,7 @@ c_{rel}(m_1, m_2) =  \max\{m1, m2\} - \min\{m1, m2\}
 
 We save the corresponding comparison results of each pair of architectures, corresponding to two consecutive commits, in a JSON file. Given the architecture of our framework, our methodology can easily be expanded with more architecture reconstructors or metric calculators. 
 
-~\sn{the rest of this paragraph is not clear.. and I wonder if it should be moved somewhere else} 
+~\sn{the rest of this paragraph is not clear.. and I wonder if it should be moved somewhere else} \jk{reformulated}
 To add another module to the framework, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. 
 In this way, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
 
