@@ -250,7 +250,7 @@ To get a view of the change of the dependencies explicitly, we additionally use 
 \begin{figure*}[!t]
 	\centering
 	\includegraphics[width=7in]{assets/combined.pdf}
-	\caption{Process from Dataset to Change Metrics \jk{Is this figure better?}}
+	\caption{Process from Dataset to Change Metrics \jk{Is this figure better?}~\sn{it is but still everything is the same type of boxes.. you should have different boxes for data vs. processes/steps. For example, Calculator is a step/process while class diagram is an output. I typically like to have boxes for processes and then icons representing the data with a label under them for input/output}}
 	\label{architecture}
 \end{figure*}
 
@@ -259,9 +259,11 @@ To get a view of the change of the dependencies explicitly, we additionally use 
 To establish the relationship between architectural changes and CI build outcome, we need to determine the architectural changes that occurred between two versions of the system.
 In this section, we describe the methodology we use to calculate these architectural changes.
 Figure \ref{architecture} shows an overview of the methodology we use.
-We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code to this commit. Inside the architecture reconstruction, we first extract the class diagram to then reconstruct an architecture based on the classes. 
-The extracted architecture is used to calculate metrics based on this architecture and these metrics are then compared with the architecture metrics from another commit to compute a set of architectural change metrics.
+We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code at this commit. Inside the architecture reconstruction step, we first extract the class diagram and then reconstruct the architecture based on the classes. 
+The calculator calculates the architectural metrics based on this extracted architecture, and the comparator then compares these metrics against metrics calculated from another commit to compute the architectural change metrics. 
 The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}} \todo{URL change}
+ 
+ \sn{ the step numbers need to be reflected in the figure}
  
 \paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database.
 
@@ -271,9 +273,11 @@ The complete source code of the framework, as well as our results which are expl
 \paragraph{Step 3} extracts the architecture information needed to compare two commits in the next step. 
 Specifically, Step 3 is split into two parts, (a) the extraction of the class structure and (b) the reconstruction of the architecture. 
 
-In Step 3a, we use the extractor of the HUSACCT framework \cite{Husacct1} to extract relation triples in the form of relationship type, source, target (see listing \ref{lst1:rsf}), and save this information in the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this format. This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. 
-~\sn{I don't understand the next part about the downside. please elaborate} The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. That is compareable to the absence of a \texttt{getVertices()} method, and you need to traverse all dependencies to get a full list of the nodes. \jk{does this help?}
-Fortunately, this is irrelevant for our work. For simplicity the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``subPkg'' means that a package is a sub package of another one, ``contains'' means that that a package contains a Java type, and ``references'' is any dependency between two Java types. The results are then fed into the reconstruction.
+In Step 3a, we use the extractor of the HUSACCT framework \cite{Husacct1} to extract relation triples in the form of relationship type, source, target (see listing \ref{lst1:rsf}), and save this information in the Rigi Standard Format (rsf) \cite{RSF}, because the ARCADE tools rely on this format. 
+%This relational system is easy convertible into a graph structure or a database and stores the modules implicitly in the dependencies. 
+%~\sn{I don't understand the next part about the downside. please elaborate} The downside of this format is that the modules cannot be extracted separately but only implicitly while analyzing the dependencies. That is compareable to the absence of a \texttt{getVertices()} method, and you need to traverse all dependencies to get a full list of the nodes. \jk{does this help?}
+%Fortunately, this is irrelevant for our work. 
+For simplicity, the dependency types are restricted to ``subPkg'', ``contains'' and ``references'', where ``subPkg'' means that a package is a sub package of another one, ``contains'' means that that a package contains a Java type, and ``references'' is any dependency between two Java types.
 
 \begin{figure}[!t]
 	\centering
@@ -298,23 +302,22 @@ references checkstyle.Factory checkstyle.Main
 
 \input{assets/metrics}
 
-In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We use two different architecture reconstruction techniques.
+In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We use two different architecture reconstruction techniques to ensure that any findings we have are not as a result of a problem or bias in one technique.
 
 The first is ACDC, because it has one of the best reconstruction accuracy rates when compared to other commonly used techniques \cite{arcRec-comparison}. 
-While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds (in our work $10\%$ of the builds, $11\%$ in Vassallo et. al \cite{CIFailTypes}) is compilation errors, it is thus better if we can instead use directly the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first level extraction.~\sn{you don't really re-implement it then.. it is just a minor modification right?}\jk{right, I changed it to use there}
+While an implementation of ACDC is provided in the ARCADE framework, this implementation works directly on the Java byte code.  Given that a common reason for failing builds is compilation errors~\cite{CIFailTypes}, it is thus better if we can instead directly use the source code for extracting the architecture. This is why we have Step 3a where we extract the class structure using the source-based HUSACCT extractor, and then feed that information into ACDC after deactivating its own first-level extraction.
 
-The second reconstruction technique is package reconstruction, which is often used as ground truth analysis \cite{arcRec-comparison}. 
-\sn{ why do we need two techniques ?} \jk{we use 2, because I found the ACDC architecture confusing to use. And when we have two, we can claim, that its not the fault of the recovery technique, that we didn't find anything} 
-We implemented this techniques ourselves based on the HUSACCT extraction.
-This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, so that the achieved results were the most consistent with the believed~\sn{believed? by who?}\jk{by me ... I needed to define a value, so I tried to find one, which gave results that seemed to be components} intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. 
+The second reconstruction technique we use is package reconstruction, which is often used to compare the implemented architecture to the documented one \cite{arcRec-comparison}. 
+We implemented this technique ourselves based on the HUSACCT extraction.
+This technique looks for the root packages in the system. If there are only a few root packages, it is assumed that the implemented architecture lies a level deeper in the packages. For example, if there is only the ``org.sonar'' as root, this is just the base container and not an architectural element. Therefore, all direct children of this package are considered as modules until there are at least an acceptable number of modules. In this work, we consider 10 as the minimum amount of modules needed. This number was chosen with manual sampling over different projects, such that the achieved results made sense to us after looking at the system and trying to understand its intended architecture. We follow Song et al.'s approach of considering all ``references'' edges as dependencies~\cite{ArcAsGraph}. 
 
 \paragraph{Step 4} calculates the architectural changes between two given commits.
-As explained in Section \ref{sec:Metrics}, we use the ARCADE metrics a2a and cvg as well as Martin's metrics. We calculate the ARCADE metrics on the architecture extracted by ACDC. Cvg is calculated twice, one based on the modules of the first version (called \textit{source}) and one based on the second version (called \textit{target}).
-The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics, some basic information on the package based architecture and the Martin's metrics; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.
+As explained in Section \ref{sec:Metrics}, we use the ARCADE metrics a2a and cvg as well as Martin's metrics. We calculate the ARCADE metrics based on the architecture extracted by ACDC. Cvg is calculated twice, one based on the modules of the first version (called \textit{source}) and one based on the second version (called \textit{target}).
+The coupling metrics are calculated on the package architecture to have some ground truth metrics for comparison. We calculate five package metrics, some basic information on the package based architecture and the Martin's metrics; thus, we have 8 metrics in total summarized in Table \ref{tableMetric}.~\sn{paraphrase the previous sentence.. not sure if "Some basic information..." is an interpretation of the 5 package metrics or if these are additional metrics}
 For every module, the absolute number of incoming and outgoing edges are calculated, the degree of the node (sum over ingoing and outgoing edges), as well as the absolute and relative instability. The absolute instability is based on the absolute number of connections between the modules, i.e. if Module A has only three ingoing connections from Module B, then the afferent coupling is considered three. For the relative instability, the coupling is booleanized, i.e. is $0$ if there is no connection or $1$ if there is one, so it is not measured how tightly connected two modules are, just if they are connected at all.
 Since we need to calculate the change for the complete architecture, and not for each module, we calculate the mean instabilities and node degree as well as the absolute number of modules (vertexes) and dependencies (edges).
 
-We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}. For metrics with absolute numbers, like node degree, we calculate the similarity as the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
+We then perform a pairwise comparison of each metric. To compare proportional metrics, like instability, the difference between the values is taken, e. g. if architecture A has an average instability of $30\%$, and architecture B has an average instability of $25\%$, then they are $5\%$ different to each other (Equation \ref{eq:relDiff}). For metrics with absolute numbers, like node degree, we calculate the similarity as the proportion of the two values, e.g. A has an average node degree of $8$ and B has $10$, then they are $80\%$ similar, i.e. $20\%$ change (Equation \ref{eq:absDiff}).
 
 \begin{equation} \label{eq:relDiff}
 c_{rel}(m_1, m_2) =  \max\{m1, m2\} - \min\{m1, m2\}
@@ -327,24 +330,27 @@ c_{rel}(m_1, m_2) =  \max\{m1, m2\} - \min\{m1, m2\}
 
 We save the corresponding comparison results of each pair of architectures, corresponding to two consecutive commits, in a JSON file. Given the architecture of our framework, our methodology can easily be expanded with more architecture reconstructors or metric calculators. 
 
-~\sn{the rest of this paragraph is not clear.. and I wonder if it should be moved somewhere else} \jk{reformulated}
 To add another module to the framework, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. 
-In this way, we have combined HUSACCT and ACDC and integrated it with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics, so that both ways of computing change can be run independent or simultaneous (Fig. \ref{implToolchain}).
+This is how we managed to combine HUSACCT and ACDC and integrate them with the ARCADE metrics. Similarly, we have implemented the package reconstruction and metrics~\sn{which metrics?}, so that both ways of computing change can be run be run individually or simultaneously (Fig. \ref{implToolchain}).
 
-\jk{this paragraph has to be in section AC, not CI build}
-Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. ~\sn{don't understand the next part} \jk{clearer now?}
+\jk{this paragraph has to be in section AC, not CI build}~\sn{I don't see why this needs to be here.. it is part of your setup.. it is not really part of the methodology for architecture extraction}
+Because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}, we limit the study to only one build tool. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Therefore, we choose the build tool maven with its convention over configuration paradigm. In this way, we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction. ~\sn{don't understand the next part} \jk{clearer now?}~\sn{not really.. perhaps first explain how a commit can be involved in more than one CI build and then explain which of those commits you use. also, this should again not be in this section. This is not related to the extraction methodology but rather to which commits you feed the methodology}
 Some commits get built more than once. Because it is impossible that the architecture changes between these builds, we only consider one of them. 
-We haven chosen the first build which uses this commit, because the following builds change most likely only the configuration of the CI server. 
+We haven chosen the first build that uses this commit, because the following builds change most likely only the configuration of the CI server. 
 Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
 
 \section{Methodology for CI Build Outcome Extraction}
 \label{sec:ci-build-outcome}
 
-\jk{Is this better?}
 The extracted architecture change metrics are compared and correlated to software faults. In this study, we use the CI build outcome as a metric for faults. 
-As Vassallo et al. \cite{CIFailTypes} described, there are different type of failures in a build. They classify based on the Maven goals. Given that we already introduced compilation errors as one possible source for failing builds, this is a sound approach. Because we cannot run every maven goal separately for every build we analyze, since it is too costly, we use a simpler approach. 
-Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. Still, we base our heuristic on the Maven goals.
-Hence, we analyze the log files from TravisCI for all builds, to classify the build outcome further, than in success and failure. We used a heuristic to filter first lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for ``Compilation failure'', ``dependencies'' or ``test failures'' to categorize the failures. We map this with the actual build result to mitigate errors in the heuristic, so that only if the actual build failed, we use one the fail categories. We end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure or (4) unknown error. 
+As Vassallo et al. \cite{CIFailTypes} described, there are different types of build failures, classified based on the Maven goals. 
+%I do not understand the next part at all so I tried to simplify
+%Given that we already introduced compilation errors as one possible source for failing builds, this is a sound approach. 
+Because it is very costly to run every maven goal separately for every build we analyze and because some builds have dependencies that need to be manually installed, it is not feasible to re-build the system ourselves for every trigger commit.
+Instead, we use the following simplified strategy to identify the reason for the failed build.
+%Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. 
+%Still, we base our heuristic on the Maven goals.
+We first differentiate between failed and passed builds by looking at their status in the TravisTorrent dataset. For failed builds, we first identify lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for the keywords ``Compilation failure'', ``dependencies'', or ``test failures'' to further categorize the failures~\sn{Are these exact words used for the search?}. Accordingly, we end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure, or (4) unknown error. The fourth category is for errors that we could not identify using our heuristic.
 
 \section{Evaluation Setup}
 
