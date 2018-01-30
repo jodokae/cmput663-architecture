@@ -43,7 +43,7 @@
 
 \begin{abstract}
 Continuous Integration (CI) is becoming an essential component in the software development process.
-However, the time cost of a CI build may often be high, if the build is broken.~\sn{isn't the cost of a build high regardless of whether it passes or fails?} \jk{The general cost of a CI build should be low. Only the time to fix a broken build is costly.}
+However, developers often need to spend time fixing broken CI builds.
 Therefore, identifying reasons for build failure and warning developers about these likely failures can save valuable time and cost for developers.
 In this paper, we investigate if there is a relationship between architectural changes and CI build outcomes.
 We form two hypotheses about the relationship: (1) architectural changes lead to higher CI build failures and (2) higher CI build failures lead to architectural changes.
@@ -61,24 +61,20 @@ To enable other researchers to replicate our negative results and to investigate
 Continuous integration (CI) is nowadays a common practice in software development \cite{CI-Common}. It helps finding faults earlier and therefore reduces the costs to fix them \cite{NutzenCI}. On the other hand, build failures decrease the development pace \cite{Costs-BuildFailures}. Hence, by decreasing the number broken builds, the speed of development is increased whereby costs are decreased.
 
 There are numerous research directions for predicting CI build failures. Within the context of the MSR 2017 challenge \cite{TravisTorrent}, different approaches emerged.
-Multiple researches have been using meta-data about the person who was submitting the commit \cite{ContrInvolv} or meta-data from previous commits \cite{Pred-Cascade}. The latter study has shown that cascaded tree classifiers have achieved the best results with this type of data. ~\sn{the two parts here are not on the same "level".. cascaded tree classifiers are an ML technique and you can feed them any type of features while "the person submitting the commit" is one feature that is based on the meta data of the project. I think you want to re-write this paragraph to make it clearer that the point is to say that the majority of work done on CI failures used meta-data of the project instead of source code metrics (but plz verify that this is indeed true}. \jk{is this clearer?}
-In general, tree classifiers are a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
-These meta-data based ML approaches alone do not have high enough accuracy.
+Multiple researches have used meta-data about the person who submitted the triggering commit \cite{ContrInvolv} or meta-data from previous commits \cite{Pred-Cascade}. The latter study showed that cascaded tree classifiers achieve the best results with this type of data. 
+In general, tree classifiers have been shown to be a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
+However, meta-data based ML approaches alone do not have high accuracy.
+Previous work has shown that in addition to meta-data about a commit and its contributors, source code metrics ~\sn{add "such as X"} also impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures has been investigated by various studies \cite{MetricsSource1, MetricsSource2}. 
 
-Not only meta-data, but also source code metrics impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures was already investigates by various studies \cite{MetricsSource1, MetricsSource2}. 
-because it has been shown that source code metrics impact the build outcome \cite{FailsCorr}. 
-In this paper, we further investigate such source code metrics. 
-Bengtsson \cite{arc-metrics} has adapted source code metrics so that they are metrics for software architecture. Therefore, they should should also impact the build outcome. 
-~\sn{I think you want a better transition to the architecture focus here.. can you cite a couple of papers that look at source code metrics for CI build outcome and then also cite other papers that looked at architecture change as a source of failure then say that given that source code metrics matter in CI and previous work showed that arch. changes matter in errors, it is interesting to investigate the relationship between CI failures and architectures} \jk{this better?}
-Paix\~{a}o et al. found a correlation between CI build outcomes and non-functional requirements~\sn{is it *changes* in non-functional requirements? a relationship between CI and non-functional requirements themselves doesn't really make sense} \cite{Fail-NFReq}.
-For example will a build break if a timing constraint is introduced, so that the code itself is not working anymore in the necessary parameters.
-\jk{now clear?}
+Bengtsson \cite{arc-metrics} showed that existing source code metrics can be used to measure software architecture. 
+Given such a relationship, and the fact that source code metrics affect the build outcome~\cite{MetricsSource1, MetricsSource2, FailsCorr}, then changes in software architecture may also have an impact on the build outcome.
+Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and restrictions in the form of non-functional requirements \cite{Fail-NFReq}, e.g., restrictions on response time.~\sn{I didn't understand your sentence so tried to adjust.. but not sure if I got the meaning right}
 Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
-To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base} , e.g.  finding the causes \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, investigating the impact on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. 
+\sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. }
 
-Paixao~\sn{you sometimes have the special character in this name and sometimes not.. make sure to find the right spelling and fix it} \jk{he is a different person with the same last name but different spelling, thats maybe confusing, but it is correct this way} et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
+Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
 
 In this work, we explore the relationship between architectural change and CI build outcome.
@@ -90,27 +86,26 @@ We hypothesize that architectural changes are either (1) preceded or (2) followe
 Our intuition for the first hypothesis is that many failing builds indicate a big problem in the system, which might entail changing the architecture to solve it. 
 On the other hand, our intuition for the second hypothesis is that a change in the architecture may result in unexpected consequences that would then lead to build failures.
 
-We propose the null hypotheses:
+We propose the following null hypothesis:
 
 \paragraph{$\mathbf{H_0}$:} Architectural change does not correlate with Continuous Integration build outcome. 
+\vspace{0.2cm}
 
-To automate our investigation, we develop an extensible framework that runs a toolchain which automatically downloads snapshots of a software system, reconstructs the architecture, and computes change metrics. With only a few lines of code, new extractors, reconstructors, and metric calculators can be added. 
+To automate our investigation, we develop an extensible framework that runs a toolchain to automatically download snapshots of a software system, reconstruct the architecture, and compute change metrics. With only a few lines of code, new extractors, reconstructors, and metric calculators can be added. 
 The architecture of our framework allows us to easily reuse existing architectural extraction tools and metrics, namely HUSACCT \cite{Husacct1}, ARCADE \cite{Arcade}, and Martin's metrics \cite{martinsMetrics}.
 
-Our analysis of almost $50,000$ commits using two different architecture reconstruction techniques shows that almost no significant correlation exists between architecture changes and CI build outcome. In total, we investigated $48$ different correlations using $32$ configurations. Based on our results, we are unable to reject the null hypothesis. Architectural change does not correlate, and therefore does not impact, with build outcome.
-~\sn{should we formulate this as accepting the null hypothesis? Typically, you formulate things using the null hypothesis and if you find a correlation, you reject the null hypothesis} \jk{done}
-
+Our analysis of almost $50,000$ commits using two different architecture reconstruction techniques shows that almost no significant correlation exists between architecture changes and CI build outcome. In total, we investigated $48$ different correlations using $32$ configurations. Based on our results, we are unable to reject the null hypothesis. Based on our findings, it seems that architectural change does not correlate, and therefore does not impact, with build outcome.
 
 To summarize, the main contributions of this paper are:
 \begin{itemize}
-\item The combination of architectural change and build outcome prediction
-\item The development of an easy extensible framework for 
+\item The first study to investigate the relationship between architectural change and CI build outcome.
+\item An open-source extensible framework for 
 \begin{itemize}
-	\item source code and log mining
+	\item source code and log mining~\sn{is that part of the framework ?}
 	\item architecture reconstruction
 	\item architecture metric calculation
 \end{itemize}
-\item comprehensive study of almost $50,000$ commits
+\item A large-scale empirical study of almost $50,000$ commits that shows that there is no significant correlation between architectural changes and CI build outcome.
 \end{itemize}
 
 
