@@ -64,15 +64,15 @@ There are numerous research directions for predicting CI build failures. Within 
 Multiple researches have used meta-data about the person who submitted the triggering commit \cite{ContrInvolv} or meta-data from previous commits \cite{Pred-Cascade}. The latter study showed that cascaded tree classifiers achieve the best results with this type of data. 
 In general, tree classifiers have been shown to be a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
 However, meta-data based ML approaches alone do not have high accuracy.
-Previous work has shown that in addition to meta-data about a commit and its contributors, source code metrics ~\sn{add "such as X"} also impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures has been investigated by various studies \cite{MetricsSource1, MetricsSource2}. 
+Previous work has shown that in addition to meta-data about a commit and its contributors, source code metrics, such as changed lines of source or test code, also impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures has been investigated by various studies \cite{MetricsSource1, MetricsSource2}. 
 
 Bengtsson \cite{arc-metrics} showed that existing source code metrics can be used to measure software architecture. 
 Given such a relationship, and the fact that source code metrics affect the build outcome~\cite{MetricsSource1, MetricsSource2, FailsCorr}, then changes in software architecture may also have an impact on the build outcome.
-Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and restrictions in the form of non-functional requirements \cite{Fail-NFReq}, e.g., restrictions on response time.~\sn{I didn't understand your sentence so tried to adjust.. but not sure if I got the meaning right}
+Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and restrictions in the form of non-functional requirements \cite{Fail-NFReq}, e.g., restrictions on response time.
 Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
-\sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. }
+\sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. } \jk{do you want to remove the next part completely or just move it maybe to Rel Work? I like the implication done by that work, so I would like to to keep it somewhere. We're talking about the paragraph based on \cite{ImpactAwareness}, right?}
 
 Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
@@ -101,7 +101,7 @@ To summarize, the main contributions of this paper are:
 \item The first study to investigate the relationship between architectural change and CI build outcome.
 \item An open-source extensible framework for 
 \begin{itemize}
-	\item source code and log mining~\sn{is that part of the framework ?}
+	\item source code and log mining~\sn{is that part of the framework ?} \jk{yes, the framework is directly connected to the TravisTorrent dataset (interchangable), so I have written a module for log mining. So yes, it's integrated, but more as a side module}
 	\item architecture reconstruction
 	\item architecture metric calculation
 \end{itemize}
@@ -262,7 +262,8 @@ In this section, we describe the methodology we use to calculate these architect
 Figure \ref{architecture} shows an overview of the methodology we use.
 We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code to this commit. Inside the architecture reconstruction, we first extract the class diagram to then reconstruct an architecture based on the classes. 
 The extracted architecture is used to calculate metrics based on this architecture and these metrics are then compared with the architecture metrics from another commit to compute a set of architectural change metrics.
-The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}} \todo{URL change}
+The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/msr18-arch/msr18-arch} - Note that this is an anonymized GitHub repo to comply with the double blind policy.}
+%TODO Change back for release
  
 \paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database.
 
