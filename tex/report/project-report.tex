@@ -269,7 +269,7 @@ In this section, we describe the methodology we use to calculate these architect
 Figure \ref{architecture} shows an overview of the methodology we use.
 We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code at this commit. Inside the architecture reconstruction step, we first extract the class diagram and then reconstruct the architecture based on the classes. 
 The calculator calculates the architectural metrics based on this extracted architecture, and the comparator then compares these metrics against metrics calculated from another commit to compute the architectural change metrics. 
-The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\footnote{\url{https://github.com/msr18-arch/msr18-arch} - Note that this is an anonymized GitHub repo to comply with the double blind policy.}}
+The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/msr18-arch/msr18-arch} - Note that this is an anonymized GitHub repo to comply with the double blind policy.}
 %TODO Change back for release
  
 \paragraph{Step 1} extracts the unique commit ID of each CI build from the TravisTorrent database.
