@@ -1,5 +1,4 @@
-\documentclass[sigplan, anonymous, review]{acmart}
-%\documentclass[sigconf]{acmart}
+\documentclass[sigconf, anonymous, review]{acmart}
 
 %\usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -12,8 +11,8 @@
 \usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{numprint}
-%\usepackage{booktabs} % For formal tables
-%\usepackage{balance}
+\usepackage[flushleft]{threeparttable} % For Table Notes
+\usepackage{balance}
 
 \newcommand{\sn}[1]{{\color{blue}\textbf{Sarah:}~#1}}
 \newcommand{\jk}[1]{{\color{violet}\textbf{Johannes:}~#1}}
@@ -149,7 +148,6 @@ Software architecture is a well-researched topic in software engineering.
 There are generally two directions of research in the area.
 The first is related to the reconstruction of the implemented architecture from the code, while the second is related to comparing this reconstructed architecture against (a) the intended or documented architecture and (b) different versions of the system (i.e., architecture evolution).
 Since most research about comparing architectures also needs to study reconstruction, we will focus this section on architecture conformance checking and architecture evolution.
-\sn{note: there is a page limit of 10pages of content + 2 for references so I'm cutting unnecssary things as I go}
 
 \subsubsection{Conformance Checking}
 
@@ -386,7 +384,7 @@ We consider the individual failure types when studying individual builds.
 However, for testing in the near past and future (i.e., preceding or next $b$ builds, we simply use two categories, one for failure and one for success. In this way, we get a single integer of how many builds failed, instead of having multiple variables. 
 Then, for every architectural metric, we discretize it from its continuous value into the two categories 'change' and 'no-change'. For that, we consider a threshold $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$, where every change above this threshold is considered a change, and everything below as no change. 
 We chose this range of thresholds, because most of the architectural changes in our dataset were small (Figure \ref{fig:histograms}). 
-\sn{this next sentence is not clear} We take different thresholds at all to figure out if small changes affect the measured correlation. 
+We consider change at different thresholds to figure out if small changes affect the measured correlation. 
 For every calculated comparison that includes no Boolean variables, the correlation test is run with Pearson's test, while others are run with Spearman's test. 
 
 \begin{figure*}[!t]
@@ -448,7 +446,10 @@ Only a2a has more changing builds than non-changing builds.
 However, an investigation of these changes in Figure~\ref{a2aHist} shows that most of the changes have a really small a2a value. 
 Most other plots in Figure \ref{fig:histograms} show that for the other metrics, most changes are quite small as well, with only few big architectural changes. 
 Only the number of nodes shown in Figure \ref{numNodesHist} has more widespread changes.
-This could be due to the nature of the reconstruction process. Since we enforce a minimum number of ten nodes per architecture in the package-architecture reconstruction, we cannot have only nine modules. Assume the architecture is changing from ten to nine modules, another layer of module separation is exectured~\sn{what's the previous word? fix.. also the previous sentence is generally not clear}. This will result in a change that is much bigger, because most packages will have more than one sub package. So the change will most likely be from ten to something above 18~\sn{no idea how you got this 18}. The effects of this red line~\sn{what red line?} are not as bad as they sound, because the node degree and number of edges metrics are in the expected norm, so this suggests that the few outliers do not negatively affect the results.
+This could be due to the nature of the reconstruction process. Since we enforce a minimum number of ten nodes per architecture in the package-architecture reconstruction, we cannot have only nine modules. 
+Assume the architecture had ten modules and one gets removed. Then, because nine is not allowed, all nine modules get split up into their submodules, if possible. 
+Because most packages will have more than one sub package, the resulting architecture will probably have around $18$ modules (two for each previous module). Consequently, the calculated change is larger than the actual one.
+The effects of this are not as bad as they sound, because the node degree and number of edges metrics are in the expected norm, so this suggests that the few outliers do not negatively affect the results.
 
 Before using the calculated metrics in further analyses, we need to ensure that our chosen metrics make sense in practice and do not all measure the exact same aspect of architectural evolution. Thus, we calculate the Pearson correlation between all the metrics we use, shown in Table \ref{tableMetricCorr}. All p values for these correlations were equal or close to 0; the highest p value we got from all the cross-metric correlations is $3.7 \cdot 10^{-102}$. 
 We consider a correlation above $60\%$ as highly correlated, and everything below $30\%$ as low correlation.
@@ -462,7 +463,7 @@ a2a and cvg highlight the change at the module level, whereas Martin's metrics f
 
 \subsection{Relationship Between Architectural Changes and Build Outcome}
 
-We find that on average, $16\%$ of all builds that had architectural changes failed ($P(f|c)$).~\sn{next three sentences not clear. Do you want to say that "Obviously, this percentage varies with the metric and threshold used. The concrete range of values we found with the different variations is between $8\%$ and $18\%$"? I'm not sure though if 16 is the average and if not, what is it} Of course, depending on the change threshold taken, this number ranges. But all metrics showed at least at some point these $16\%$. The complete range of the values is between $8\%$ and $18\%$. 
+We find that on average, $16\%$ of all builds that had architectural changes failed ($P(f|c)$). Obviously, this percentage varies with the metric and threshold used. The concrete range of values we found with the different variations is between $8\%$ and $18\%$, whereupon six of the eight metrics had $16\%$ as their upper or lower bound, one metric had this value as its mean and the eighth metric ranged from $12\%-18\%$, i.e. has no statistical significant deviation.
 If we check for the probability of change under the condition that the build failed ($P(c|f)$), we get a range from $0\%$ up to $60\%$, based on the metric and the change threshold. For the package metrics, the probability was almost always low, but the ARCADE metrics have more interesting results. First, the probability drastically decreases as the change threshold increases. If we look at the probability of architectural change according to the a2a metric and we consider every change as an architectural change (i.e. change threshold at $0.0$), then we end up with a $61\%$ probability. Of course, this is natural since we do not change the number of failing builds but the number of considered changes when we change the threshold of what we consider a change. 
 Because of the constant values around $p(f|c) = 16\%$ and peak values for $p(c|f)$ with $61\%$ for a2a and $35-36\%$ for cvg, we are led to the conclusion that there is the possibility for correlation between architectural change and CI build outcome.
 
@@ -476,7 +477,7 @@ Nevertheless, in Figure \ref{a2aPlot}, we compute the correlation values over th
 The highest correlation found for a2a was the one with a change threshold of $0.0$, i.e. every little change was considered as an architectural change. However, even the strongest correlation we found, in a realistic scenario, was only $4\%$ over the next ten builds.
 
 Some of the metrics have low p-values, which indicates that there is a statistically significant relationship between build outcome and those metrics. However, the detected correlation is so small that we cannot conclude this as a meaningful impact. Because taking the smallest changes into consideration increases the correlation coefficient, and the threshold for previous and following builds had no significant change on the correlation coefficient, we conclude that the stronger correlations could be noise. 
-The strongest correlation was found with the a2a metric, which works on the modules and does not consider the relationship between them. Therefore, the possible correlation happens not in the interaction between the modules, but the modules themselves.~\sn{previous sentence not clear} Furthermore, over all correlations, the tendency was towards a positive value, with only $38\%$ negative correlation values. Because we encoded the outcome of no build error as zero, this suggests that architectural change is occurring more often around failing builds, whereas the architecture stays the same around non-failing builds. That is, if there truly is a correlation.
+The strongest correlation was found with the a2a metric, which works on the modules and does not consider the relationship between them. Therefore, the cause of the possible correlation lies not in the interaction between the modules, but in the modules themselves. Furthermore, over all correlations, the tendency was towards a positive value, with only $38\%$ negative correlation values. Because we encoded the outcome of no build error as zero, this suggests that architectural change is occurring more often around failing builds, whereas the architecture stays the same around non-failing builds. That is, if there truly is a correlation.
 
 \begin{figure}[!t]
 	\centering
@@ -516,7 +517,7 @@ Because this work introduces an easy expandable framework, this should be possib
 
 We analyzed $49,531$ builds from $159$ different Java Maven projects from various domains to determine the relationship between architectural changes and continuous integration build outcome.
 We designed an extensible framework that currently uses one extractor to identify source code facts, two architecture reconstructors, and three architecture evolution metrics based on previous research.
-In total, we tested the correlation between $8$ architecture change metrics and build outcome in $6$ different constellations\sn{constellations is a strange word to use here}, including the previous and following builds, and multiple change thresholds.
+In total, we tested the correlation between $8$ architecture change metrics and build outcome in $6$ different use cases, including the previous and following builds, and multiple change thresholds.
 Our results show that there is no significant relationship between architectural changes and build outcome.
 
 We could not reject the null hypothesis that architectural change does not affect CI build outcomes at or near the change. The highest correlation found was around $4\%$ and would imply that architectural changes lead to fewer failures. 
