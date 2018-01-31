@@ -68,15 +68,16 @@ There are numerous research directions for predicting CI build failures. Within 
 Multiple researches have used meta-data about the person who submitted the triggering commit \cite{ContrInvolv} or meta-data from previous commits \cite{Pred-Cascade}. The latter study showed that cascaded tree classifiers achieve the best results with this type of data. 
 In general, tree classifiers have been shown to be a useful machine learning (ML) technique to predict build outcome using meta data about the current and previous commits \cite{Pred-Tree}. 
 However, meta-data based ML approaches alone do not have high accuracy.
-Previous work has shown that in addition to meta-data about a commit and its contributors, source code metrics ~\sn{add "such as X"} also impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures has been investigated by various studies \cite{MetricsSource1, MetricsSource2}. 
+Previous work has shown that in addition to meta-data about a commit and its contributors, source code metrics, such as changed lines of source or test code, also impact the build outcome \cite{FailsCorr}. The impact of source code metrics on bugs and failures has been investigated by various studies \cite{MetricsSource1, MetricsSource2}. 
 
 Bengtsson \cite{arc-metrics} showed that existing source code metrics can be used to measure software architecture. 
 Given such a relationship, and the fact that source code metrics affect the build outcome~\cite{MetricsSource1, MetricsSource2, FailsCorr}, then changes in software architecture may also have an impact on the build outcome.
-Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and restrictions in the form of non-functional requirements \cite{Fail-NFReq}, e.g., restrictions on response time.~\sn{I didn't understand your sentence so tried to adjust.. but not sure if I got the meaning right}
+Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and restrictions in the form of non-functional requirements \cite{Fail-NFReq}, e.g., restrictions on response time.
 Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
 \sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. }
+\jk{do you want to remove the next part completely or just move it maybe to Rel Work? I like the implication done by that work, so I would like to to keep it somewhere. We're talking about the paragraph based on \cite{ImpactAwareness}, right?}
 
 Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
@@ -105,7 +106,7 @@ To summarize, the main contributions of this paper are:
 \item The first study to investigate the relationship between architectural change and CI build outcome.
 \item An open-source extensible framework for 
 \begin{itemize}
-	\item source code and log mining~\sn{is that part of the framework ?}
+	\item source code and log mining~\sn{is that part of the framework ?} \jk{yes, the framework is directly connected to the TravisTorrent dataset (interchangable), so I have written a module for log mining. So yes, it's integrated, but more as a side module}
 	\item architecture reconstruction
 	\item architecture metric calculation
 \end{itemize}
@@ -144,21 +145,31 @@ Rausch et al. \cite{FailsinCIFlow} also studied reasons for failing builds. They
 \subsection{Architecture}
 \label{sec:relwork-arch}
 
-\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} \todo{citation done, revamp TODO, not yet quite sure how to do it}
+\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} 
+\jk{added another introductory sentence, regrouped papers into conformance and evolution, and what we use}
 
 Software architecture is a well-researched topic in software engineering.
 There are generally two directions of research in the area.
 The first is related to the reconstruction of the implemented architecture from the code, while the second is related to comparing this reconstructed architecture against (a) the intended or documented architecture and (b) different versions of the system (i.e., architecture evolution).
-We discuss related work from both these general directions.
+Since most research about comparing architectures also needs to study reconstruction, we will focus this section on architecture conformance checking and architecture evolution.
 
-Already in 2001 the Gail Murphy's reflexion models \cite{MurphyRefl} considered the gap between designed and actual architecture of a software system as a problem. For that, they developed a technique to map the reverse engineered model with the designed or expected one to visualize and measure the drift between them. These reflexion models can help find violations in the architecture and are a basis for nowadays architecture conformance checking tools. 
+\subsubsection{Conformance Checking}
 
 The ARAMIS workbench \cite{Aramis} takes the step from static reconstruction of the architecture based on method calls and inheritance to extracting the data flow during runtime to check it against the predefined structure. 
 For model-driven and generative software development, the task of extracting architecture is more complex than in traditional projects, because it passes through different layers of abstraction and possibly multiple DSLs. 
 Thus, the way of checking consistency must account for different layers and is abstracted with architecture description languages (ADL) \cite{ArcCons,Arc-MDSE}. 
 Also using ADLs, Haitzer et al. \cite{Arc-Decision} study architectural drift and erosion. In their system, the architect can simulate multiple implementation scenarios. With the help of the ADL, the program then calculates the consequences of this change, and the architect can make an educated decision which change has the best impact on the system and its architecture. 
 
+Already in 2001 the Gail Murphy's reflexion models \cite{MurphyRefl} considered the gap between designed and actual architecture of a software system as a problem. For that, they developed a technique to map the reverse engineered model with the designed or expected one to visualize and measure the drift between them. These reflexion models can help find violations in the architecture and are a basis for nowadays architecture conformance checking tools. 
+
 Caracciolo et al. \cite{ArcConf} found that the automated checking of the implemented architecture with the intended one, leads to fewer architecture violations. They extracted the architecture using classic static analysis and a dependency graph. Their system checks then for violations of the MVC pattern and reports it directly to the developer. Over the course of time, fewer violations were found compared to a control group, which shows that the developers learned how to avoid architecture violations.
+
+HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. They argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
+The framework extracts several types of dependencies between source code elements (e.g. classes, interfaces, packages). HUSAACT needs to have a module specification, i.e. which root packages or classes are part of which architecture module. If given this, it maps the defined architecture vs the real implementation and reports violations.
+If no such specification is available, it is not possible to compare two versions of software on a higher level than the implementation graph. 
+Hillemacher \cite{MScSteffen} has compared four different tools for architecture extraction and conformance checking and elected HUSACCT to be the best extraction tool, which is what we need here.
+
+\subsubsection{Architecture Evolution}
 
 Nakamura and Basili \cite{StructDist} introduced the measuring of architectural distance using kernels. For that, both architectures need to be represented as a graph structure (here OO class structure) and are then compared for similar substructures. This solves the problems with renaming and is applicable to every graph. 
 Because it works on the complete class graph and not an abstracted version, i.e. the architecture, this technique is not viable for consistency checking, as the designed architecture is not represented down to the class level. 
@@ -167,15 +178,12 @@ Since the graph is compared to kernels, it is necessary to define a distance mea
 Tonu et al. \cite{Swag} have researched architecture stability using the SWAG kit, primarily in C and C++ projects, but also introduced support for Java.\footnote{\url{http://www.swag.uwaterloo.ca/javex/}} Using four different types of metrics, growth, change, cohesion and coupling, they try to analyze when the architecture of a software system stabilizes and then predict stability for future versions. It does so by extracting facts from the source code (or in case of Java byte code) and reconstructing the architecture. A fact can be anything, from LoC to function calls and classes. 
 In both studied projects, the architecture stabilizes relatively quickly and has only small changes afterwards. Unfortunately, we cannot use this tool in our research, because we want to study the source files and not the byte code of Java projects. But we do analyze change and coupling metrics.
 
-HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. They argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
-The framework extracts several types of dependencies between source code elements (e.g. classes, interfaces, packages). HUSAACT needs to have a module specification, i.e. which root packages or classes are part of which architecture module. If given this, it maps the defined architecture vs the real implementation and reports violations.
-If no such specification is available, it is not possible to compare two versions of software on a higher level than the implementation graph. 
-Hillemacher \cite{MScSteffen} has compared four different tools for architecture extraction and conformance checking and elected HUSACCT to be the best extraction tool, which is what we need here.
-
 In his PhD thesis \cite{arcade-thesis}, Garcia developed the ARCADE framework. It is used to detect architectural decay, also called thrift and erosion, as well as architecture smells. During this, various recovery techniques were compared \cite{arcRec-comparison}, whereat ACDC \cite{ACDC} and ARC were the most successful. 
 ACDC clusters modules based on patterns. Patterns are, for example, if two elements are in the same package, are used together, or if they depend on the same resources. For Java, ACDC recovers the architecture from the class files. ARC is introduced by Garcia himself, clusters entities based on semantic similarity using a statistical language model based on comments and identifiers in the source code.
 The ARCADE framework uses these different recovery techniques to compute similarity metrics, namely a2a (architecture to architecture) and cvg (cluster coverage) \cite{Arcade}. 
 The first one defines similarity based on the minimum number of steps to get from one architecture graph to the other. For example, removing one dependency or adding one node is each one step. While a2a looks at the architecture from a top-level perspective, cvg looks into the modules, or clusters, and computes if they are still the same module. For example, if all classes in a module are changed but the module name itself is untouched, it cannot still be considered to be the same module. Hence, it compares the entities inside the modules and only considers two modules equal, if at least $x \%$ of the entities are equal.
+
+\subsubsection{Utilization in this Study}
 
 One reason for failing builds are syntax errors. Because builds with syntax errors are uncompilable, we do not want to use recovery techniques which rely on the compiled class files. Thus, we do not use the SWAG Kit or ARCADE directly.
 However, the metrics and the recovery technique are promising in our context. Hence, we combine the strengths of HUSAACT in extracting the structure from the source files with the recovery technique ACDC and the metrics from ARCADE. 
@@ -261,7 +269,8 @@ In this section, we describe the methodology we use to calculate these architect
 Figure \ref{architecture} shows an overview of the methodology we use.
 We first read the commit ID of the build out of the TravisTorrent dataset and then download the source code at this commit. Inside the architecture reconstruction step, we first extract the class diagram and then reconstruct the architecture based on the classes. 
 The calculator calculates the architectural metrics based on this extracted architecture, and the comparator then compares these metrics against metrics calculated from another commit to compute the architectural change metrics. 
-The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\url{https://github.com/jodokae/cmput663-architecture}. Note that this is an anonymized GitHub repo to comply with the double blind policy.~\sn{make sure to change the URL}} \todo{URL change}
+The complete source code of the framework, as well as our results which are explained later, can be found online\footnote{\footnote{\url{https://github.com/msr18-arch/msr18-arch} - Note that this is an anonymized GitHub repo to comply with the double blind policy.}}
+%TODO Change back for release
  
  \sn{ the step numbers need to be reflected in the figure}
  
