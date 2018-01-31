@@ -76,8 +76,8 @@ Furthermore, Paix\~{a}o et al. found a correlation between CI build outcomes and
 Since non-functional requirements are often addressed by software architects \cite{NFR-Architects}, it is interesting to investigate if the software architecture influences the build results or is itself influenced by continuous integration. 
 This could happen if, for example, multiple builds fail and, thus, the architecture gets changed to improve the problematic area in the source code.
 
-\sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. }
-\jk{do you want to remove the next part completely or just move it maybe to Rel Work? I like the implication done by that work, so I would like to to keep it somewhere. We're talking about the paragraph based on \cite{ImpactAwareness}, right?}
+%\sn{don't think we need this next part in the intro.. if this is all work discussed in the intro, I would remove it here: To investigate the relationship between CI and software architecture, it is necessary to measure the architectural change (AC) between two builds. Architectural change has been studied by different researchers in different contexts \cite{Aramis,StructDist,Arc-MDSE,Arcade-Base}, including  finding the causes for change \cite{AC-Causes}, checking consistency with the designed architecture \cite{ArcConf, ArcCons}, and investigating the impact of the change on the business model \cite{ArcChange-Business} or the non-changed modules of the architecture \cite{Knowledge-AC}. }
+%\jk{do you want to remove the next part completely or just move it maybe to Rel Work? I like the implication done by that work, so I would like to to keep it somewhere. We're talking about the paragraph based on \cite{ImpactAwareness}, right?}~\sn{I was talkin about the highlighted part. I just commented it out for now}
 
 Paixao et al. \cite{ImpactAwareness} show that most developers are not aware that their code changes actually affect the architecture of the system. When made aware of the relationship, developers tend to be more careful abut their changes and they try to improve the overall architecture of the system.
 Based on such previous findings, we argue that if developers realize that any architecture changes they make influence the build outcome in CI, something that affects them on a daily basis, this would further increase their awareness about the importance of the architecture of the system.
@@ -106,7 +106,7 @@ To summarize, the main contributions of this paper are:
 \item The first study to investigate the relationship between architectural change and CI build outcome.
 \item An open-source extensible framework for 
 \begin{itemize}
-	\item source code and log mining~\sn{is that part of the framework ?} \jk{yes, the framework is directly connected to the TravisTorrent dataset (interchangable), so I have written a module for log mining. So yes, it's integrated, but more as a side module}
+	\item source code and log mining from CI data
 	\item architecture reconstruction
 	\item architecture metric calculation
 \end{itemize}
@@ -145,56 +145,59 @@ Rausch et al. \cite{FailsinCIFlow} also studied reasons for failing builds. They
 \subsection{Architecture}
 \label{sec:relwork-arch}
 
-\sn{I quickly skimmed this section but will come back it again. I feel it can be better organized. For example, can you first discuss all extraction tools and methods and then discuss how these tools/methods were used to compare intended and implemented architectues and evolution etc? You can use subsubsections for structuring for example. I feel that right  now it is not that coherent. Can you also include a citation to Gail Murphy's reflexion models http://ieeexplore.ieee.org/abstract/document/917525/ .. while it is not specific to architecture.. I think the reflexion models help find violations of architecture or somethign like that} 
-\jk{added another introductory sentence, regrouped papers into conformance and evolution, and what we use}
-
 Software architecture is a well-researched topic in software engineering.
 There are generally two directions of research in the area.
 The first is related to the reconstruction of the implemented architecture from the code, while the second is related to comparing this reconstructed architecture against (a) the intended or documented architecture and (b) different versions of the system (i.e., architecture evolution).
 Since most research about comparing architectures also needs to study reconstruction, we will focus this section on architecture conformance checking and architecture evolution.
+\sn{note: there is a page limit of 10pages of content + 2 for references so I'm cutting unnecssary things as I go}
 
 \subsubsection{Conformance Checking}
 
 The ARAMIS workbench \cite{Aramis} takes the step from static reconstruction of the architecture based on method calls and inheritance to extracting the data flow during runtime to check it against the predefined structure. 
-For model-driven and generative software development, the task of extracting architecture is more complex than in traditional projects, because it passes through different layers of abstraction and possibly multiple DSLs. 
-Thus, the way of checking consistency must account for different layers and is abstracted with architecture description languages (ADL) \cite{ArcCons,Arc-MDSE}. 
-Also using ADLs, Haitzer et al. \cite{Arc-Decision} study architectural drift and erosion. In their system, the architect can simulate multiple implementation scenarios. With the help of the ADL, the program then calculates the consequences of this change, and the architect can make an educated decision which change has the best impact on the system and its architecture. 
+%For model-driven and generative software development, the task of extracting architecture is more complex than in traditional projects, because it passes through different layers of abstraction and possibly multiple DSLs. 
+%Thus, the way of checking consistency must account for different layers and is abstracted with architecture description languages (ADL) \cite{ArcCons,Arc-MDSE}. 
+%Using ADLs, 
+Haitzer et al. \cite{Arc-Decision} study architectural drift and erosion. In their system, the architect can simulate multiple implementation scenarios. With the help of the ADL, the program then calculates the consequences of this change, and the architect can make an educated decision which change has the best impact on the system and its architecture. 
 
-Already in 2001 the Gail Murphy's reflexion models \cite{MurphyRefl} considered the gap between designed and actual architecture of a software system as a problem. For that, they developed a technique to map the reverse engineered model with the designed or expected one to visualize and measure the drift between them. These reflexion models can help find violations in the architecture and are a basis for nowadays architecture conformance checking tools. 
+Murphy et al.'s reflexion models \cite{MurphyRefl} considered the gap between designed and actual architecture of a software system as a problem. For that, the authors developed a technique to map the reverse engineered model with the designed or expected one to visualize and measure the drift between them. These reflexion models can help find violations in the architecture and are a basis for nowadays architecture conformance checking tools. 
 
-Caracciolo et al. \cite{ArcConf} found that the automated checking of the implemented architecture with the intended one, leads to fewer architecture violations. They extracted the architecture using classic static analysis and a dependency graph. Their system checks then for violations of the MVC pattern and reports it directly to the developer. Over the course of time, fewer violations were found compared to a control group, which shows that the developers learned how to avoid architecture violations.
+Caracciolo et al. \cite{ArcConf} found that the automated checking of the implemented architecture with the intended one leads to fewer architecture violations. They extracted the architecture using classic static analysis and a dependency graph. Their system checks then for violations of the MVC pattern and reports it directly to the developer. Over the course of time, fewer violations were found compared to a control group, which shows that the developers learned how to avoid architecture violations.
 
-HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. They argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
-The framework extracts several types of dependencies between source code elements (e.g. classes, interfaces, packages). HUSAACT needs to have a module specification, i.e. which root packages or classes are part of which architecture module. If given this, it maps the defined architecture vs the real implementation and reports violations.
-If no such specification is available, it is not possible to compare two versions of software on a higher level than the implementation graph. 
-Hillemacher \cite{MScSteffen} has compared four different tools for architecture extraction and conformance checking and elected HUSACCT to be the best extraction tool, which is what we need here.
+HUSAACT \cite{Husacct1,Husacct2} is a highly customizable architecture conformance framework for Java and C\#. Dependencies between architecture modules can be defined in multiple ways and different kinds of dependencies are possible. The authors of this work argue, that a ``call'' dependency cannot be compared directly to a ``inherits'' dependency and, hence, must be treated differently. 
+The framework extracts several types of dependencies between source code elements (e.g. classes, interfaces, packages). HUSAACT needs to have a module specification, i.e. which root packages or classes are part of which architecture module. If given this, it maps the defined architecture vs. the real implementation and reports violations.
+%If no such specification is available, it is not possible to compare two versions of software on a higher level than the implementation graph. 
+Hillemacher \cite{MScSteffen} compared four different tools for architecture extraction and conformance checking and found HUSACCT to be the best extraction tool, which is why we use it in our work.
 
 \subsubsection{Architecture Evolution}
 
-Nakamura and Basili \cite{StructDist} introduced the measuring of architectural distance using kernels. For that, both architectures need to be represented as a graph structure (here OO class structure) and are then compared for similar substructures. This solves the problems with renaming and is applicable to every graph. 
-Because it works on the complete class graph and not an abstracted version, i.e. the architecture, this technique is not viable for consistency checking, as the designed architecture is not represented down to the class level. 
-Since the graph is compared to kernels, it is necessary to define a distance measurement for this. A similar approach is used by Garcia \cite{arcade-thesis} with the cluster coverage metric.
+Nakamura and Basili \cite{StructDist} measure architectural distance using kernels. For that, both architectures need to be represented as a graph structure (here OO class structure) and are then compared for similar substructures. 
+%This solves the problems with renaming and is applicable to every graph. 
+Because this technique works on the complete class graph and not an abstracted version, i.e. the architecture, it is not viable for consistency checking, as the designed architecture is not necessarily represented down to the class level. 
+%Since the graph is compared to kernels, it is necessary to define a distance measurement for this. 
+A similar approach is used by Garcia \cite{arcade-thesis} with the cluster coverage metric.
 
-Tonu et al. \cite{Swag} have researched architecture stability using the SWAG kit, primarily in C and C++ projects, but also introduced support for Java.\footnote{\url{http://www.swag.uwaterloo.ca/javex/}} Using four different types of metrics, growth, change, cohesion and coupling, they try to analyze when the architecture of a software system stabilizes and then predict stability for future versions. It does so by extracting facts from the source code (or in case of Java byte code) and reconstructing the architecture. A fact can be anything, from LoC to function calls and classes. 
-In both studied projects, the architecture stabilizes relatively quickly and has only small changes afterwards. Unfortunately, we cannot use this tool in our research, because we want to study the source files and not the byte code of Java projects. But we do analyze change and coupling metrics.
+\input{assets/metrics}
 
-In his PhD thesis \cite{arcade-thesis}, Garcia developed the ARCADE framework. It is used to detect architectural decay, also called thrift and erosion, as well as architecture smells. During this, various recovery techniques were compared \cite{arcRec-comparison}, whereat ACDC \cite{ACDC} and ARC were the most successful. 
+Tonu et al. \cite{Swag} have researched architecture stability using the SWAG kit, primarily in C and C++ projects, but also introduced support for Java.\footnote{\url{http://www.swag.uwaterloo.ca/javex/}} Using four different types of metrics (growth, change, cohesion, and coupling), they analyze when the architecture of a software system stabilizes and then predict stability for future versions. The SWAG kit does this by extracting facts from the source code (or in case of Java, byte code) and then reconstructing the architecture. A fact can be anything, from LoC to function calls and classes. 
+In the two studied projects, the architecture stabilizes relatively quickly and has only small changes afterwards. Unfortunately, we cannot use this tool in our research, because we want to study the source files and not the byte code of Java projects. However, we do analyze change and coupling metrics.
+
+In his PhD thesis \cite{arcade-thesis}, Garcia developed the ARCADE framework. It is used to detect architectural decay, also called thrift and erosion, as well as architecture smells. He compares various recovery techniques \cite{arcRec-comparison} and finds that ACDC \cite{ACDC} and ARC were the most successful. 
 ACDC clusters modules based on patterns. Patterns are, for example, if two elements are in the same package, are used together, or if they depend on the same resources. For Java, ACDC recovers the architecture from the class files. ARC is introduced by Garcia himself, clusters entities based on semantic similarity using a statistical language model based on comments and identifiers in the source code.
 The ARCADE framework uses these different recovery techniques to compute similarity metrics, namely a2a (architecture to architecture) and cvg (cluster coverage) \cite{Arcade}. 
 The first one defines similarity based on the minimum number of steps to get from one architecture graph to the other. For example, removing one dependency or adding one node is each one step. While a2a looks at the architecture from a top-level perspective, cvg looks into the modules, or clusters, and computes if they are still the same module. For example, if all classes in a module are changed but the module name itself is untouched, it cannot still be considered to be the same module. Hence, it compares the entities inside the modules and only considers two modules equal, if at least $x \%$ of the entities are equal.
-
-\subsubsection{Utilization in this Study}
-
-One reason for failing builds are syntax errors. Because builds with syntax errors are uncompilable, we do not want to use recovery techniques which rely on the compiled class files. Thus, we do not use the SWAG Kit or ARCADE directly.
-However, the metrics and the recovery technique are promising in our context. Hence, we combine the strengths of HUSAACT in extracting the structure from the source files with the recovery technique ACDC and the metrics from ARCADE. 
-In previous studies, other researchers \cite{MScSteffen, arcRec-comparison} have given us confidence that the choices HUSACCT and ACDC are indeed some of the best tools, which we can use.
-The cvg metric is comparable to kernel based similarity whereas a2a considers change. Coupling in the architecture will be addressed with Martin's metrics. We reuse the modules from HUSACCT and ARCADE directly, while we need to implement the Martin's metrics ourself. 
 
 \section{Architecture Metrics Used} \label{sec:Metrics}
 
 As part of our work, we need to extract metrics that describe the architectural change that happened in a given version of the code. 
 In Section~\ref{sec:relwork-arch}, we provided a general description of several approaches that exist in the literature.
-In this section, we provide a detailed description of the eight metrics we use in our work, and the reasoning behind the choice.
+In this section, we discuss the specific metrics and techniques that we use.
+
+Because CI builds often fail due to syntax errors making them uncompilable, we do not want to use recovery techniques that rely on analyzing compiled code. Thus, we do not use the SWAG Kit or ARCADE directly.
+However, both use methodologies are promising in our context. Hence, we combine the strengths of HUSAACT in extracting the structure from the source files with the recovery technique ACDC and the metrics from ARCADE. 
+In previous studies, other researchers \cite{MScSteffen, arcRec-comparison} have given us confidence that our choices HUSACCT and ACDC are indeed some of the best tools that we can use.
+The cvg metric is comparable to kernel-based similarity whereas a2a considers change. We will use Martin's metrics to address coupling in the architecture. We reuse the modules from HUSACCT and ARCADE directly, while we need to implement the Martin's metrics ourselves. 
+
+We now provide a detailed description of the eight metrics we use in our work, and the reasoning behind the choice.
 A summary of these metrics is shown in Table~\ref{tableMetric}.
 
 
@@ -229,6 +232,13 @@ aco(A_i) & steps to create $A_i$
 \end{gather}
 
 
+\begin{figure*}[!t]
+	\centering
+	\includegraphics[width=7in]{assets/combined.pdf}
+	\caption{Methodology overview. White boxes shows steps/processes while gray boxes show input/output of these steps.}
+	\label{architecture}
+\end{figure*}
+
 \textit{cvg} is a metric that measures how a given module is changing. For that, the \textit{Cluster to Cluster} (c2c) metric is calculated, which defines how many elements of the cluster overlap divided by the number of elements in the bigger cluster (Equation \ref{eq:c2c}). In the context of software architecture, a cluster is synonymous to a module.
 As an example, if a module has 20 elements, and from one version to another, two elements get removed and three are added, then $c2c = \frac{18}{21}$. 
 If this ratio is above a predefined threshold $th_{cvg}$, the clusters are considered similar, according to the similarity metric $simC$ in Equation \ref{eq:simC}. The cvg metric then calculates the ratio between equal modules and the amount of modules in the architecture (Equation \ref{eq:cvg}). In ARCADE \cite{Arcade}, the cvg is calculated with a threshold of $75\%$ from the earlier version to the latter one ($\text{cvg}_\text{src}$) and with $66\%$ the other way around ($\text{cvg}_\text{tar}$). These are the standard settings in ARCADE, but it is not explained why these numbers are chosen. One explanation might be that adding functionality to a module does not change its behavior as much as removing elements. Therefore, the higher threshold for $\text{cvg}_\text{src}$ is accounting for this.
@@ -254,15 +264,6 @@ They are only considered during the reconstruction of the architecture itself us
 To get a view of the change of the dependencies explicitly, we additionally use the widely accepted Martin's metrics \cite{Val-MartinsMet}, which especially account for the change in between the modules. 
 
 \section{Methodology for Architectural Comparison}
-
-\begin{figure*}[!t]
-	\centering
-	\includegraphics[width=7in]{assets/combined.pdf}
-	\caption{Process from Dataset to Change Metrics. Files are marked in gray. \sn{it is but still everything is the same type of boxes.. you should have different boxes for data vs. processes/steps. For example, Calculator is a step/process while class diagram is an output. I typically like to have boxes for processes and then icons representing the data with a label under them for input/output}~\jk{I followed the UML standards, and the boxes for Artifacts is a little bit different with the little edge on the top right. }}
-	\label{architecture}
-\end{figure*}
-
-\input{assets/projects}
 
 To establish the relationship between architectural changes and CI build outcome, we need to determine the architectural changes that occurred between two versions of the system.
 In this section, we describe the methodology we use to calculate these architectural changes.
@@ -292,22 +293,6 @@ For simplicity, the dependency types are restricted to ``subPkg'', ``contains'' 
 	\caption{Implemented tool chain}
 	\label{implToolchain}
 \end{figure}
-
-\begin{lstlisting}[
-frame = single, 
-belowskip=-0.8 \baselineskip,
-float,
-caption=Rigi Standard Format example,
-label=lst1:rsf,
-columns=flexible
-]
-subPkg   checkstyle checkstyle.grammars
-subPkg   checkstyle checkstyle.gui
-contains checkstyle checkstyle.Main
-references checkstyle.Factory checkstyle.Main
-\end{lstlisting}
-
-\input{assets/metrics}
 
 In Step 3b, we reconstruct the architecture of the current version of the system based on the information extracted in Step 3a. We use two different architecture reconstruction techniques to ensure that any findings we have are not as a result of a problem or bias in one technique.
 
@@ -340,6 +325,20 @@ We save the corresponding comparison results of each pair of architectures, corr
 To add another module to the framework, one needs only to implement a new subclass for the changing module, store its result in the Rigi Standard Format and it can be integrated with all existing tools. 
 This is how we managed to combine HUSACCT and ACDC and integrate them with the ARCADE metrics. Similarly, we have implemented the package reconstruction and the metrics that are based on the package architecture, so that both ways of computing change can be run be run individually or simultaneously (Fig. \ref{implToolchain}).
 
+\begin{lstlisting}[
+frame = single, 
+belowskip=-0.8 \baselineskip,
+float,
+caption=Rigi Standard Format example,
+label=lst1:rsf,
+columns=flexible
+]
+subPkg   checkstyle checkstyle.grammars
+subPkg   checkstyle checkstyle.gui
+contains checkstyle checkstyle.Main
+references checkstyle.Factory checkstyle.Main
+\end{lstlisting}
+
 \section{Methodology for CI Build Outcome Extraction}
 \label{sec:ci-build-outcome}
 
@@ -351,42 +350,44 @@ Because it is very costly to run every maven goal separately for every build we 
 Instead, we use the following simplified strategy to identify the reason for the failed build.
 %Furthermore, because some builds are already older and have dependencies which are not anymore available or need to be installed manually, the approach to rerun everything may even be impossible. 
 %Still, we base our heuristic on the Maven goals.
-We first differentiate between failed and passed builds by looking at their status in the TravisTorrent dataset. For failed builds, we first identify lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for the keywords ``Compilation failure'', ``dependencies'', or ``test failures'' to further categorize the failures~\sn{Are these exact words used for the search?}\jk{almost. I think I searched for "There are test failures" which is the hard coded phrase in maven}. Accordingly, we end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure, or (4) unknown error. The fourth category is for errors that we could not identify using our heuristic.
+We first differentiate between failed and passed builds by looking at their status in the TravisTorrent dataset. For failed builds, we first identify lines that start with the ``\texttt{[Error]}'' keyword, which is used by the Maven log to indicate defects. Afterwards, we look for the keywords ``compilation failure'', ``dependencies'', or ``test failures'' to further categorize the failures. Accordingly, we end up with five possible build results: (0) no error, (1) error during dependency resolution, (2) compilation failure, (3) test failure, or (4) unknown error. The fourth category is for errors that we could not identify using our heuristic.
 
 \section{Evaluation Setup}
+
+\input{assets/projects}
 
 We now explain the setup we use for our evaluation.
 
 \paragraph{Data Set.}
-To investigate our hypotheses, we analyze projects from the TravisTorrent dataset, which use Java and Maven. 
-We have restricted ourself to Maven, because the build tool impacts the outcome of the build but not the architecture itself \cite{FailsCorr}. Although this introduces bias, it ensures consistent results in return. HUSACCT needs the path to the source files, so we can exclude test files and resources. Maven has a convention over configuration paradigm. In this way, we can be sure where everything is stored in the file structure. This eases the implementation of the class structure extraction.
+To investigate our hypothesis, we analyze projects from the TravisTorrent dataset, which use Java and Maven. 
+We have restricted ourself to Maven, because of the conventions Maven uses. HUSACCT needs the path to the source files so we need to consistently identify the source code location of every project we analyze. By using Maven, we can be sure where everything is stored in the file structure, which eases the implementation of the class structure extraction.
 
 The TavisTorrent dataset contains $241$ projects that use Java as their main programming language and are built with Maven. 
 From these $241$ projects, we exclude ones that have have less than two commits on the master branch, because we need at least two commits to be able to compare architectures. 
-This left us with \todo{$X$} projects.
-We further filter this list to exclude projects where we could not retrieve their builds or logs from GitHub and TravisCI~\sn{why would this ever happen? aren't these stored in the travistorrent data set?} \jk{no, only the IDs which link to the server, but some are just not present anymore}, or where our toolchain was unable to reconstruct the architecture~\sn{again why would this happen?} \jk{bugs, download errors .. various reasons, some are problems in the code, others problems with the used tools.. and some I just don't know. That's why I just gave the beginning and the end number, because we lost here the most projects. But I don't think it would change the results.}
+We further filter this list to exclude projects where we could not retrieve their builds or logs from GitHub and TravisCI, or where our toolchain was unable to reconstruct the architecture.
 
-Some commits get built more than once. This happens if the configuration of the CI server changes, a developer starts another build without changing code or if builds get started independently of the pushed code.
+Some commits get built more than once. This happens if the configuration of the CI server changes, a developer starts another build without changing code, or if builds get started independently of the pushed code.
 The only thing that can happen that affects the build outcome is a changing configuration. We haven chosen only to consider the first build that uses this commit, because it is impossible that the architecture changes between these builds.
 Thus, we can ensure that changing configuration does not bias the results. Instead, we compare the changing source code based on the older configuration, i.e. the configuration which is equal to the one of the older build. 
 This left us with $159$ projects to analyze, containing a total of
-$49,531$ commits. A list of the ten biggest analyzed projects, in terms of total number of commits~\sn{what is an unrestricted commit?}\jk{bad wording, total number of commits and not number of commits after our restrictions took place}, can be found in table \ref{tableProjects}.
+$49,531$ commits. A list of the ten biggest analyzed projects, in terms of total number of commits, can be found in Table \ref{tableProjects}.
 
-The pass rate of the studied projects is $84.9\%$. Around $10\%$ of the builds failed because of errors before or during the compilation of the software. One third of the errors could be mapped to test errors. We did not further separate the other types of failures, but sampling shows that some of the reasons for the other category include configuration errors or incorrect maven plugins.
+The pass rate of the studied projects is $84.9\%$. Around $10\%$ of the builds failed, because of errors before or during the compilation of the software. One third of the errors could be mapped to test errors. We did not further separate the other types of failures, but sampling shows that some of the reasons for the other category include configuration errors or incorrect maven plugins.
 The active time of the projects in the data set varies.
-For the ten biggest projects (in terms of number of commits), it is between one and four years of development time, some of which start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), while others start at build 1 (e.g. Checkstyle)~\sn{ is the part about where they start general to all projects or to the top 10?} \jk{does it matter? If it's true for 10, it is also true for all.}.
+For the ten biggest projects (in terms of number of commits), it is between one and four years of development time, some of which start at a well-established state (the TravisTorrent dataset starts, for example, at build number 500 for SonarQube), while others start at build 1 (e.g. Checkstyle).
 The projects also belong to a range of different domains.
-In the ten biggest projects, there are two code analyzers, three APIs~\sn{libraries? and what kind of libraries? libraries have domains too} \jk{c.f. table 1. I thought it sounds better to say three APIs then, one x API, one y API and one z API. And I used the self description of the projects for this, if they classified themself as API, then I said it's an API}, a web client and an IDE, some for databases, linear algebra or ontologies. Table \ref{tableProjects} gives a detailed list.
+In the ten biggest projects, there are two code analyzers, three APIs, a web client, and an IDE for different purposes. Table \ref{tableProjects} gives a detailed list.
 
 
 \paragraph{Calculated Correlations.}
 
-The calculated architectural metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome, then the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means that we look for correlations between a change in build $x$ and the build result in builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future (i.e., the relationships mentioned in our hypothesis). 
-~\sn{Before I try to rewrite this, I need to  understand why you don't consider the individual types of build failures if you differentiate between them? So if you do record why the build failed, why don't you see if there is a correlation with failure in general and then with the individual types of failure?}\jk{I consider the type of failure in the direct correlations with the corresponding build. If I do it with multiple builds, then I have to correlate AC: x \% with the next n Builds: [0, 1, 2, 2, 0], which would be 0 succ builds, 1 error type A, 2 error type B, 2 error type C etc. And I didnt' had a idea how to measure this type of correlation. Then i simplified it to "in the next 5 builds, there are 2 failures".} Because there are different reasons for a CI build failure (see Section~\ref{sec:ci-build-outcome}), for testing in the near past and future, the fail types get categorized into non-failure and failure. In this way, we get a single integer of how many builds failed, instead of having multiple variables. 
-Then, for every architectural metric, the change gets classified from its continuous value into the two categories 'change' and 'no-change'. For that, we consider a threshold $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$, where every change above this threshold is considered a change, and everything below as no change. 
+The calculated architectural metrics are tested for correlation with the build result. This is done in multiple ways. First, the metric is tested against the direct build outcome. Then, the previous or following $b$ outcomes for $b \in \{2, 3, 5, 10\}$. This means that we look for correlations between a change in build $x$ and the build result in builds $\{x, x \pm 1, \hdots, x \pm b\}$. From this, we can see if architectural change correlates to build failures in recent history or near future (i.e., the relationships mentioned in the introduction). 
+We consider the individual failure types when studying individual builds. 
+However, for testing in the near past and future (i.e., preceding or next $b$ builds, we simply use two categories, one for failure and one for success. In this way, we get a single integer of how many builds failed, instead of having multiple variables. 
+Then, for every architectural metric, we discretize it from its continuous value into the two categories 'change' and 'no-change'. For that, we consider a threshold $t \in \{0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.5\}$, where every change above this threshold is considered a change, and everything below as no change. 
 We chose this range of thresholds, because most of the architectural changes in our dataset were small (Figure \ref{fig:histograms}). 
-We take different thresholds at all to figure out if small changes affect the measured correlation. 
-For every calculated comparison that includes no Boolean variables, the correlation test is run with Pearson's test, while others are run with Spearman's test. ~\sn{this previous paragraph generally needs another revision} \jk{better?}
+\sn{this next sentence is not clear} We take different thresholds at all to figure out if small changes affect the measured correlation. 
+For every calculated comparison that includes no Boolean variables, the correlation test is run with Pearson's test, while others are run with Spearman's test. 
 
 \begin{figure*}[!t]
 	\centering
